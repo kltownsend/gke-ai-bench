@@ -1,4 +1,4 @@
-# gke-agent-runtimes-lab
+# gke-ai-bench
 
 The harness behind a Layer2C Labs project that asked one question: do Google's GKE agent runtimes give a
 coding agent a place to run that a platform team can trust, by default, and how much of that would the team
