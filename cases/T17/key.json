@@ -1,0 +1,4 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.explicit_selfpay"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "note": "explicit_selfpay needs both a self-pay term and a choice verb; \"self-pay\" alone with \"I'll\" matches neither \"i'll pay\" nor \"i choose\". Frozen with the driver; recorded in phase3-pilot-report.md, removed from the agent's workspace."}

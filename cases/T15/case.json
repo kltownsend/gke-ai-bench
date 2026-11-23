@@ -1,0 +1,2 @@
+{"id": "T15", "baseline": "head", "commit": "7774111",
+ "ticket": "Under arm F2, patients who ask to move an appointment end up with one to three new bookings instead, and the appointment they wanted moved stays where it was. Seen on reschedule_own:lab23:8 and four other patients in the same cells."}

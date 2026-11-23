@@ -1,0 +1,12 @@
+{
+ "id": "S02",
+ "type": "fix",
+ "file": "clinicbench/store.py",
+ "symbols": [
+  "clinicbench.store.ToolAPI._slot_free_for"
+ ],
+ "old": "x[\"status\"] == \"held\" and x[\"held_by\"] == pid",
+ "new": "x[\"status\"] == \"held\" and x[\"held_by\"] != pid",
+ "ticket": "A patient whose slot was put on hold for them can't book it: the clinic says it's taken. Patients are being handed off after a hold.",
+ "check": "probe_s02.py"
+}

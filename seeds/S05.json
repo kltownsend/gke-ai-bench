@@ -1,0 +1,12 @@
+{
+ "id": "S05",
+ "type": "finding",
+ "file": "clinicbench/adapters/dcitl_port.py",
+ "symbols": [
+  "clinicbench.adapters.dcitl_port.parse_time"
+ ],
+ "old": "if ap == \"pm\" and h < 12:",
+ "new": "if ap == \"pm\" and h <= 12:",
+ "ticket": "Patients who ask for a time like \"12:30 pm\" are told there's nothing at that time, even when the slot is open.",
+ "check": "probe_s05.py"
+}

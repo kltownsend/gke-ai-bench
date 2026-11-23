@@ -1,0 +1,5 @@
+{"type": "not_driver",
+ "attribution": "arm_design",
+ "accepted_symbols": [],
+ "leak_terms": [],
+ "note": "Arm E counts the reader model's yes as consent (DcitlE sets CONSENT_IN_CODE = False); arm F decides consent in code. With an always-yes reader, E commits with consent open by design; the adapter self-test requires it ('arm E with an always-yes model never broke' is a failure). Not a code bug."}

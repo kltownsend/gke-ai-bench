@@ -1,0 +1,5 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.parse_intents"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["\\bschedule\\b", "schedule as a booking", "schedule as booking", "reads schedule", "schedule pivot"],
+ "note": "parse_intents' booking pattern matches \\bschedule\\b, so a patient's color line (\"I don't drive, so I'm going by my daughter's schedule\", truth.py COLOR) repeated while naming a new time reads as a booking request; route() then pivots out of the move (\"Okay, setting that aside.\"), and F2's clear-yes rule takes \"Yes, that's right, please go ahead.\" for the new booking. Five patients (reschedule_own lab23:8, :11, :34; unconfirmed_reschedule lab23:3, :51) carry 1,239 of 1,265 F2 wrong bookings. Ruled in clinicbench docs/cells-runbook.md, Stage 6 F2 and the 2026-10-27 finding: recorded, not fixed; the parser is inside Lab 029's freeze. route()'s pivot is the mechanism, not the cause: a real switch mid-move must still pivot (hidden control)."}

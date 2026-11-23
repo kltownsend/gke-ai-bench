@@ -1,0 +1,17 @@
+{
+ "type": "fix",
+ "fix_commit": "3f7f0d0",
+ "fix_scope": "clinicbench/scorer.py hunk only; the commit's policy.py, stubs.py and voice.py hunks are other fixes",
+ "accepted_files": [
+  "clinicbench/scorer.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.scorer.process"
+ ],
+ "leak_terms": [
+  "read-back cost only for self-pay",
+  "flags cancels for a missing slot"
+ ],
+ "note": "process() required action, slot and doctor of every write's read-back, plus cost for every booking, so a cancel (action and appointment) and a covered booking (no cost) were always incomplete. The fix needs action and appt for a cancel, action, slot and doctor otherwise, and cost only for a self-pay booking.",
+ "reference_build": "build_baseline.py \"3f7f0d0^\" t06 ; build_baseline.py \"3f7f0d0^\" t06fix --overlay 3f7f0d0:clinicbench/scorer.py (3f7f0d0^ predates the freeze manifest, so the builder writes an empty one: nothing was frozen then)"
+}

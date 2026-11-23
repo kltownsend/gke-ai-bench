@@ -1,0 +1,12 @@
+{
+ "id": "S06",
+ "type": "finding",
+ "file": "clinicbench/adapters/dcitl_port.py",
+ "symbols": [
+  "clinicbench.adapters.dcitl_port.explicit_confirm"
+ ],
+ "old": "if re.search(r\"\\bi confirm\\b\", t):",
+ "new": "if re.search(r\"\\bi confirmed\\b\", t):",
+ "ticket": "Patients who say \"I confirm\" are asked to confirm again, sometimes until they're handed off.",
+ "check": "probe_s06.py"
+}

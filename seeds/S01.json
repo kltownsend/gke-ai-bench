@@ -1,0 +1,12 @@
+{
+ "id": "S01",
+ "type": "fix",
+ "file": "clinicbench/store.py",
+ "symbols": [
+  "clinicbench.store.ToolAPI._cancel"
+ ],
+ "old": "a = self.store.appointments.pop(appointment_id)\n        self.store.slots[a[\"slot\"]].update(status=\"open\", held_by=None)",
+ "new": "a = self.store.appointments.pop(appointment_id)\n        self.store.slots[a[\"slot\"]].update(status=\"booked\", held_by=None)",
+ "ticket": "After a patient cancels, the time they gave up never shows as open again. Another patient asking for that exact time is told it's taken.",
+ "check": "probe_s01.py"
+}

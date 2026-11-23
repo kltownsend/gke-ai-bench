@@ -1,0 +1,14 @@
+# The bundled Kubernetes Secrets provider's atespace-to-namespace grant: the lab-agent atespace may
+# resolve Secrets in lab-creds and nowhere else. The install creates the ConfigMap empty; the
+# provider reads it once at startup, so setup restarts it after applying this.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-credential-provider-namespace-policy
+  namespace: ate-system
+data:
+  namespace-policy.yaml: |
+    policies:
+    - atespace: lab-agent
+      allowedNamespaces:
+      - lab-creds

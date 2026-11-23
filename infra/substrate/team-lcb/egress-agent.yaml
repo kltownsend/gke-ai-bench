@@ -1,0 +1,10 @@
+# Agent phase: the model API only, with team two's own token Secret (lcb-creds). No package hosts:
+# the project is already installed.
+rules:
+- https:
+    hostnames: ["aiplatform.googleapis.com"]
+    effects:
+      replaceHeaders:
+      - header: Authorization
+        prefix: "Bearer "
+        credentialUri: ate-secret://k8s.io/default/lcb-creds/lab-agent-token/token

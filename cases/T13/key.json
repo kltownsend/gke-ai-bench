@@ -1,0 +1,7 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.Driver.reschedule",
+                      "clinicbench.adapters.dcitl_port.Driver.resolve_appt"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["split on the first", "splits on the first", "first \"to\"", "only appointment",
+                "sole appointment"],
+ "note": "reschedule() splits the line on the first \"to\" (\"I'd like to move...\"), so resolve_appt sees only \"I'd like\", names nothing, and falls back to the patient's only appointment, which reschedule then proposes to move; arm E's reader takes the yes. Recorded in Promise Boundary (Lab 23) notes as driver bug 1 (x0678, Qwen E), frozen with the driver, removed from the agent's workspace."}

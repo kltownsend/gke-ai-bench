@@ -1,0 +1,12 @@
+# The minimum compatible cluster's one added step, part 3 of 3: the agent's
+# Kubernetes service account acts as lab-agent through Workload Identity. Nothing else: no
+# NetworkPolicy, no Pod Security admission, no security context. Counted in the operations ledger.
+# Placeholder ${LAB_AGENT} is filled from harness/lab_env.sh when infra/cluster.sh
+# applies this file (its render step). By hand: envsubst '${LAB_AGENT}' < FILE | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lab-agent
+  namespace: lab-agent
+  annotations:
+    iam.gke.io/gcp-service-account: "${LAB_AGENT}"

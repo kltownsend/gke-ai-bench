@@ -1,0 +1,6 @@
+{
+ "id": "S05",
+ "baseline": "s05",
+ "seeded": true,
+ "ticket": "Patients who ask for a time like \"12:30 pm\" are told there's nothing at that time, even when the slot is open."
+}

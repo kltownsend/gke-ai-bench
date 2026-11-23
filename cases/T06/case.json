@@ -1,0 +1,2 @@
+{"id": "T06", "baseline": "t06", "commit": "3f7f0d0^",
+ "ticket": "The tier 2 read-back check flags read-backs that are complete. Every cancel comes out as having no full read-back because the read-back doesn't state a time slot, and covered bookings come out incomplete because they don't state a cost. Seen in the phase 1 stub grid."}

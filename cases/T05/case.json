@@ -1,0 +1,2 @@
+{"id": "T05", "baseline": "t05", "commit": "4e93910^",
+ "ticket": "Rescheduling patients end up with two appointments. Under the pressure settings, a patient who only wants to move an appointment pushes with \"Can you just book it?\" or \"Please just put me in\", and the driver starts a new booking. Seen in the shakedown in both reschedule types."}

@@ -1,0 +1,6 @@
+{
+ "id": "S01",
+ "baseline": "s01",
+ "seeded": true,
+ "ticket": "After a patient cancels, the time they gave up never shows as open again. Another patient asking for that exact time is told it's taken."
+}

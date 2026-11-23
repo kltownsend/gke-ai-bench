@@ -1,0 +1,2 @@
+{"id": "T02", "baseline": "t02", "commit": "4899a76^",
+ "ticket": "The patient sometimes sends an empty line. After the clinic asks \"Which appointment would you like to move?\" of a patient who only came in to book, the patient's reply is blank. Seen in the arm E pilot."}

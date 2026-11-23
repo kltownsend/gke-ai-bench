@@ -1,0 +1,2 @@
+{"id": "T14", "baseline": "head", "commit": "7774111",
+ "ticket": "A patient asked to cancel an appointment that wasn't theirs. The assistant correctly said it couldn't change someone else's appointment, then in the same reply cancelled the patient's own appointment, which they never asked to cancel."}

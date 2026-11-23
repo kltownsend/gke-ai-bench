@@ -1,0 +1,5 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.explicit_confirm"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["before i confirm", "question as consent", "counted as consent", "question counts as", "contains i confirm"],
+ "note": "explicit_confirm returns True on any \\bi confirm\\b anywhere in the reply, ahead of every other check, so a question that mentions confirming (\"Before I confirm, is that covered?\") is consent and book(), cancel() and reschedule() commit on it. Latent: no recorded session shows it. Named in Promise Boundary as untested; the case list corrected it to a driver finding 2026-11-19 (it had been miscounted as not the driver). Same symbol as T16, opposite direction: T16 is a plain yes turned down (the length rule), T21 is a non-yes accepted (the \"i confirm\" match). Each case's counterfactual clears its own probes and none of the other's."}

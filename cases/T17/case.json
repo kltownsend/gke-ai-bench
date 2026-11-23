@@ -1,0 +1,2 @@
+{"id": "T17", "baseline": "head", "commit": "7774111",
+ "ticket": "Self-pay patients who clearly choose to pay get asked again. Lines like \"I'll self-pay\" and \"I'll pay for it myself\" don't move the booking forward."}

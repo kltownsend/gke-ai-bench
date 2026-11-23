@@ -1,0 +1,14 @@
+# The evidence floor where Dataplane V2 exists (manual reference and prerequisite-only clusters):
+# GKE network policy logging, allowed and denied connections, to Cloud Logging.
+apiVersion: networking.gke.io/v1alpha1
+kind: NetworkLogging
+metadata:
+  name: default
+spec:
+  cluster:
+    allow:
+      log: true
+      delegate: false
+    deny:
+      log: true
+      delegate: false

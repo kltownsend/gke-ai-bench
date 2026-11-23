@@ -1,0 +1,19 @@
+{
+ "type": "fix",
+ "fix_commit": "8ad3cac",
+ "accepted_files": [
+  "clinicbench/truth.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.truth.build"
+ ],
+ "note": "Fix filters replacement times by the patient's hard limits and drops limits that rule out every other time. Pre-fix: 40 of 1,000 lab23 truths and 59 of 1,000 hidden truths contradict; the shakedown reported 42 on a slightly different set.",
+ "regression_exclude": {
+  "truth_types": [
+   "change_of_mind"
+  ],
+  "session_types": [
+   "change_of_mind"
+  ]
+ }
+}

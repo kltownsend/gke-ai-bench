@@ -1,0 +1,42 @@
+# The Executor rung's git remote (a git server in the cluster). AX's only
+# documented input is a Workspace that git-clones a repository, and the lab's forge is on the workstation,
+# out of the cluster's reach. This serves bare repositories by git's static ("dumb") HTTP protocol:
+# a plain file server, no git on the server, nothing to authenticate. The controller copies each
+# call's repository in with kubectl exec (agent/executor_venue.py) and deletes it after. Tasks reach
+# it only through their Gateway's one `http` rule for this name (infra/executor/gateway.yaml).
+# LAB_AGENT_IMAGE (the GKE agent image, pinned by digest; python only) is substituted at apply time.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-forge
+  labels: {pod-security.kubernetes.io/enforce: restricted}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: forge
+  namespace: lab-forge
+  labels: {app: forge}
+spec:
+  automountServiceAccountToken: false
+  securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001,
+                    seccompProfile: {type: RuntimeDefault}}
+  containers:
+  - name: forge
+    image: LAB_AGENT_IMAGE
+    command: ["python3", "-u", "-I", "-m", "http.server", "8080", "--directory", "/srv"]
+    ports: [{containerPort: 8080}]
+    securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: ["ALL"]}}
+    resources: {limits: {cpu: 500m, memory: 256Mi}}
+    volumeMounts: [{name: srv, mountPath: /srv}]
+  volumes:
+  - {name: srv, emptyDir: {sizeLimit: 2Gi}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forge
+  namespace: lab-forge
+spec:
+  selector: {app: forge}
+  ports: [{port: 8080, targetPort: 8080}]

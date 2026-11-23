@@ -1,0 +1,146 @@
+# The Agent Sandbox rung (v1.0.6), installed the documented way: a SandboxTemplate, a warm pool
+# and a claim per agy call (the GKE how-to's production path: "a throwaway environment per
+# investigation"). Two templates, read side by side:
+#
+# - lab-documented: the how-to's example settings and nothing else. networkPolicy omitted, so the
+#   controller generates its default (ingress only from the sandbox router; egress to public IPs
+#   only, blocking 10/8, 172.16/12, 192.168/16, 169.254/16 and so cluster DNS and the metadata
+#   server). No service account. Prediction: the agent can't get a credential or resolve a name,
+#   so it can't call its model.
+# - lab-agent: the same, plus the minimum the agent needs to reach its model, each one counted in
+#   the operations ledger: Workload Identity (the lab-agent service account) and a networkPolicy
+#   that adds DNS and the GKE metadata server to the default's public-internet egress.
+#
+# Both satisfy the recommended secure-sandbox-policy (gVisor runtime class, node selector and
+# toleration, no token automount, non-root, drop ALL, CPU and memory limits). LAB_AGENT_IMAGE is
+# substituted at apply time (infra/cluster.sh setup).
+# Placeholder ${LAB_PROJECT} is filled from harness/lab_env.sh when this file is applied
+# (the render step in infra/cluster.sh). By hand: envsubst '${LAB_PROJECT}' < FILE
+apiVersion: extensions.agents.x-k8s.io/v1beta1
+kind: SandboxTemplate
+metadata:
+  name: lab-documented
+  namespace: lab-agent
+spec:
+  podTemplate:
+    metadata:
+      labels: {app: lab-agent, lab-template: documented}
+    spec:
+      runtimeClassName: gvisor
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      nodeSelector: {sandbox.gke.io/runtime: gvisor}
+      tolerations:
+      - {key: sandbox.gke.io/runtime, operator: Equal, value: gvisor, effect: NoSchedule}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001}
+      containers:
+      - name: agent
+        image: LAB_AGENT_IMAGE
+        command: ["sleep", "infinity"]
+        workingDir: /work
+        env:
+        - {name: HOME, value: /home/agent}
+        - {name: AGY_ADC_AUTH, value: "true"}
+        - {name: GOOGLE_CLOUD_QUOTA_PROJECT, value: "${LAB_PROJECT}"}
+        - {name: GOOGLE_CLOUD_PROJECT, value: "${LAB_PROJECT}"}
+        - {name: GOOGLE_CLOUD_LOCATION, value: global}
+        - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {drop: ["ALL"]}
+        resources:
+          # Requests set below the limits so both warm pools and a replacement fit one gVisor node
+          # (requests default to limits, and two 2-CPU Pods don't fit a 3.92-CPU c3-standard-4).
+          requests: {cpu: 500m, memory: 1Gi}
+          limits: {cpu: "2", memory: 2Gi}
+        volumeMounts:
+        - {name: work, mountPath: /work}
+        - {name: home, mountPath: /home/agent}
+        - {name: tmp, mountPath: /tmp}
+      volumes:
+      - {name: work, emptyDir: {sizeLimit: 1Gi}}
+      - {name: home, emptyDir: {sizeLimit: 512Mi}}
+      - {name: tmp, emptyDir: {sizeLimit: 256Mi}}
+---
+apiVersion: extensions.agents.x-k8s.io/v1beta1
+kind: SandboxTemplate
+metadata:
+  name: lab-agent
+  namespace: lab-agent
+spec:
+  # The default policy's egress (public internet, private and link-local ranges excepted), plus
+  # the two additions the agent needs: DNS to kube-dns / NodeLocal DNSCache, and the GKE metadata
+  # server, which is how Workload Identity hands out the lab-agent token.
+  networkPolicy:
+    ingress:
+    - from:
+      - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: agent-sandbox-system}}
+        podSelector: {matchLabels: {app: sandbox-router}}
+    egress:
+    - to:
+      - ipBlock: {cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16]}
+    - to:
+      - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+        podSelector: {matchLabels: {k8s-app: kube-dns}}
+      - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+        podSelector: {matchLabels: {k8s-app: node-local-dns}}
+      - ipBlock: {cidr: 169.254.20.10/32}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+    - to: [{ipBlock: {cidr: 169.254.169.252/32}}]
+      ports: [{protocol: TCP, port: 988}]
+    - to: [{ipBlock: {cidr: 169.254.169.254/32}}]
+      ports: [{protocol: TCP, port: 80}]
+  podTemplate:
+    metadata:
+      labels: {app: lab-agent, lab-template: agent}
+    spec:
+      serviceAccountName: lab-agent
+      runtimeClassName: gvisor
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      nodeSelector: {sandbox.gke.io/runtime: gvisor}
+      tolerations:
+      - {key: sandbox.gke.io/runtime, operator: Equal, value: gvisor, effect: NoSchedule}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001}
+      containers:
+      - name: agent
+        image: LAB_AGENT_IMAGE
+        command: ["sleep", "infinity"]
+        workingDir: /work
+        env:
+        - {name: HOME, value: /home/agent}
+        - {name: AGY_ADC_AUTH, value: "true"}
+        - {name: GOOGLE_CLOUD_QUOTA_PROJECT, value: "${LAB_PROJECT}"}
+        - {name: GOOGLE_CLOUD_PROJECT, value: "${LAB_PROJECT}"}
+        - {name: GOOGLE_CLOUD_LOCATION, value: global}
+        - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {drop: ["ALL"]}
+        resources:
+          # Requests set below the limits so both warm pools and a replacement fit one gVisor node
+          # (requests default to limits, and two 2-CPU Pods don't fit a 3.92-CPU c3-standard-4).
+          requests: {cpu: 500m, memory: 1Gi}
+          limits: {cpu: "2", memory: 2Gi}
+        volumeMounts:
+        - {name: work, mountPath: /work}
+        - {name: home, mountPath: /home/agent}
+        - {name: tmp, mountPath: /tmp}
+      volumes:
+      - {name: work, emptyDir: {sizeLimit: 1Gi}}
+      - {name: home, emptyDir: {sizeLimit: 512Mi}}
+      - {name: tmp, emptyDir: {sizeLimit: 256Mi}}
+---
+apiVersion: extensions.agents.x-k8s.io/v1beta1
+kind: SandboxWarmPool
+metadata: {name: lab-documented-pool, namespace: lab-agent}
+spec:
+  replicas: 1
+  sandboxTemplateRef: {name: lab-documented}
+---
+apiVersion: extensions.agents.x-k8s.io/v1beta1
+kind: SandboxWarmPool
+metadata: {name: lab-agent-pool, namespace: lab-agent}
+spec:
+  replicas: 1
+  sandboxTemplateRef: {name: lab-agent}

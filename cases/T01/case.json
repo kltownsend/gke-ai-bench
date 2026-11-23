@@ -1,0 +1,2 @@
+{"id": "T01", "baseline": "t01", "commit": "c4d0bdd^",
+ "ticket": "Covered-booking patients keep getting handed off to staff. When the clinic lists open times and asks which one they'd like, the patient answers with every time that works for them instead of picking one, and when it turns down an offered time it comes back with the same full list. Seen in the first phase 3 pilot on the covered_booking patients."}

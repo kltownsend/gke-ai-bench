@@ -1,0 +1,7 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.parse_intents",
+                      "clinicbench.adapters.dcitl_port.Driver.route"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["second booking", "moved there", "\\bmove\\b", "reads as book", "pivot to a new",
+                "wrong question"],
+ "note": "While a reschedule is open, parse_intents reads \"let's go with Dr. Chen\" as a book intent (the book pattern has \"with dr\") and misses \"moved\" (the reschedule pattern is \\bmove\\b), so route() treats the line as a pivot to a new booking, proposes \"Shall I book it?\", and books on the yes. Each of the three alone clears every probe. Recorded in Promise Boundary (Lab 23) notes as driver bug 2 (x0195), frozen with the driver, removed from the agent's workspace."}

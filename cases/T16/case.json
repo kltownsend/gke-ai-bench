@@ -1,0 +1,2 @@
+{"id": "T16", "baseline": "head", "commit": "7774111",
+ "ticket": "Arm F loses bookings it should make. A patient answers the read-back with \"Yes, that's right, please go ahead.\", gets asked to reply yes or no, says it again, and is handed to staff with nothing booked. It shows up across the arm F payment cells."}

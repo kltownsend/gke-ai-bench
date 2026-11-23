@@ -1,0 +1,11 @@
+# Isolation probe: team two's actor asking the gateway for TEAM ONE's Secret (lab-creds). The
+# credential provider's namespace policy grants atespace lcb only lcb-creds, so the model call must
+# fail; a success means one team can spend another's credential.
+rules:
+- https:
+    hostnames: ["aiplatform.googleapis.com"]
+    effects:
+      replaceHeaders:
+      - header: Authorization
+        prefix: "Bearer "
+        credentialUri: ate-secret://k8s.io/default/lab-creds/lab-agent-token/token

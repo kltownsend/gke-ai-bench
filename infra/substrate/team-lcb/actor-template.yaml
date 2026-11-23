@@ -1,0 +1,42 @@
+# Team two's ActorTemplate: atespace lcb, on the SAME worker pool as team one (workload: lab-agent),
+# because sharing the platform is the point. Same credential path as team one (a placeholder from
+# the shim, the gateway injects), with team two's own Secret (egress-agent.yaml).
+# Placeholders ${LAB_PROJECT} and ${LAB_AGENT} are filled from harness/lab_env.sh when this file is applied
+# (the render step in harness/lcb_team.py). By hand: envsubst '${LAB_PROJECT} ${LAB_AGENT}' < FILE
+metadata:
+  atespace: lcb
+  name: lcb-agent
+workerSelector:
+  matchLabels:
+    workload: lab-agent
+containers:
+- name: agent
+  image: LCB_ACTOR_IMAGE
+  env:
+  - {name: HOME, value: /home/agent}
+  - {name: GCE_METADATA_HOST, value: "127.0.0.1:8081"}
+  - {name: SSL_CERT_FILE, value: /run/ate/egress-trust-bundle/trust-bundle.pem}
+  - {name: AGY_ADC_AUTH, value: "true"}
+  - {name: GOOGLE_CLOUD_QUOTA_PROJECT, value: "${LAB_PROJECT}"}
+  - {name: GOOGLE_CLOUD_PROJECT, value: "${LAB_PROJECT}"}
+  - {name: LAB_AGENT, value: "${LAB_AGENT}"}
+  - {name: GOOGLE_CLOUD_LOCATION, value: global}
+  - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+  volumeMounts:
+  - {name: system-info, mountPath: /run/ate/egress-trust-bundle}
+  wakeupProbe:
+    httpGet: {path: /healthz, port: 8080}
+    timeoutSeconds: 60
+volumes:
+- name: system-info
+  systemInfo:
+    dataSources:
+    - trustBundle:
+        names: [egress-mitm.ate.dev, system-roots.ate.dev]
+        path: trust-bundle.pem
+resources:
+  limits:
+    cpuMillicores: 2000
+    memoryBytes: 2147483648   # 2Gi: the bench's own sandbox limit
+snapshotConfig:
+  preferredFidelity: SNAPSHOT_FIDELITY_MEMORY

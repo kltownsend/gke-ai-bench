@@ -1,0 +1,5 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.parse_time"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["3:30 am", "afternoon as", "afternoon\" as", "in the afternoon\" is", "misread"],
+ "note": "parse_time converts to 24-hour time only when am/pm is written, so \"3:30 in the afternoon\" parses to 03:30; resolve_appt then finds none of the patient's appointments at that time and not_yours() refuses their own appointment. Recorded behavior, ruled in clinicbench docs/shakedown-report.md (\"The driver reads \\\"3:30 in the afternoon\\\" as 3:30 am\"; the agent's side, not defects; what the bench is for), frozen with the driver. Distinct from seeded case S05 (noon-hour pm, also parse_time, on baseline s05): T20's probes say no am/pm and avoid the noon hour; they fail on head and on s05 alike, and a parse_time that reads \"in the afternoon\" leaves S05's probes passing on head."}

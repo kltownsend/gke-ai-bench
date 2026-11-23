@@ -1,0 +1,21 @@
+{
+ "type": "fix",
+ "fix_commit": "4899a76",
+ "accepted_files": [
+  "clinicbench/policy.py",
+  "clinicbench/voice.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.policy.PatientPolicy.answer",
+  "clinicbench.policy.PatientPolicy.respond",
+  "clinicbench.policy.PatientPolicy._request_part",
+  "clinicbench.voice.Voice.say"
+ ],
+ "leak_terms": [
+  "never answers with nothing",
+  "blank-line defect",
+  "answer rendered as an empty line",
+  "no answer about an appointment it wasn't"
+ ],
+ "note": "Asked about an appointment it isn't changing (or for a time or doctor while not booking), the policy returned no entries and only an empty proposition part, which the voice rendered as an empty line. The fix answers those with no_target / no_booking parts plus a restated request, restates the request for any turn that would render nothing, and adds the two lines to the voice."
+}

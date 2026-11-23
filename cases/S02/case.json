@@ -1,0 +1,6 @@
+{
+ "id": "S02",
+ "baseline": "s02",
+ "seeded": true,
+ "ticket": "A patient whose slot was put on hold for them can't book it: the clinic says it's taken. Patients are being handed off after a hold."
+}

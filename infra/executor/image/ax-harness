@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# The lab's wrapper around Google's ax-harness: start the placeholder metadata shim on loopback
+# (agent/actor_server.py's Shim; it hands out only `ate-placeholder`), wait for it, then exec
+# Google's harness unchanged, then lab-hold. The egress gateway replaces the placeholder on aiplatform.googleapis.com.
+set -euo pipefail
+python3 -I /opt/lab/lab_shim.py >/dev/null 2>&1 &
+for _ in $(seq 1 50); do
+  curl -s -o /dev/null "http://${GCE_METADATA_HOST:-127.0.0.1:8081}/" && break
+  sleep 0.1
+done
+# Google's harness runs unchanged; then the hold, so the controller can collect the workspace
+# before AX parks the finished Task (lab-hold explains why).
+code=0
+/usr/local/share/ax/google-ax-harness "$@" || code=$?
+exec /usr/local/bin/lab-hold "$code"

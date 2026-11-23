@@ -1,0 +1,22 @@
+#!/bin/sh
+# lab-hold CODE: package a finished Task's workspace and hold the Task open until it's collected.
+# AX rc.1 parks a Task's actor the moment its command exits, and a Completed Task can be neither
+# resumed nor reached by `ax ssh` ("must be Working to ssh"), though the AX docs read results with
+# `ax ssh <task> -- cat /workspace/...`. And `ax ssh` runs as a root that can't write the Task
+# user's clone. So the patch is built here, as the Task's own user: every change since LAB_BASE
+# (the commit the controller published), untracked files included, AX's .ax/ excluded, written to
+# .ax/lab-patch. Then CODE goes to .ax/lab-done, and the command waits (up to LAB_HOLD_S, default
+# 900 s) for the controller's .ax/lab-release/collected before exiting with CODE, so the Task's
+# outcome is the agent's own. lab-release is mode 0777 because that same root can't create a file
+# in the Task user's directories either.
+code=${1:?exit code}
+d="$PWD/.ax"
+mkdir -p "$d" "$d/lab-release" && chmod 0777 "$d/lab-release" && rm -f "$d/lab-patch.ok" "$d/lab-release/collected"
+if { git add -A -- . ':(exclude).ax' && git diff --cached --binary "${LAB_BASE:?}"; } \
+     > "$d/lab-patch" 2> "$d/lab-patch.err"; then
+  : > "$d/lab-patch.ok"
+fi
+echo "$code" > "$d/lab-done"
+i=0
+while [ ! -e "$d/lab-release/collected" ] && [ "$i" -lt "${LAB_HOLD_S:-900}" ]; do sleep 1; i=$((i + 1)); done
+exit "$code"

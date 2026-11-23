@@ -1,0 +1,15 @@
+{
+ "type": "fix",
+ "tier": "easy",
+ "accepted_files": [
+  "clinicbench/truth.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.truth._booking"
+ ],
+ "regression_reference": "head",
+ "seed": {
+  "old": "selfpay_max=cost + rng.choice([0, 50, 100, 200]),",
+  "new": "selfpay_max=cost - rng.choice([0, 50, 100, 200]),"
+ }
+}

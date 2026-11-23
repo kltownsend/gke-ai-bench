@@ -1,0 +1,23 @@
+# The agent Task's Gateway (AX v0.4.0-rc.1): Substrate egress rules, copied onto each Task's actor.
+# Two hosts. The model API, over https so the gateway terminates TLS and replaces agy's placeholder
+# Authorization header with the lab-agent token (the Substrate rung's pattern: Vertex AI, the
+# Substrate way). And the in-cluster forge, cleartext http, which AX allows only without injected
+# headers. Anything else is meant to be denied (observed: unlisted names get NXDOMAIN, other HTTP gets 403; see the run notes). The token Secret lives in ax-system, labeled
+# ax.io/credential=true, as AX's install grants it (harness/token_secret.py writes it).
+apiVersion: ax.io/v1alpha1
+kind: Gateway
+metadata:
+  name: lab-agent-gw
+  atespace: default
+spec:
+  egress:
+  - https:
+      hostnames: ["aiplatform.googleapis.com"]
+      effects:
+        replaceHeaders:
+        - header: Authorization
+          prefix: "Bearer "
+          credentialUri: "ate-secret://k8s.io/default/ax-system/lab-agent-token/token"
+  - http:
+      hostnames: ["forge.lab-forge.svc.cluster.local"]
+      ports: {numbers: [8080]}

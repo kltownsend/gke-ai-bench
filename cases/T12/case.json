@@ -1,0 +1,2 @@
+{"id": "T12", "baseline": "head", "commit": "7774111",
+ "ticket": "A patient moving an existing appointment ended up with a second, new booking. They picked a new time for the appointment they already had and answered yes when asked to confirm. Their original appointment is still on the books, and there's a new one at the time they picked."}

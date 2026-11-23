@@ -1,0 +1,60 @@
+#!/bin/bash
+# promise-boundary lab: Qwen3.8-Flash-Next-FP4-Local, single Spark (node 1), NVIDIA's published DGX Spark
+# recipe from the model card (rev b9ce18a6), run detached instead of interactive. Deliberate diffs from the
+# card: image pinned by digest (nightly-20261015) instead of :latest; HF offline (weights pre-pulled);
+# served-model-name set; container named for serve_instr.sh. Everything else is the card's envelope,
+# including MTP 4, FP8 KV, 262144 context, qwen3 reasoning parser, qwen3_xml tool parser.
+# clinicbench copy (Keith, 2026-11-12: Qwen in as a reader, thinking off). Identical to
+# ~/promise-boundary/serve_qwen38_fp4local.sh (sha256 c7496f4f..., kept here as
+# serve_qwen38_fp4local.sh.orig) except one added flag, --default-chat-template-kwargs
+# '{"enable_thinking": false}', which turns off Qwen3.8's default thinking server-side, the same
+# kind of difference serve_gemma26b_pinned_think.sh carries. The harness is unchanged.
+set -u
+CNAME=pb-qwen38
+IMAGE=eugr/spark-vllm-b12x@sha256:03a956544e9f9b4b7ba91690469fbe7848bdbef29a7d2e0f5788368467bb3595
+mkdir -p $HOME/.cache/huggingface $HOME/.cache/vllm $HOME/.cache/flashinfer $HOME/.triton $HOME/.cache/b12x
+docker rm -f "$CNAME" 2>/dev/null
+docker run -d --name "$CNAME" \
+  --gpus all --ipc host --network host --shm-size=16g \
+  --ulimit memlock=-1 --ulimit stack=67108864 \
+  --security-opt seccomp=unconfined --security-opt apparmor=unconfined \
+  -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
+  -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+  -v $HOME/.cache/vllm:/root/.cache/vllm \
+  -v $HOME/.cache/flashinfer:/root/.cache/flashinfer \
+  -v $HOME/.triton:/root/.triton \
+  -v $HOME/.cache/b12x:/root/.cache/b12x \
+  --entrypoint /bin/bash "$IMAGE" -lc '
+export VLLM_PLE_TABLE_MEMORY="disk"
+export B12X_DISK_BACKEND="io_uring"
+export CUTE_DSL_ARCH="sm_121a"
+export SAFETENSORS_FAST_GPU="1"
+export VLLM_WORKER_MULTIPROC_METHOD="spawn"
+export VLLM_SSM_CONV_STATE_LAYOUT="DS"
+export VLLM_USE_AOT_COMPILE="1"
+export VLLM_USE_MEGA_AOT_ARTIFACT="1"
+export VLLM_USE_V2_MODEL_RUNNER="1"
+export B12X_POLICY_MODE="auto"
+export VLLM_MXFP8_LM_HEAD="1"
+export VLLM_B12X_MOE_FP4_LAYER_MAX_INPUT_SCALE="w13"
+export VLLM_B12X_MOE_FP4_FORCE_A16=1
+export B12X_W4A16_A4_PREFILL=1
+exec vllm serve nvidia/Qwen3.8-Flash-Next-FP4-Local \
+    --revision b9ce18a6887e18c089fdea8509a33e63429a3300 \
+    --served-model-name qwen38-flash-next \
+    --host 0.0.0.0 --port 8000 \
+    --tensor-parallel-size 1 --pipeline-parallel-size 1 \
+    --mamba-cache-mode align \
+    --enable-prefix-caching --enable-chunked-prefill \
+    --dtype bfloat16 --kv-cache-dtype fp8 \
+    --quantization modelopt_mixed --block-size 16 --load-format b12x \
+    --max-model-len 262144 --max-num-seqs 8 --max-num-batched-tokens 4096 \
+    --speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":4}" \
+    --gdn-decode-kernel b12x --linear-backend b12x --moe-backend b12x \
+    --no-enable-flashinfer-autotune --mm-encoder-tp-mode data \
+    --reasoning-parser qwen3 --tool-call-parser qwen3_xml --enable-auto-tool-choice \
+    --default-chat-template-kwargs "{\"enable_thinking\": false}" \
+    --compilation-config "{\"pass_config\":{\"fuse_act_quant\":true}}" \
+    --gpu-memory-utilization 0.8
+'
+[ -x "$HOME/serve_instr.sh" ] && "$HOME/serve_instr.sh" "$CNAME"

@@ -1,0 +1,50 @@
+# LOCAL SHAKEOUT ONLY: ../actor-template.yaml at 1 CPU and 1 GiB for Docker Desktop's 7.7 GiB VM.
+# The agent's ActorTemplate (protojson-shaped ateapi.ActorTemplate), applied with
+# `kubectl ate create actor-template -f` after LAB_ACTOR_IMAGE is substituted (infra/cluster.sh
+# setup --profile substrate). The image is agent/Dockerfile.actor, pinned by digest; its USER is
+# the agent's uid and its main process is the actor server.
+#
+# Credential path (gateway injection): GCE_METADATA_HOST points agy at the
+# server's loopback shim, which hands out the placeholder `ate-placeholder`; the egress gateway
+# replaces it on aiplatform.googleapis.com (egress-policy.yaml). SSL_CERT_FILE is the projected
+# trust bundle (egress-mitm.ate.dev plus system-roots.ate.dev), as the MITM guide specifies for Go.
+# Placeholders ${LAB_PROJECT} and ${LAB_AGENT} are filled from harness/lab_env.sh when this file is applied
+# (the render step in infra/cluster.sh). By hand: envsubst '${LAB_PROJECT} ${LAB_AGENT}' < FILE
+metadata:
+  atespace: lab-agent
+  name: lab-agent
+workerSelector:
+  matchLabels:
+    workload: lab-agent
+containers:
+- name: agent
+  image: LAB_ACTOR_IMAGE
+  env:
+  - {name: HOME, value: /home/agent}
+  - {name: GCE_METADATA_HOST, value: "127.0.0.1:8081"}
+  - {name: SSL_CERT_FILE, value: /run/ate/egress-trust-bundle/trust-bundle.pem}
+  - {name: AGY_ADC_AUTH, value: "true"}
+  - {name: GOOGLE_CLOUD_QUOTA_PROJECT, value: "${LAB_PROJECT}"}
+  - {name: GOOGLE_CLOUD_PROJECT, value: "${LAB_PROJECT}"}
+  - {name: LAB_AGENT, value: "${LAB_AGENT}"}
+  - {name: GOOGLE_CLOUD_LOCATION, value: global}
+  - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+  volumeMounts:
+  - {name: system-info, mountPath: /run/ate/egress-trust-bundle}
+  wakeupProbe:
+    httpGet: {path: /healthz, port: 8080}
+    timeoutSeconds: 60
+volumes:
+- name: system-info
+  systemInfo:
+    dataSources:
+    - trustBundle:
+        names: [egress-mitm.ate.dev, system-roots.ate.dev]
+        path: trust-bundle.pem
+# An actor occupies its whole worker; sized at the pool's per-worker limits.
+resources:
+  limits:
+    cpuMillicores: 1000
+    memoryBytes: 1073741824   # 1Gi (local shakeout; 2Gi on GKE)
+snapshotConfig:
+  preferredFidelity: SNAPSHOT_FIDELITY_MEMORY

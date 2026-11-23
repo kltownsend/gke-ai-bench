@@ -1,0 +1,15 @@
+{
+ "type": "finding",
+ "tier": "easy",
+ "accepted_files": [
+  "clinicbench/adapters/dcitl_port.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.adapters.dcitl_port.explicit_confirm"
+ ],
+ "regression_reference": "head",
+ "seed": {
+  "old": "if re.search(r\"\\bi confirm\\b\", t):",
+  "new": "if re.search(r\"\\bi confirmed\\b\", t):"
+ }
+}

@@ -1,0 +1,11 @@
+# The agent image for the GKE rungs: the local sandbox's pinned python image plus the official
+# agy 1.5.13 Linux x64 build (C3 nodes are x86; the local rung used the arm64 build of the same
+# release). Nothing else: no credentials, no Clinic code, no cases. Build for linux/amd64 and push
+# by digest; PodSandbox refuses an image that isn't pinned by digest.
+#
+#   docker buildx build --platform linux/amd64 -f agent/Dockerfile.agent \
+#       --build-context agy=agent/vendor/agy-1.5.13-x64/x -t IMAGE --push .
+FROM python@sha256:6771159cd4fa5d9bba1258caf0b82e6b73458c694d178ad97c5e925c2d0e1a91
+COPY --from=agy antigravity /usr/local/bin/agy
+RUN chmod 0555 /usr/local/bin/agy && mkdir -p /work /home/agent && chown 10001:10001 /work /home/agent
+WORKDIR /work

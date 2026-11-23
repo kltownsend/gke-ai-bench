@@ -1,0 +1,5 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.Driver.book"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["unclear counter", "doctor loop", "provider loop", "which doctor?\" loop", "no counter"],
+ "note": "Driver.book: when the patient's answer leaves more than one candidate provider, it re-asks with prov_options and never calls self.unclear(), so the two-strikes hand-off every other unresolvable answer gets never fires and the question repeats until the patient gives up. parse_providers reading both names in \"Dr. Okafor, not Dr. Chen\" is what puts two candidates in play for that phrasing; it is not the ruled cause, and fixing it alone leaves the loop for \"either one\", \"whoever is free\" and a bare specialty (hidden probes). Ruled in clinicbench docs/phase3-pilot-report.md (\"F's loop (no unclear counter there)\") and docs/shakedown-report.md (doctor loops, about 147 ineligible-coverage conversations); frozen with the driver, not fixed."}

@@ -1,0 +1,20 @@
+{
+ "frozen_at": "2026-10-22T17:31:13+00:00",
+ "files": {
+  "docs/contract.md": "02c90977ac08e8b59472621cc38a63bc00c53dcdd97015ec60a5d0751ab73253",
+  "docs/contract-changes.md": "51e22406ac086a17a37e45b3a8c1e30230ec201e7874836de15bee89bdf5088c",
+  "clinicbench/world.py": "b990c900fa5de6cff8dfde3650f41d582eacb69b0eaa6d3b49da10f3722e9013",
+  "clinicbench/records.py": "775237126119620950e81739ef697088a500bdc0be3213aee847551749900f08",
+  "clinicbench/truth.py": "1c4b0dde4129a20c5cb5a7dd5f0c5ca31c6f3f62d88ea2fae914141d3072f672",
+  "clinicbench/store.py": "9c48adbdf9dbe792c42f81719e37cfd709a6c3b217e2c1303880cf706a07886d",
+  "clinicbench/policy.py": "1122fcbad12127df69bec809dcb1e68fe5a2970267a86a45aa8779ae56785a97",
+  "clinicbench/voice.py": "428423784b30c2ce1602346f81900b2ad8f6804e3497f207ad943f3b99d20d90",
+  "clinicbench/hearing.py": "b8f219e83994dcb02859f13cb4c7f41de281e5737778defb1f354239b5a4b3d4",
+  "clinicbench/session.py": "ff7de06bc7a486be0653d767ba818aefdd9ac85023d89806f44afd343eada7e2",
+  "clinicbench/scorer.py": "8c1698859613dcee33b4dcdcad47fc70906401ed83d303e9d7f0c39b0ff4bf8f",
+  "clinicbench/adapters/lab23_dcitl.py.orig": "2dce94bdc85b0f148ca149c31c1009d5dc815b01f226afcc8505aa79f85fe42b",
+  "clinicbench/adapters/dcitl_port.py": "06755272b3c66caee35e7c518f9f5cf8ab2259311d899b6de92ae7b39ad89667",
+  "clinicbench/adapters/shim.py": "0e5f6997e955b43e0d68f25db849011113495404a73111dbbdcf1032573c94fa",
+  "clinicbench/adapters/dcitl_f.py": "29dad1f8c36340a67bcdb5da60eb55d3340fba28128baefd492352312e3ef429"
+ }
+}

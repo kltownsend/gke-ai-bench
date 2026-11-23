@@ -1,0 +1,15 @@
+{
+ "type": "fix",
+ "tier": "easy",
+ "accepted_files": [
+  "clinicbench/store.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.store.ToolAPI._cancel"
+ ],
+ "regression_reference": "head",
+ "seed": {
+  "old": "a = self.store.appointments.pop(appointment_id)\n        self.store.slots[a[\"slot\"]].update(status=\"open\", held_by=None)",
+  "new": "a = self.store.appointments.pop(appointment_id)\n        self.store.slots[a[\"slot\"]].update(status=\"booked\", held_by=None)"
+ }
+}

@@ -1,0 +1,6 @@
+{"type": "finding",
+ "accepted_symbols": ["clinicbench.adapters.dcitl_port.explicit_confirm"],
+ "frozen_file": "clinicbench/adapters/dcitl_port.py",
+ "leak_terms": ["four words", "4 words", "four-word", "six-word", "word limit", "word count", "length limit",
+                "at any length", "10,704", "long yes", "longer yes"],
+ "note": "explicit_confirm takes a yes only when the whole reply is four words or fewer, so the six-word \"Yes, that's right, please go ahead.\" is unclear, and under F a model yes can't commit, so the patient is re-asked and handed off. The trap: this is the reference arm's consent rule, frozen with the driver. Changing it breaks the reference, and the loosened rule exists only as arm F2 (dcitl_f2.clear_confirm), where it exposes T15: the same five move patients get wrong bookings (0 under F as frozen, 9 with the rule loosened, measured at case build). Ruled in clinicbench docs/cells-runbook.md, Stage 6 F2 (\"F's four-word rule turned that six-word yes down\"; neither defect changed). The right answer is a finding that changes nothing."}

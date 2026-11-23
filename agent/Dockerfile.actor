@@ -1,0 +1,16 @@
+# The agent image for the Agent Substrate rung: the GKE agent image (agy 1.5.13 x64 on the pinned
+# python base) plus the actor server (agent/actor_server.py) as the main process, run as the
+# agent's uid. Substrate takes the process user from the image's USER (cmd/atelet/oci.go at
+# v1.0.0, resolveImageUser); ActorTemplate has no runAsUser. No credentials, no Clinic code, no
+# cases. Build for linux/amd64 and push by digest; ActorTemplate images "must include a digest".
+#
+#   docker buildx build --platform linux/amd64 -f agent/Dockerfile.actor \
+#       --build-arg BASE=$LAB_AGENT_IMAGE -t IMAGE --push agent
+ARG BASE
+FROM ${BASE}
+COPY actor_server.py pod_sandbox.py /opt/lab/
+RUN chmod 0444 /opt/lab/*.py
+USER 10001:10001
+WORKDIR /work
+ENV HOME=/home/agent PYTHONDONTWRITEBYTECODE=1
+CMD ["python3", "-u", "-I", "/opt/lab/actor_server.py", "8080"]

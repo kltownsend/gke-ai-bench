@@ -1,0 +1,12 @@
+{
+ "id": "S03",
+ "type": "fix",
+ "file": "clinicbench/truth.py",
+ "symbols": [
+  "clinicbench.truth._booking"
+ ],
+ "old": "selfpay_max=cost + rng.choice([0, 50, 100, 200]),",
+ "new": "selfpay_max=cost - rng.choice([0, 50, 100, 200]),",
+ "ticket": "Self-pay booking patients who say they'll pay for the visit refuse once they hear the price. The self-pay booking type almost never ends in a booking.",
+ "check": "probe_s03.py"
+}

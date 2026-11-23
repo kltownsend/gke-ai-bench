@@ -1,0 +1,15 @@
+{
+ "type": "fix",
+ "tier": "easy",
+ "accepted_files": [
+  "clinicbench/store.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.store.ToolAPI._slot_free_for"
+ ],
+ "regression_reference": "head",
+ "seed": {
+  "old": "x[\"status\"] == \"held\" and x[\"held_by\"] == pid",
+  "new": "x[\"status\"] == \"held\" and x[\"held_by\"] != pid"
+ }
+}

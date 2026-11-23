@@ -1,0 +1,27 @@
+{
+ "type": "fix",
+ "fix_commit": "c4d0bdd",
+ "accepted_files": [
+  "clinicbench/hearing.py",
+  "clinicbench/policy.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.hearing.labels",
+  "clinicbench.hearing.DriverHearing.__call__",
+  "clinicbench.policy.PatientPolicy.respond",
+  "clinicbench.policy.PatientPolicy.respond_offer"
+ ],
+ "regression_exclude": {
+  "session_types": [
+   "pivot"
+  ]
+ },
+ "leak_terms": [
+  "picks one offered time",
+  "every working time it had",
+  "counters with its top-ranked",
+  "144 of 240 covered bookings",
+  "144 covered-booking hand-offs"
+ ],
+ "note": "The hearing parser didn't pass the times the driver listed to the policy, and the policy answered a slot question, or countered a turned-down offer, with every working time; F can't choose between two and hands off. The fix reads the listed times as slot_options and has the patient name its highest-ranked working time among them, and counter with its highest-ranked working time."
+}

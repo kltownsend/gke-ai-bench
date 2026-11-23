@@ -1,0 +1,2 @@
+{"id": "T25", "baseline": "head", "commit": "7774111",
+ "ticket": "In arm E runs, appointments get booked or moved when the patient hadn't clearly agreed to that time. It happens even with the stub reader that answers yes to every question, on ordinary booking and reschedule requests. Arm F with the same reader doesn't do it."}

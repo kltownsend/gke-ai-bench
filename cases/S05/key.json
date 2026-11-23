@@ -1,0 +1,15 @@
+{
+ "type": "finding",
+ "tier": "easy",
+ "accepted_files": [
+  "clinicbench/adapters/dcitl_port.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.adapters.dcitl_port.parse_time"
+ ],
+ "regression_reference": "head",
+ "seed": {
+  "old": "if ap == \"pm\" and h < 12:",
+  "new": "if ap == \"pm\" and h <= 12:"
+ }
+}

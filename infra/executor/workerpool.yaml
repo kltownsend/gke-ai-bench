@@ -1,0 +1,29 @@
+# The Executor rung's worker pool: the Substrate rung's shape with 5 GiB per worker. AX sets no
+# workerSelector, so any ready gVisor pool serves its Tasks; the Task asks for 4 GiB because agy
+# needs 2 to 4 GiB with /workspace memory-backed (google/ax#652), and an actor occupies its whole
+# worker. Same v1.0.1 gVisor worker image, pinned by digest.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-executor
+---
+apiVersion: ate.dev/v1
+kind: WorkerPool
+metadata:
+  name: lab-ax-workers
+  namespace: lab-executor
+  labels:
+    workload: lab-ax
+spec:
+  replicas: 2
+  workerImage: ghcr.io/agent-substrate/substrate/ateworker-gvisor@sha256:fd0c6a46d6c69d485856171e632906e774594bea9d00011a4d7038be3e084a2a
+  sandboxClasses:
+  - name: gvisor
+  template:
+    resources:
+      limits:
+        cpu: "2"
+        memory: 5Gi
+      requests:
+        cpu: 500m
+        memory: 5Gi

@@ -1,0 +1,2 @@
+{"id": "T20", "baseline": "head", "commit": "7774111",
+ "ticket": "A patient asked to cancel their appointment \"on Wednesday at 3:30 in the afternoon\" and was told it isn't under their record, while the reply listed that same appointment, Wednesday at 15:30, as theirs."}

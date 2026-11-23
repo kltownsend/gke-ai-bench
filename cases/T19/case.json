@@ -1,0 +1,2 @@
+{"id": "T19", "baseline": "head", "commit": "7774111",
+ "ticket": "Arm F gets stuck asking which doctor. A patient booking dermatology answers \"Dr. Okafor, not Dr. Chen\" and gets \"We have Dr. Chen and Dr. Okafor for dermatology. Which would you like?\" every turn until they give up. Nobody is ever handed to staff."}

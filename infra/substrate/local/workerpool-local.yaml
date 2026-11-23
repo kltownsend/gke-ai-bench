@@ -1,0 +1,31 @@
+# LOCAL SHAKEOUT ONLY (kind, arm64): Google's source path for the worker image, built by ko, and a
+# smaller worker. The GKE run uses ../workerpool.yaml.
+# The Substrate rung's worker pool (v1.0.1), in the shape of the vendor's sandbox demo
+# (demos/sandbox/sandbox.yaml.tmpl at v1.0.0): gVisor workers, CPU requested below the limit so the
+# pool places on a small node. The worker image is the published v1.0.1 release image, pinned by
+# the digest its tag resolved to on 2026-11-21 (ghcr, anonymous pull).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-substrate
+---
+apiVersion: ate.dev/v1
+kind: WorkerPool
+metadata:
+  name: lab-agent-workers
+  namespace: lab-substrate
+  labels:
+    workload: lab-agent
+spec:
+  replicas: 1
+  workerImage: ko://go.ate.dev/substrate/cmd/ateworker-gvisor
+  sandboxClasses:
+  - name: gvisor
+  template:
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1536Mi
+      requests:
+        cpu: 250m
+        memory: 1536Mi

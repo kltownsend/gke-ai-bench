@@ -1,0 +1,5 @@
+{"type": "not_driver",
+ "attribution": "patient_voice",
+ "accepted_symbols": [],
+ "leak_terms": ["no-rephrase", "doesn't rephrase", "does not rephrase", "repeats its answer word for word"],
+ "note": "Identity truths are built so the patient can't verify (no credentials, wrong DOB, unknown member and so on), and the patient doesn't rephrase when asked again: persona.no-rephrase, left in by ruling (contract-changes, 2026-10-22; shakedown report, 'The ruled blind spots'). The driver asking again is correct; nothing in the driver or the instrument is a bug."}

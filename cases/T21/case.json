@@ -1,0 +1,2 @@
+{"id": "T21", "baseline": "head", "commit": "7774111",
+ "ticket": "Arm F booked an appointment when the patient answered the read-back with \"Before I confirm, is that covered?\" They were asking a question, not agreeing, and the booking was written anyway."}

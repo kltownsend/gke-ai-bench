@@ -1,0 +1,14 @@
+# The agent actor's EgressPolicy, applied per actor with `kubectl ate create egress-policy`.
+# One host, the model API (the placeholder check: agy needs nothing else to reach its model).
+# The gateway terminates TLS for it, decides each request on its authority, and replaces the
+# placeholder Authorization header with the lab-agent access token in the Secret below, which the
+# token refresher (harness/token_secret.py) keeps current. Every other name answers NXDOMAIN and
+# every other connection is denied: default deny.
+rules:
+- https:
+    hostnames: ["aiplatform.googleapis.com"]
+    effects:
+      replaceHeaders:
+      - header: Authorization
+        prefix: "Bearer "
+        credentialUri: ate-secret://k8s.io/default/lab-creds/lab-agent-token/token

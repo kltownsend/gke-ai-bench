@@ -1,0 +1,7 @@
+# Install phase: the package hosts only, relayed without inspection, the platform's equivalent of
+# the bench's own CONNECT allowlist proxy (tools/allowlist_proxy.py: pypi.org, files.pythonhosted.org,
+# pythonhosted.org, port 443). No model access during install; everything else denied by default.
+rules:
+- tlsPassthrough:
+    hostnames: ["pypi.org", "files.pythonhosted.org", "*.pythonhosted.org"]
+    ports: {numbers: [443]}

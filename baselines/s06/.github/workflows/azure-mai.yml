@@ -1,0 +1,216 @@
+# Clinic cells against a Microsoft Foundry reader (Microsoft-Decision-1.1, or a chat model such as
+# MAI Code 2 Flash), started by committing a run request.
+#
+# How a run is requested: commit runs/<id>.json (see runs/README.md) on a runs/* or claude/* branch
+# and push. A Claude session on a phone can do that; it never holds an Azure credential. The push
+# only checks the request and prints what it would run. It never calls Azure.
+# How it's paid for: Keith starts the run himself with "Run workflow" (the GitHub app or the
+# Actions page), on that branch, naming the file. The run job refuses any other trigger and any
+# actor but kltownsend. Required reviewers would be the cleaner gate, but on a private repo GitHub
+# only offers them on Enterprise.
+# How it authenticates: OIDC. The job proves to Entra that it is this repo in that environment, and
+# Entra issues a short-lived token. GitHub stores only IDs, no key or password.
+# What comes back: each job's results folder as an artifact (30 days), and a small report committed
+# to the run branch at runs/<id>.report.json so the phone session can pull it.
+
+name: azure-mai
+
+on:
+  push:
+    branches-ignore: [main]
+    paths: ["runs/*.json", "!runs/*.report.json"]
+  workflow_dispatch:
+    inputs:
+      run_file:
+        description: "run request, e.g. runs/mai-flash-canary-1.json"
+        required: true
+
+concurrency:
+  group: azure-mai-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      req: ${{ steps.plan.outputs.req }}
+      file: ${{ steps.plan.outputs.file }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - id: plan
+        env:
+          BEFORE: ${{ github.event.before }}
+          INPUT_FILE: ${{ inputs.run_file }}
+        run: |
+          set -eu
+          if [ -n "${INPUT_FILE:-}" ]; then
+            case "$INPUT_FILE" in
+              runs/*.json) ;;
+              *) echo "::error::run_file must be runs/<id>.json"; exit 1 ;;
+            esac
+            case "$INPUT_FILE" in *..*|*/*/*|*.report.json) echo "::error::bad run_file $INPUT_FILE"; exit 1 ;; esac
+            files="$INPUT_FILE"
+          else
+            base="$BEFORE"
+            if [ -z "$base" ] || ! git cat-file -e "$base" 2>/dev/null || [ "$base" = 0000000000000000000000000000000000000000 ]; then
+              base=$(git merge-base origin/main HEAD)
+            fi
+            files=$(git diff --name-only --diff-filter=AM "$base" HEAD -- 'runs/*.json' | grep -v '\.report\.json$' || true)
+          fi
+          n=$(printf '%s\n' "$files" | grep -c . || true)
+          [ "$n" -eq 1 ] || { echo "::error::push exactly one new or changed run request; found $n: $files"; exit 1; }
+          req=$(python3 scripts/azure_run_plan.py "$files")
+          echo "file=$files" >> "$GITHUB_OUTPUT"
+          echo "req=$req" >> "$GITHUB_OUTPUT"
+          echo "### Run request \`$files\`" >> "$GITHUB_STEP_SUMMARY"
+          printf '```json\n%s\n```\n' "$(cat "$files")" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            msg="Checked, not run. To run it: Actions, azure-mai, Run workflow, branch $GITHUB_REF_NAME, run_file $files"
+            echo "::notice::$msg"
+            echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  run:
+    needs: plan
+    # the spending gate: only a manual dispatch by Keith calls Azure
+    if: github.event_name == 'workflow_dispatch' && github.triggering_actor == 'kltownsend'
+    runs-on: ubuntu-latest
+    environment: azure-mai
+    timeout-minutes: 350
+    permissions:
+      contents: read
+      id-token: write   # the OIDC token Entra trades for an Azure access token
+      actions: read     # to download a previous run's folder when resuming
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.req).include }}
+    env:
+      R: ${{ needs.plan.outputs.req }}
+      DIM: ${{ matrix.dim }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      # the chat reader's endpoint and deployment, or Microsoft-Decision's resource root and deployment
+      MAI_ENDPOINT: ${{ fromJSON(needs.plan.outputs.req).reader == 'msdecision' && vars.MSDECISION_ENDPOINT || vars.MAI_ENDPOINT }}
+      MAI_DEPLOYMENT: ${{ fromJSON(needs.plan.outputs.req).reader == 'msdecision' && vars.MSDECISION_DEPLOYMENT || vars.MAI_DEPLOYMENT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.14"}
+      - name: settings
+        run: |
+          set -eu
+          for v in AZURE_TENANT_ID AZURE_CLIENT_ID MAI_ENDPOINT MAI_DEPLOYMENT; do
+            [ -n "$(printenv $v)" ] || { echo "::error::environment variable $v isn't set on azure-mai"; exit 1; }
+          done
+          j() { python3 -c "import json,os;print(json.loads(os.environ['R'])['$1'])"; }
+          name="$(j id)${DIM:+-$DIM}"
+          {
+            echo "NAME=$name"; echo "OUT=results/$name"
+            echo "READER=$(j reader)"; echo "BATCH=$(j batch)"; echo "ARM=$(j arm)"; echo "PROMPT=$(j prompt)"; echo "PAR=$(j par)"
+            echo "MAI_API=$(j api)"; echo "MAI_TOKEN_CAP=$(j token_cap)"
+            echo "MAI_REASONING_EFFORT=$(j reasoning_effort)"; echo "RESUME=$(j resume_run_id)"
+          } >> "$GITHUB_ENV"
+      - name: resume a previous run's folder
+        if: env.RESUME != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: results-${{ env.NAME }}
+          run-id: ${{ env.RESUME }}
+          github-token: ${{ github.token }}
+          path: _resume
+      - name: unpack
+        if: env.RESUME != ''
+        run: mkdir -p results && tar -xzf _resume/${{ env.NAME }}.tgz -C results && rm -rf _resume
+      - name: run
+        id: run
+        env: {DEADLINE_MIN: "330"}
+        run: |
+          set +e
+          sh scripts/azure_cells.sh
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          case $rc in
+            0) echo "done" ;;
+            3) echo "::warning::token cap reached; resume with resume_run_id $GITHUB_RUN_ID and a higher cap" ;;
+            4) echo "::warning::deadline reached; resume with resume_run_id $GITHUB_RUN_ID" ;;
+            *) echo "::error::gate failure (rc $rc)"; tail -20 "$OUT/run.log" ;;
+          esac
+          exit 0
+      - name: report
+        if: always()
+        run: |
+          python3 - <<'EOF'
+          import json, os
+          out, name = os.environ["OUT"], os.environ["NAME"]
+          def load(p):
+              try: return json.load(open(os.path.join(out, p)))
+              except Exception: return None
+          calls = [json.loads(l) for l in open(os.path.join(out, "azure_usage.jsonl"))] if os.path.exists(os.path.join(out, "azure_usage.jsonl")) else []
+          calls = [c for c in calls if "status" in c]
+          venue = load("venue.json") or {}
+          rep = {"name": name, "rc": "${{ steps.run.outputs.rc }}", "summary": load("summary.json"),
+                 "calls": len(calls), "ok_calls": sum(c["status"] == 200 for c in calls),
+                 "prompt_tokens": sum(c.get("prompt", 0) for c in calls),
+                 "output_tokens": sum(c.get("completion", 0) for c in calls),
+                 "reasoning_tokens": sum(c.get("reasoning", 0) for c in calls),
+                 "models_reported": sorted({c["model"] for c in calls if c.get("model")}),
+                 "errors": sorted({c["err"][:120] for c in calls if c.get("err")})[:10],
+                 "cap_hit": load("azure_usage.jsonl.cap_hit"),
+                 "venue": {k: venue.get(k) for k in ("started_utc", "batch", "arm", "dim", "prompt", "model_revision", "python", "par")},
+                 "run_id": os.environ["GITHUB_RUN_ID"], "artifact": f"results-{name}"}
+          json.dump(rep, open(f"report-{name}.json", "w"), indent=1)
+          print(json.dumps(rep, indent=1))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write(f"### {name}\n```json\n{json.dumps(rep, indent=1)}\n```\n")
+          EOF
+          mkdir -p results && tar -czf "$NAME.tgz" -C results "$NAME" 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-${{ env.NAME }}
+          path: ${{ env.NAME }}.tgz
+          retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-${{ env.NAME }}
+          path: report-${{ env.NAME }}.json
+          if-no-files-found: warn
+
+  report:
+    needs: [plan, run]
+    if: always() && needs.plan.result == 'success' && needs.run.result != 'skipped'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # commits runs/<id>.report.json to the run branch, never to main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {pattern: "report-*", path: _reports, merge-multiple: true}
+      - env:
+          FILE: ${{ needs.plan.outputs.file }}
+          RUN_RESULT: ${{ needs.run.result }}
+        run: |
+          set -eu
+          [ "$GITHUB_REF_NAME" != main ] || exit 0
+          out="${FILE%.json}.report.json"
+          python3 - "$out" <<'EOF'
+          import glob, json, os, sys
+          reps = [json.load(open(p)) for p in sorted(glob.glob("_reports/*.json"))]
+          json.dump({"run_id": os.environ["GITHUB_RUN_ID"], "job_result": os.environ["RUN_RESULT"],
+                     "url": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                     "jobs": reps}, open(sys.argv[1], "w"), indent=1)
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$out"
+          git commit -m "Run report: $(basename "$FILE" .json) (Actions run $GITHUB_RUN_ID)"
+          git fetch -q origin "$GITHUB_REF_NAME"
+          git rebase -q "origin/$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"

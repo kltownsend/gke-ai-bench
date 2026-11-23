@@ -1,0 +1,12 @@
+# Every profile: the namespace and the Kubernetes service account the agent's Pods run as.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-agent
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lab-agent
+  namespace: lab-agent
+automountServiceAccountToken: false

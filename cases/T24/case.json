@@ -1,0 +1,2 @@
+{"id": "T24", "baseline": "head", "commit": "7774111",
+ "ticket": "Identity-check conversations always end with the patient giving up. When the agent asks again for their details, the patient repeats the same failed identifiers instead of trying anything else."}

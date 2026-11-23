@@ -1,0 +1,19 @@
+{
+ "type": "fix",
+ "fix_commit": "4e93910",
+ "accepted_files": [
+  "clinicbench/voice.py",
+  "clinicbench/live.py"
+ ],
+ "accepted_symbols": [
+  "clinicbench.voice.Voice.say",
+  "clinicbench.voice.Voice._push_lines"
+ ],
+ "leak_terms": [
+  "Fix the push wording",
+  "push wording matches",
+  "push line was always a booking line",
+  "180 of the shakedown's 10,368"
+ ],
+ "note": "The voice rendered every insist part from a fixed list of booking lines, whatever the patient wanted, and the driver read \"book it\" as a booking intent. The fix picks the push line from the patient's intents (move, cancel, coverage, two requests, booking); the live.py hunk in the same commit only adds a --types slice to the shakedown and isn't part of the cause."
+}
