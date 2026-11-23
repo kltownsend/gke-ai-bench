@@ -12,9 +12,15 @@ it; only the bundled credential provider reads it, for the lab-agent atespace on
 (infra/substrate/namespace-policy.yaml).
 
 Run with an interpreter that has google-auth (GOOGLE_AUTH_PY), after sourcing
-harness/lab_env.sh, with kubectl pointed at the Substrate cluster.
+harness/lab_env.sh, with kubectl pointed at the Substrate cluster. It refuses to write unless kubectl's
+current context is that cluster in LAB_PROJECT (LAB_TOKEN_CLUSTER, default LAB_CLUSTER).
 
-usage: token_secret.py [--once]
+What this does and doesn't protect: the token stays out of the actor, but anyone who can read Secrets
+in that namespace (cluster administrators, the credential provider) can read it, and it stays valid
+for up to an hour after the refresher stops. Delete it when a session ends (--delete), and use a
+project with nothing else of value in it.
+
+usage: token_secret.py [--once | --delete]
 """
 import json
 import os
@@ -32,6 +38,17 @@ NAMESPACE = os.environ.get("LAB_TOKEN_NAMESPACE", "lab-creds")
 NAME, KEY = "lab-agent-token", "token"
 AX_LABEL = os.environ.get("LAB_TOKEN_AX_LABEL") == "1"
 EVERY_S = 40 * 60
+CLUSTER = os.environ.get("LAB_TOKEN_CLUSTER") or os.environ.get("LAB_CLUSTER", "lab-substrate")
+PROJECT = os.environ.get("LAB_PROJECT") or sys.exit("LAB_PROJECT is not set: source harness/lab_env.sh")
+
+
+def check_context():
+    """GKE contexts are named gke_<project>_<location>_<cluster>; refuse anything else."""
+    ctx = subprocess.run(["kubectl", "config", "current-context"], capture_output=True, text=True,
+                         timeout=30).stdout.strip()
+    if not (ctx.startswith(f"gke_{PROJECT}_") and ctx.endswith(f"_{CLUSTER}")):
+        sys.exit(f"refusing: kubectl context is {ctx!r}, not cluster {CLUSTER} in {PROJECT}. "
+                 "Run infra/cluster.sh setup for that cluster, or set LAB_TOKEN_CLUSTER.")
 
 
 def mint() -> tuple[str, float]:
@@ -58,6 +75,12 @@ def write(token: str):
 
 
 def main():
+    check_context()
+    if "--delete" in sys.argv:
+        subprocess.run(["kubectl", "-n", NAMESPACE, "delete", "secret", NAME, "--ignore-not-found"],
+                       check=True, timeout=60)
+        print(json.dumps({"event": "token secret deleted", "secret": f"{NAMESPACE}/{NAME}"}), flush=True)
+        return
     while True:
         token, exp = mint()
         write(token)

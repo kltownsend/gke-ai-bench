@@ -6,8 +6,10 @@ otherwise build by hand?
 
 The results are on the project site, https://gke-ai-layer2c.web.app, with a "How it was tested" page for every
 claim. This repository is the instrument behind those pages: the probes, the drivers, the configurations and
-the cases, so you can run the same tests on your own Google Cloud project and check the numbers, or point them
-at your own cluster.
+the cases, so you can run the same tests on your own Google Cloud project and get your own measurements, or
+point them at your own cluster. It doesn't reproduce the site's numbers exactly: the lab's raw run records and
+its rulings aren't here, and your project, timing and model behavior will differ. Read your numbers beside the
+site's as two runs of the same instrument.
 
 ## What's here
 
@@ -17,14 +19,15 @@ at your own cluster.
 | `harness/` | The run drivers: resume and continuity (`resume_probe.py`), the first request after a long idle (`incluster_wake.py`), Google's own benchmark under lab settings (`google_bench.py`), the density control (`density_control.py`), per-team identities and the isolation matrix (`tenants.py`), cross-team reach (`cross_team_probe.py`), warm-pool reuse and long calls (`remaining_small.py`), the coding-agent runs (`canary_agy.py`, `pilot.py`, `pilot_report.py`) and team two (`lcb_team.py`) |
 | `agent/` | How the agent runs on each venue: a local Docker sandbox, a GKE Pod, Agent Sandbox, Agent Substrate (`substrate_venue.py`, with the polled wait) and Agent Executor; the actor's HTTP adapter and metadata shim (`actor_server.py`); the token minter |
 | `controller/` | The deterministic controller (Deterministic Code In The Loop): it runs the investigation in stages and calls the agent only for a hypothesis and a change |
-| `validator/`, `subject/` | The sealed judge. The agent's code runs in its own locked container and never shares a process with the judge; hidden inputs and a sampled regression check decide whether a fix is real |
+| `validator/`, `subject/` | The judge. The agent's code runs in its own locked container (no network, read-only, never sharing a process with the judge), and the judge's probes, hidden inputs and keys are never mounted where the agent works. That separation holds during a run; the keys themselves are public in this repository |
 | `cases/`, `seeds/` | The 21 frozen Clinic cases with their answer keys: 16 mined from the published record, 5 seeded defects |
 | `baselines/` | The Clinic source trees the cases start from, sanitized so no file names a cause |
 | `infra/` | The plain GKE baselines and runtime clusters (`cluster.sh`), Kubernetes and Substrate configuration, team two's actor, the Executor image |
 | `tests/` | Unit tests for the judge, the controller, the venues and the harness |
 
-`RUNBOOK.md` is the run guide, written so a coding agent can follow it. `AGENTS.md` holds the rules an agent
-running it should keep.
+`RUNBOOK.md` is the run guide, written so a coding agent can follow it, with what each step cost the lab and the
+exact versions it ran. `AGENTS.md` holds the rules an agent running it should keep. Use a Google Cloud project
+with nothing else of value in it: the agent runs code nobody reviewed.
 
 ## What it measures, and what it doesn't
 
@@ -32,7 +35,8 @@ It measures facts about a configuration, checked by probes: does the real token 
 does a suspended agent come back with its memory, processes and files, how long the first request after a
 long idle takes, what a second team can and can't reach. It also runs a real coding agent (Google's
 Antigravity CLI on Gemini) on the Clinic's cases inside each venue, as a guard that the venue still lets the
-agent do its work.
+agent do its work. Because every case's key is public here, results on these cases measure a venue, not a
+model's ability on unseen problems; plant fresh seeds for that.
 
 It doesn't produce verdicts. The project site's verdicts, and the method for reaching them, are the lab's
 own and aren't part of this repository. Run the harness and build your own assessment.
@@ -44,7 +48,7 @@ databases, deployments or concurrent users.
 ## The cases and their keys
 
 All 21 cases ship with their answer keys. The 16 mined cases' answers were already public through the
-Clinic's record. The 5 seeded defects (S01 to S06) were planted after the record froze, so no model had seen
+Clinic's record. The 5 seeded defects (S01, S02, S03, S05 and S06) were planted after the record froze, so no model had seen
 their answers; publishing them here ends that. If you want answers no model has seen, plant your own:
 `validator/build_seeded.py` builds a seeded tree and accepts a seed only if its edit applies once, its probes
 fail on the seeded tree and pass on the clean one, and the leak scan stays clean.

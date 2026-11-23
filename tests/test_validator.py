@@ -4,8 +4,7 @@ Run from the tools directory (Docker must be running):
 
     python3 -m unittest tests.test_validator -v
 
-Needs the baselines: validator/build_baseline.py "8ad3cac^" t03, 8ad3cac t03fix, ... 7774111 head, and
-validator/build_seeded.py.
+Uses the baselines that ship in baselines/ (no clinicbench checkout or history needed).
 """
 
 import os
@@ -20,7 +19,6 @@ sys.path.insert(0, os.path.join(TOOLS, "validator"))
 import subject as S  # noqa: E402
 import validate as V  # noqa: E402
 
-REPO = os.path.expanduser(os.environ.get("CLINICBENCH_DIR", "~/lab-src/clinicbench"))   # the clinicbench checkout
 CASES = os.path.join(TOOLS, "cases")
 FIX = {"kind": "fix", "files": ["clinicbench/truth.py"], "symbols": ["clinicbench.truth.build"]}
 FINDING = {"kind": "finding", "files": ["clinicbench/adapters/dcitl_port.py"],
@@ -53,9 +51,9 @@ def log_change(ws, paths, reason="replacement times respect the patient's limits
 
 
 def t03_fix(ws):
-    patch = subprocess.run(["git", "-C", REPO, "show", "8ad3cac", "--", "clinicbench/truth.py"],
-                           capture_output=True, text=True, check=True).stdout
-    subprocess.run(["patch", "-p1", "-d", ws, "-s"], input=patch, text=True, check=True)
+    # The shipped fix tree (built from the fix commit), so the test needs no clinicbench history.
+    shutil.copyfile(os.path.join(TOOLS, "baselines", "t03fix", "clinicbench", "truth.py"),
+                    os.path.join(ws, "clinicbench", "truth.py"))
 
 
 def verdict(case, ws, answer):

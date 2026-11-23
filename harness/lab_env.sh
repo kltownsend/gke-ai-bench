@@ -18,6 +18,7 @@ else
 fi
 unset _lab_env_file
 : "${LAB_PROJECT:?set LAB_PROJECT in lab.env (see lab.env.example)}"
+if [ "$LAB_PROJECT" = "your-project-id" ]; then echo "lab.env still has the placeholder LAB_PROJECT" >&2; return 1 2>/dev/null || exit 1; fi
 export LAB_PROJECT
 export LAB_REGION="${LAB_REGION:-us-central1}"
 export LAB_ZONE="${LAB_ZONE:-$LAB_REGION-a}"

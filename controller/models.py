@@ -12,11 +12,17 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 
 TOOLS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# The clinicbench checkout (the application under test), for the reference fix commits.
-REPO = os.path.expanduser(os.environ.get("CLINICBENCH_DIR", "~/lab-src/clinicbench"))
+
+
+def _fix_tree(case_dir):
+    """The reference fix for a mined case: the baselines/<baseline>fix tree that ships with the repo,
+    built from the fix commit (validator/build_baseline.py)."""
+    with open(os.path.join(case_dir, "case.json")) as fh:
+        return os.path.join(TOOLS, "baselines", json.load(fh)["baseline"] + "fix")
 
 
 def _key(case_dir):
@@ -50,9 +56,9 @@ class OracleStub:
         if "seed" in self.key:
             _edit(ctx["workspace"], self.key["accepted_files"][0], self.key["seed"]["new"], self.key["seed"]["old"])
         else:
-            patch = subprocess.run(["git", "-C", REPO, "show", self.key["fix_commit"], "--",
-                                    *self.key["accepted_files"]], capture_output=True, text=True, check=True).stdout
-            subprocess.run(["patch", "-p1", "-d", ctx["workspace"], "-s"], input=patch, text=True, check=True)
+            fix = _fix_tree(self.case_dir)
+            for rel in self.key["accepted_files"]:
+                shutil.copyfile(os.path.join(fix, rel), os.path.join(ctx["workspace"], rel))
         return {}
 
 

@@ -1,82 +1,140 @@
 # Run guide
 
 Written so a coding agent can follow it step by step, and a person can check each step. Read `AGENTS.md`
-first: every step below that meters asks for a yes before it runs, and the session ends parked.
+first: every step below that meters asks for a yes before it runs, and every session ends parked.
 
-The order is cheapest first. Steps 1 to 3 cost nothing but downloads. Steps 4 to 8 run on your own Google
-Cloud project and cost cluster time and model calls; the costs are what the lab paid, on its billing report.
+What you get from this: your own measurements on your own project, with the same probes, judge, cases and
+settings the lab used. You won't get the lab's published numbers back exactly. Its raw run records aren't in
+this repository, its verdicts come from rulings that aren't either, and your project, region, quota, model
+behavior and timing will differ. Compare your numbers with the site's as two runs of the same instrument.
 
-## What it cost the lab
+Use a Google Cloud project with nothing else of value in it. The agent runs code nobody reviewed, and some
+steps turn its own permission prompts off on purpose.
 
-| Step | Cluster time | Model calls | Billed |
+## What it cost the lab (historical, not an estimate)
+
+From the lab project's billing report, runs on 2026-11-20 to 2026-11-23, us-central1, list prices in USD, no
+committed-use discounts. Your bill depends on your region, credits and how long things run.
+
+| Step | Resources | Model calls | Billed |
 |---|---|---|---|
-| One plain GKE baseline (probes, a reach run, a canary) | about 45 to 55 minutes | a few calls | about $0.30 to $0.50 |
-| Agent Substrate install (the wizard) | about 45 minutes | none | about $0.70 |
-| Substrate experiments, one session (resume, wake, density, isolation) | 3 to 5 hours | none | about $3 to $7 |
-| The Clinic case set on Substrate (21 cases, 3 runs each) | about 1.5 hours | 63 runs | $31.65 in model calls |
-| Team two's 10 tasks | about 15 minutes | 10 runs | $1.02 in model calls |
-| A parked Substrate install, per day | none running | none | about $1.70 (the database disk); the zonal cluster fee was covered by the free tier |
+| One plain GKE baseline (probes, a reach run, a canary) | 45 to 55 cluster-minutes, one or two c3-standard-4 nodes | a few | about $0.30 to $0.50 |
+| Agent Substrate install (the wizard) | about 45 minutes: two c3-standard-4 workers, E2 system nodes, a 500 GiB balanced persistent disk | none | about $0.70 |
+| Substrate experiments, one session (resume, wake, density, isolation) | 3 to 5 hours of the same, plus a one-node pool for Google's load generator | none | about $3 to $7 |
+| The Clinic case set on Substrate (21 cases, 3 runs each) | about 1.5 hours | 63 agent runs, 10.9M input, 1.5M output and 57.5M cached tokens | $31.65 in model calls |
+| Team two's 10 tasks | about 15 minutes | 10 agent runs | $1.02 in model calls |
+| A parked Substrate install, per day | node pools at zero | none | about $1.70: the 500 GiB balanced disk ($0.10 per GiB-month). The zonal cluster fee was covered by the free tier, which a second cluster in the same billing account doesn't get |
 
-The whole lab project, five days of runs including every rung: $117.76 billed, $100.52 of it model calls.
-Model calls are Gemini on Vertex AI at pay-as-you-go rates; thinking tokens are billed inside output tokens.
+Model: `gemini-4-hydrogen-medium` on Vertex AI, global endpoint, pay-as-you-go at $1.50 per million input
+tokens, $0.075 per million cached input tokens and $7.50 per million output tokens; thinking tokens are
+billed inside output tokens. Set a budget alert on the project before step 5.
 
-## 0. Prerequisites
+## Versions the lab ran
 
-- A Google Cloud project with billing on, and the APIs for GKE, Compute Engine, Artifact Registry, Vertex AI
-  and Cloud Logging enabled.
-- On your workstation: `gcloud` with the GKE auth plugin, `kubectl`, Docker (with buildx), Go 1.27.3 or later
-  (for the Substrate installer and `kubectl ate`), Python 3.13, git and curl.
-- Agent Substrate needs a regional SSD quota large enough for its bundled 500 GiB database disk. Request the
-  raise before the install day; it isn't instant.
+| Piece | Version |
+|---|---|
+| GKE | 1.37.1-gke.1552000 for the plain baselines and Agent Sandbox (Regular channel); the Substrate installer's 1.37 on the Rapid channel |
+| Agent Sandbox | v1.0.6 (manifests fetched by `fetch_vendor.sh`) |
+| Agent Substrate | v1.0.1, images `ghcr.io/agent-substrate/substrate:v1.0.1`, commit `20778a6dbb01f13024642851bb592bf67c9fec05` |
+| Substrate installer | ai-on-gke/substrate-gke at `0de82014290a31321a9c9f1f6cde48b1d7f48b66` |
+| Agent Executor | google/ax v0.4.0-rc.1, `2701b10b459e6fe69ae3e4e0a1422641f349e229` (a preview) |
+| Antigravity CLI | agy 1.5.13 (fetched and checksum-verified) |
+| Model | `gemini-4-hydrogen-medium`, Vertex AI, global. If your project can't call it, set `LAB_MODEL` and say so beside your results |
+| clinicbench (optional) | https://github.com/kltownsend/clinicbench at `1d45ebdee80b74af4b26a98280deb4f7ec863cca` |
+| LoopControlBench (team two) | https://github.com/kltownsend/loopcontrolbench at `2b4e733c6bf5b563e38188fe1f8135f37cce07b7` |
+| Workstation | Python 3.13, Go 1.27.3, Docker with buildx, gcloud with the GKE auth plugin, kubectl, git, curl |
 
-## 1. Configure
+## 0. Before you start
+
+**APIs** on the project: Kubernetes Engine, Compute Engine, Artifact Registry, Vertex AI, Cloud Logging, IAM
+and IAM Service Account Credentials (`iamcredentials.googleapis.com`, which the token minting needs).
+
+**Your own permissions** (the operator, not the agent): enough to create GKE clusters, node pools, disks,
+buckets, firewall rules, an Artifact Registry repository, a service account and IAM bindings. Project Owner
+on a throwaway project covers it. You also need permission to impersonate the agent's service account; step
+1 grants it.
+
+**Quota:** Agent Substrate's bundled database takes a 500 GiB balanced persistent disk, which counts against
+the regional SSD quota. Request a raise before install day if yours is lower; it isn't instant.
+
+## 1. Configure and bootstrap
 
 ```bash
 cp lab.env.example lab.env        # git-ignored; set LAB_PROJECT, and anything else you change
 source harness/lab_env.sh          # in every shell that runs the lab
 ```
 
-`harness/lab_env.sh` derives the rest: the agent's service-account email, the Artifact Registry path, and a
-gcloud configuration directory of the lab's own (`$HOME/.config/gcloud-$LAB_PROJECT`), so your own gcloud and
-Application Default Credentials stay untouched.
+`harness/lab_env.sh` derives the rest: the agent's service-account email (`LAB_AGENT`), the Artifact Registry
+path (`LAB_REGISTRY`), and a gcloud configuration directory of the lab's own
+(`$HOME/.config/gcloud-$LAB_PROJECT`), so your own gcloud and Application Default Credentials stay untouched.
 
-Then, once:
+The Python environment for the token minters:
 
 ```bash
-gcloud auth login                                   # into the lab's own gcloud config
+python3.13 -m venv "$LAB_SRC/venv" && "$LAB_SRC/venv/bin/pip" install -r requirements.txt
+# then in lab.env:  GOOGLE_AUTH_PY=$LAB_SRC/venv/bin/python   (and re-source harness/lab_env.sh)
+```
+
+The pinned upstream checkouts and tools:
+
+```bash
+mkdir -p "$LAB_SRC"
+git clone https://github.com/agent-substrate/substrate.git "$SUBSTRATE_DIR"
+git -C "$SUBSTRATE_DIR" checkout 20778a6dbb01f13024642851bb592bf67c9fec05
+(cd "$SUBSTRATE_DIR" && go install ./cmd/kubectl-ate)            # kubectl ate, from v1.0.1
+git clone https://github.com/ai-on-gke/substrate-gke.git "$SUBSTRATE_GKE_DIR"
+git -C "$SUBSTRATE_GKE_DIR" checkout 0de82014290a31321a9c9f1f6cde48b1d7f48b66
+kubectl ate --help >/dev/null && echo "kubectl ate ok"
+```
+
+The project side, once, in the lab's gcloud config:
+
+```bash
+gcloud auth login
+gcloud config set project "$LAB_PROJECT"
+gcloud services enable container.googleapis.com compute.googleapis.com artifactregistry.googleapis.com \
+    aiplatform.googleapis.com logging.googleapis.com iam.googleapis.com iamcredentials.googleapis.com
 gcloud iam service-accounts create "$LAB_AGENT_SA_NAME" --project "$LAB_PROJECT"
 gcloud projects add-iam-policy-binding "$LAB_PROJECT" \
     --member "serviceAccount:$LAB_AGENT" --role roles/aiplatform.user
+gcloud iam service-accounts add-iam-policy-binding "$LAB_AGENT" --project "$LAB_PROJECT" \
+    --member "user:$(gcloud config get-value account)" --role roles/iam.serviceAccountTokenCreator
 gcloud artifacts repositories create lab-images --repository-format docker \
     --location "$LAB_REGION" --project "$LAB_PROJECT"
+gcloud auth configure-docker "$LAB_REGION-docker.pkg.dev"
 gcloud auth application-default login --impersonate-service-account "$LAB_AGENT"
 ```
 
-The service account's one grant is Vertex AI user. That's the identity the agent's model calls run as; the
-token minters (`agent/mint_token.py`, `harness/token_secret.py`) mint short-lived tokens for it by
-impersonation, and no personal credential reaches a sandbox.
+The agent's service account gets one project role, Vertex AI user. That role allows more Vertex AI operations
+than the one generate call the lab makes, which is one more reason for a project with nothing else in it. If
+your organization grants roles at the folder or organization level, check what the account inherits. A custom
+role with only the prediction permissions is tighter; the lab didn't test one.
+
+**Preflight**, before anything meters: mint one token and check whose it is.
+
+```bash
+$GOOGLE_AUTH_PY agent/mint_token.py "$(mktemp -d)"      # must print {"minted_for": "<your LAB_AGENT>", ...}
+```
 
 ## 2. Fetch what isn't redistributed
 
 ```bash
-./fetch_vendor.sh
+./fetch_vendor.sh            # dry run: lists what it would download
+./fetch_vendor.sh --yes      # after a yes: agy 1.5.13 (about 190 MB) and the Agent Sandbox manifests
 ```
 
-Downloads Google's Antigravity CLI (agy 1.5.13, Linux x64 and arm64, about 190 MB) and the Agent Sandbox
-v1.0.6 manifests, and checks each against the checksum the lab recorded. It needs a yes: it's a download
-under Google's terms.
+Each file is checked against the checksum the lab recorded when it downloaded it.
 
 ## 3. Free checks on your workstation
 
 ```bash
-git clone https://github.com/kltownsend/clinicbench "$LAB_SRC/clinicbench"
 $LAB_PYTHON -m unittest discover -s tests -v
 ```
 
-161 tests, Docker running. They cover the judge (honest answers pass; forgeries, key reads, symlinks,
-out-of-scope edits and regressions fail), the controller, the venues and the harness. Two or three skip
-without a lab credential or the team-two checkout. `docs/JUDGE.md` explains the judge and how to validate a
-workspace by hand.
+161 tests with Docker running; two or three skip without a lab credential or the team-two checkout. They cover
+the judge (honest answers pass; forgeries, key reads, symlinks, out-of-scope edits and regressions fail), the
+controller, the venues and the harness. No clinicbench checkout is needed: the case trees ship in `baselines/`.
+`docs/JUDGE.md` explains the judge and how to validate a workspace by hand.
 
 Optionally, Agent Substrate on a local kind cluster by Google's quickstart (`infra/substrate/local/`,
 `infra/substrate/local_env.sh`). The lab used it only to check its own apparatus, never as a result.
@@ -85,92 +143,120 @@ Optionally, Agent Substrate on a local kind cluster by Google's quickstart (`inf
 
 ```bash
 docker buildx build --platform linux/amd64 -f agent/Dockerfile.agent \
-    --build-context agy=agent/vendor/agy-1.5.13-x64/x -t "$LAB_REGISTRY/lab-agent" --push .
+    --build-context agy=agent/vendor/agy-1.5.13-x64/x -t "$LAB_REGISTRY/lab-agent:run" --push .
 docker buildx build --platform linux/amd64 -f agent/Dockerfile.actor \
-    --build-context agy=agent/vendor/agy-1.5.13-x64/x -t "$LAB_REGISTRY/lab-actor" --push .
+    --build-context agy=agent/vendor/agy-1.5.13-x64/x -t "$LAB_REGISTRY/lab-actor:run" --push .
+docker buildx imagetools inspect "$LAB_REGISTRY/lab-agent:run" --format '{{.Name}}@{{.Manifest.Digest}}'
+docker buildx imagetools inspect "$LAB_REGISTRY/lab-actor:run" --format '{{.Name}}@{{.Manifest.Digest}}'
 ```
 
-Paste each pushed digest (`...@sha256:...`) into `lab.env` as `LAB_AGENT_IMAGE` and `LAB_ACTOR_IMAGE`; the
-venues refuse an image that isn't pinned by digest. The Executor and team-two images build the same way
-(`infra/executor/image/Dockerfile`, `infra/substrate/team-lcb/Dockerfile`; each file's header has its command).
+Paste each digest reference into `lab.env` as `LAB_AGENT_IMAGE` and `LAB_ACTOR_IMAGE`, then re-source
+`harness/lab_env.sh`; the venues refuse an image that isn't pinned by digest. The Executor and team-two images
+build the same way (`infra/executor/image/Dockerfile`, `infra/substrate/team-lcb/Dockerfile`; each file's header
+has its command).
 
 ## 5. The plain GKE baselines (optional)
 
 Three clusters, one at a time, each deleted before the next: `default` (GKE defaults plus Workload Identity),
 `hardened` (what a team restricts by hand) and `vulnerable` (deliberately open, so the probes have something to
-find).
+find; don't leave it running). `infra/cluster.sh` is a dry run unless given `--apply`.
 
 ```bash
-infra/cluster.sh hardened                          # dry run: prints the commands
-infra/cluster.sh hardened --apply                  # after a yes on the cost
-infra/cluster.sh setup --profile hardened --apply
+infra/cluster.sh hardened                              # prints the commands; read them
+infra/cluster.sh hardened --apply                      # after a yes on the cost
+infra/cluster.sh setup --profile hardened --apply      # kubectl credentials and the profile's manifests
+kubectl config current-context                         # must name lab-hardened in your project
 infra/cluster.sh listener --profile hardened --apply   # the canary listener for the reach test
 $LAB_PYTHON harness/probe_run.py --venue hardened --out runs/probes
 $LAB_PYTHON harness/reach_run.py --profile hardened --case S01 --out runs/reach
 infra/cluster.sh down --apply && infra/cluster.sh inventory --apply
 ```
 
+The hardened profile restricts the control plane to `OPERATOR_CIDR` (your workstation's address as a /32);
+set it in `lab.env` first.
+
 ## 6. Agent Sandbox (optional)
 
 ```bash
-infra/cluster.sh sandbox --apply                  # the cluster plus the gVisor node pool
-infra/cluster.sh setup --profile sandbox --apply
+infra/cluster.sh sandbox --apply                       # the cluster plus the gVisor node pool
+infra/cluster.sh setup --profile sandbox --apply       # Agent Sandbox v1.0.6, its policy, the lab's template
 $LAB_PYTHON harness/probe_run.py --venue sandbox --out runs/probes
 ```
 
 ## 7. Agent Substrate
 
-Install by Google's documented path, an interactive wizard. `infra/substrate/INSTALL.md` has the pinned
-versions and every answer the lab gave. Rehearse it free with `make dry-run` in the substrate-gke checkout.
-Save the exit summary: it prints the snapshot bucket (`SUBSTRATE_BUCKET` in `lab.env`) and the teardown
-commands.
+Install by Google's documented path, an interactive wizard. `infra/substrate/INSTALL.md` has every answer the
+lab gave; rehearse it free with `make dry-run` in `$SUBSTRATE_GKE_DIR`. Save the exit summary: it prints the
+snapshot bucket (set `SUBSTRATE_BUCKET` in `lab.env`) and the teardown commands.
 
 Then the lab's part, and the token supply, which keeps the gateway's injected token fresh during runs:
 
 ```bash
 infra/cluster.sh setup --profile substrate --apply
-$GOOGLE_AUTH_PY harness/token_secret.py &
+kubectl config current-context                          # must name $LAB_CLUSTER in your project
+$GOOGLE_AUTH_PY harness/token_secret.py --once          # must print "token written"
+$GOOGLE_AUTH_PY harness/token_secret.py &               # then keep it fresh while you run
 ```
 
-The experiments, each mapped to its page on the project site. Every one but the case set and team two runs
-with no model calls.
+The token supply refuses any kubectl context but your cluster in your project. The token stays out of the
+actor, but anyone who can read Secrets in its namespace can read it, and it stays valid for up to an hour
+after the refresher stops.
 
-| Run | Command | Site page |
+The experiments, each mapped to its page on the project site. Run them one at a time on a new install, from
+the repository root. All but the case set and team two make no model calls.
+
+| Run | Command (prefix each with `$LAB_PYTHON`) | Site page |
 |---|---|---|
 | Token containment and the escape suite | `harness/probe_run.py --venue substrate --out runs/probes` | /tests/gateway-keys/ |
 | Suspend and resume, continuity checks | `harness/resume_probe.py --explicit 20 --wake 20 --out runs/resume` | /tests/picks-up/ |
 | The same from storage, past the 30-minute local copy | `harness/resume_probe.py --storage 12 --wait 2100 --out runs/resume` | /tests/picks-up/ |
 | First request after a long idle, inside the cluster | `harness/incluster_wake.py --n 12 --wait 2100 --out runs/wake` | /tests/restore-500ms/ |
-| Google's own benchmark under lab settings | `harness/google_bench.py setup --apply`, `build --apply`, `run TEST --apply` (`list` shows the tests) | /tests/density-10x/ |
+| Google's own benchmark under lab settings | `harness/google_bench.py list`, then `setup --apply`, `build --apply`, `run TEST --apply` | /tests/density-10x/ |
 | The container control for density | `harness/density_control.py --apply --out runs/density` | /tests/density-10x/ |
 | Per-team identities and the isolation matrix | `harness/tenants.py setup`, `run`, `teardown` | /teams/ |
 | Cross-team reach from a team-two actor | `harness/cross_team_probe.py` | /teams/ |
 | Warm-pool reuse, a long held call, the no-network actor | `harness/remaining_small.py reuse`, `longcall SECONDS`, `denyall` | /tests/warm-pool/ |
-| The Clinic case set | `LAB_SUBSTRATE_POLL=1 harness/pilot.py --gke substrate --dangerous --cap 50 --out runs/caseset` | /tests/coding-environments/ |
+| The Clinic case set | `harness/pilot.py --gke substrate --dangerous --cap 50 --out runs/caseset` with `LAB_SUBSTRATE_POLL=1` set | /tests/coding-environments/ |
 | Its report | `harness/pilot_report.py runs/caseset` | /tests/coding-environments/ |
-| Team two (LoopControlBench) | `harness/lcb_team.py onboard --apply`, `probes --apply`, `run --tasks 10 --cap 25 --apply` | /teams/ |
-
-Run them through `$LAB_PYTHON` from the repository root, one at a time on a new install.
+| Team two (LoopControlBench, cloned to `$LCB_DIR`) | `harness/lcb_team.py onboard --apply`, `probes --apply`, `run --tasks 10 --cap 25 --apply` | /teams/ |
 
 `LAB_SUBSTRATE_POLL=1` starts each agent call detached inside the actor and checks back every 10 seconds. A
 request held open and silent through Substrate's router is cut at about 5 minutes; without the polled wait,
-long agent calls fail as infrastructure. `--dangerous` turns agy's own permission prompts off, so the
-runtime's controls are the only ones; leave it off to compare with the prompts on.
+long agent calls fail as infrastructure.
+
+`--dangerous` turns agy's own permission prompts off, so the runtime's controls are the only ones. That's the
+point of the test, and it's why the containment probes come first: run the probe row and read its results
+before any `--dangerous` run, and leave the flag off if anything there surprised you. `--cap` is the harness's
+own stop on estimated model spend in dollars, priced from token counts; it's not a billing limit, which is
+what the budget alert is for.
+
+Agent Executor (a preview) has a venue and an image here, but no guided run: the lab stopped testing it after
+its first run. To try it, install AX v0.4.0-rc.1 by its own docs, set `LAB_TOKEN_NAMESPACE=ax-system`,
+`LAB_TOKEN_AX_LABEL=1` and `LAB_TOKEN_CLUSTER` for the token supply, and run
+`$LAB_PYTHON harness/probe_run.py --venue executor`.
 
 ## 8. End every session parked
 
 ```bash
-infra/cluster.sh park --apply        # node pools to zero, a manifest of what remains
-infra/cluster.sh inventory --apply   # must print "inventory clean"
-infra/cluster.sh unpark --apply      # next session
+$GOOGLE_AUTH_PY harness/token_secret.py --delete   # stop the refresher first (kill its process)
+$LAB_PYTHON harness/tenants.py teardown            # if you ran the isolation matrix
+infra/cluster.sh park --apply                      # node pools to zero, and a manifest of what remains
+infra/cluster.sh inventory --apply
 ```
+
+"Inventory clean" means nothing is running and nothing exists beyond what `park` recorded. It doesn't mean
+nothing bills: a parked Substrate install keeps its cluster, the 500 GiB database disk, the snapshot buckets
+and two firewall rules, about $1.70 a day for the lab. `infra/cluster.sh unpark --apply` resumes.
 
 When you're done for good: `infra/cluster.sh substrate-down --apply` runs Google's teardown in order (the
 actors, `ate-setup delete`, the database disk, `tools/cleanup-gcp`), then the lab's own `down` and the
-inventory. Never assume teardown worked: read the inventory.
+inventory. It needs `SUBSTRATE_BUCKET`. Then remove what step 1 created, if you won't run again: the Artifact
+Registry repository, the agent's service account (which removes its bindings), and the lab's gcloud config
+directory. Never assume a teardown worked: read the inventory.
 
 ## What to change, and what not to
 
-The probes, the judge and the cases are the instrument; change them and you're measuring something else, which
-is fine, but say so beside the result. The venues, the cluster sizes, the model and the case set are the
-settings; the lab's are in `lab.env.example` and this guide. Raw results land in `runs/` (git-ignored).
+The probes, the judge and the cases are the instrument; change them and you're measuring something else,
+which is fine, but say so beside the result. The venues, the cluster sizes, the model and the case set are the
+settings; the lab's are in `lab.env.example` and this guide. Raw results land in `runs/` (git-ignored); keep
+them, including the runs you exclude, with the reason.

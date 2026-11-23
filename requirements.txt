@@ -1,0 +1,4 @@
+# The harness itself is standard library only. These are for the token minters
+# (agent/mint_token.py, harness/token_secret.py), at the versions the lab ran.
+google-auth==2.23.4
+requests==2.31.0
