@@ -390,7 +390,7 @@ inventory)
     done <<< "$got"; }
   # A parked cluster (infra/cluster.sh park) may leave exactly what its manifest names, and no
   # instance: its node pools are at zero.
-  PARKED=$(ls "$(dirname "$0")"/../runs/.parked-*.json 2>/dev/null | head -1)
+  PARKED=$(ls "$(dirname "$0")"/../runs/.parked-*.json 2>/dev/null | head -1 || true)   # none: not parked (ls fails; pipefail)
   pk() { [[ -n $PARKED ]] && python3 -c "import json,sys;print(' '.join(json.load(open(sys.argv[1]))['allowed'].get(sys.argv[2],[])))" "$PARKED" "$1"; }
   if [[ -n $PARKED ]]; then
     echo "parked: $(basename "$PARKED") (the cluster, its disks, buckets, firewall rules and installer service accounts allowed)"
