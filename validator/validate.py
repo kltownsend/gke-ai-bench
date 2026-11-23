@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The judge: decides whether a triage case is done. It never imports workspace code.
 
-Rebuilt after the ChatGPT build review (reviews/gke-agent-runtimes-build-brief.reconciled.md),
+Rebuilt after an adversarial build review,
 which showed that the v0 validator ran its checks inside the process that imported the code under
 test and trusted that process's last JSON line. A six-line atexit hook forged a pass; workspace
 code read the answer key. The fix is DCITL's own separation:

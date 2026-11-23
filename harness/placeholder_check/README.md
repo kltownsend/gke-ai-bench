@@ -8,8 +8,16 @@ fake Google front end on an internal Docker network (no internet, no real token,
 2. trust a CA given by `SSL_CERT_FILE`, as Substrate's MITM egress gateway requires;
 3. reach its model call with only `aiplatform.googleapis.com` resolvable.
 
-Make a throwaway CA and a leaf for `*.googleapis.com` in `ca/` and `srv/` (openssl; see the notes
-entry for the commands), then:
+Make a throwaway CA and a leaf for `*.googleapis.com` in `ca/` and `srv/` (valid one day; never reuse them):
+
+    mkdir -p ca srv
+    openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj "/CN=lab throwaway CA" \
+        -keyout ca/ca.key -out ca/ca.pem
+    openssl req -newkey rsa:2048 -nodes -subj "/CN=*.googleapis.com" -keyout srv/leaf.key -out srv/leaf.csr
+    openssl x509 -req -days 1 -in srv/leaf.csr -CA ca/ca.pem -CAkey ca/ca.key -CAcreateserial \
+        -extfile <(printf "subjectAltName=DNS:*.googleapis.com") -out srv/leaf.pem
+
+Then:
 
     bash run.sh -e SSL_CERT_FILE=/run/ate/egress-trust-bundle/ca.pem             # all hosts
     bash run.sh                                                                     # no CA: must fail

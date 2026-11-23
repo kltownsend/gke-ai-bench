@@ -16,3 +16,10 @@ __pycache__/
 # Vendored binaries (agy builds): fetched by each user, not redistributed.
 agent/vendor/
 infra/vendor/
+
+# The placeholder check's throwaway certificates.
+harness/placeholder_check/ca/
+harness/placeholder_check/srv/*.pem
+harness/placeholder_check/srv/*.key
+harness/placeholder_check/srv/*.csr
+harness/placeholder_check/srv/*.srl
