@@ -186,7 +186,9 @@ infra/cluster.sh down --apply && infra/cluster.sh inventory --apply
 ```
 
 The hardened profile restricts the control plane to `OPERATOR_CIDR` (your workstation's address as a /32);
-set it in `lab.env` first.
+set it in `lab.env` first. If it's unset, `harness/drive.sh` looks the address up from
+`checkip.amazonaws.com`, a third-party (AWS) service: the only call the workstation makes outside Google Cloud
+and the upstream downloads.
 
 ## 6. Agent Sandbox (optional)
 

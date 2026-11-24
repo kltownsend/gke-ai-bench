@@ -2,7 +2,13 @@
 # One cluster at a time: create, set up, [listener], probe, [reach], tear down, inventory.
 # Teardown runs whatever happens. PROFILES picks clusters; REACH=1 adds the listener and a reach run.
 cd "$(dirname "$0")/.." && source harness/lab_env.sh
-export OPERATOR_CIDR="$(curl -s --max-time 10 https://checkip.amazonaws.com)/32"
+# The hardened profile's authorized network. Set OPERATOR_CIDR in lab.env to skip the lookup; otherwise
+# this asks a third-party service, checkip.amazonaws.com (AWS), for the workstation's public address.
+if [[ -z ${OPERATOR_CIDR:-} ]]; then
+  echo "OPERATOR_CIDR not set: asking checkip.amazonaws.com for this workstation's public address" >&2
+  OPERATOR_CIDR="$(curl -fsS --max-time 10 https://checkip.amazonaws.com)/32"
+fi
+export OPERATOR_CIDR
 R=${OUT:-runs/probes}; mkdir -p "$R"
 for PR in ${PROFILES:-default hardened vulnerable}; do
   echo "== $PR $(date '+%H:%M:%S')"

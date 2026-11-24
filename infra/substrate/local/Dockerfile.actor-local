@@ -1,7 +1,8 @@
 # The local shakeout's actor (kind on Docker Desktop, arm64; apparatus checks only). The actor
 # server on Python 3.13 without agy: the snapshot-and-restore probe makes no agent or model calls.
 # The GKE run uses agent/Dockerfile.actor on the agy image.
-FROM python:3.13-slim
+# The same multi-arch python 3.13 slim index the other images pin (it carries arm64 and amd64).
+FROM python@sha256:6771159cd4fa5d9bba1258caf0b82e6b73458c694d178ad97c5e925c2d0e1a91
 COPY actor_server.py pod_sandbox.py /opt/lab/
 RUN chmod 0444 /opt/lab/*.py && mkdir -p /work /home/agent && chown 10001:10001 /work /home/agent
 USER 10001:10001
