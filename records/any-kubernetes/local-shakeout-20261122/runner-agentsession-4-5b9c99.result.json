@@ -1,0 +1,15 @@
+{
+ "test": "agentsession_4",
+ "job": "runner-agentsession-4-5b9c99",
+ "dest": "/tmp/bench/agentsession_4",
+ "source": "guide's agent-session invocation; 4 users, 10 min, sync lifecycle (lab sizing); users overridden to 2 (shakeout); duration overridden to 3m (shakeout)",
+ "complete": true,
+ "served": {
+  "ok": true,
+  "requests": 258,
+  "failures": 0,
+  "permission_denied_lines": 0
+ },
+ "worker_nodepools": [],
+ "runner_placement": "local shakeout: one kind node, shared"
+}

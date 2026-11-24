@@ -1,0 +1,3013 @@
+{
+ "case": "T12",
+ "venue": "local sandbox",
+ "label": "pilot-r3",
+ "egress_allow": "default",
+ "final_stage": "waiting_for_approval",
+ "attempts": 3,
+ "wall_seconds": 1220,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 81429,
+    "output_tokens": 19047,
+    "thinking_tokens": 17968,
+    "cache_read_tokens": 148062,
+    "total_tokens": 100476
+   },
+   "seconds": 121.515731668,
+   "turns": 1
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 29761,
+    "output_tokens": 3287,
+    "thinking_tokens": 2842,
+    "cache_read_tokens": 85685,
+    "total_tokens": 33048
+   },
+   "seconds": 193.821816951,
+   "turns": 1
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 78340,
+    "output_tokens": 15088,
+    "thinking_tokens": 14141,
+    "cache_read_tokens": 119012,
+    "total_tokens": 93428
+   },
+   "seconds": 220.723626588,
+   "turns": 1
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 53335,
+    "output_tokens": 5729,
+    "thinking_tokens": 3553,
+    "cache_read_tokens": 295254,
+    "total_tokens": 59064
+   },
+   "seconds": 519.887324032,
+   "turns": 1
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 82544,
+    "output_tokens": 22491,
+    "thinking_tokens": 21125,
+    "cache_read_tokens": 315820,
+    "total_tokens": 105035
+   },
+   "seconds": 158.488459962,
+   "turns": 1
+  }
+ ],
+ "totals": {
+  "input_tokens": 325409,
+  "output_tokens": 65642,
+  "thinking_tokens": 59629,
+  "cache_read_tokens": 963833
+ },
+ "egress": {
+  "denied:www.googleapis.com": 5,
+  "allowed:aiplatform.googleapis.com": 12,
+  "denied:play.googleapis.com": 388
+ },
+ "tokens_served": 5,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/policy.py"
+   ],
+   "symbols": [
+    "clinicbench.policy.PatientPolicy._in_truth"
+   ],
+   "attribution": null,
+   "cause": "PatientPolicy._in_truth does not check that 'book' is in self.t['intents'] before accepting a booking offer, unlike 'cancel'. When a reschedule workflow pivots to 'book' (triggered by 'schedule' in the patient's rambling color), the patient's populated schedule['works'] causes them to confirm the new booking instead of refusing it."
+  },
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/policy.py"
+   ],
+   "symbols": [
+    "clinicbench.policy.PatientPolicy._in_truth"
+   ],
+   "attribution": null,
+   "cause": "PatientPolicy._in_truth accepts a `book` offer whenever the slot is in schedule[\"works\"] without checking that \"book\" is in self.t[\"intents\"]. When the driver pivots from reschedule to book (triggered by \"schedule\" in a rambling color line), the patient confirms the new booking instead of refusing it."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_intents",
+    "clinicbench.adapters.dcitl_port.Driver.route"
+   ],
+   "attribution": null,
+   "cause": "When a patient moving an appointment picks a new time and includes rambling color text mentioning 'schedule', parse_intents matches it as 'book' and Driver.route pivots the open 'reschedule' workflow to 'book' (which PatientPolicy._in_truth then confirms because it does not check 'book' in intents)."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-canary-t0ef3v_6/clinicbench",
+ "egress_log": [
+  {
+   "event": "start",
+   "egress_allow": [
+    "aiplatform.googleapis.com"
+   ],
+   "project": "example-project",
+   "t": 1795237123.945
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795237125.088
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795237125.089
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237125.118
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237125.121
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237130.048
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237135.052
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237140.057
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237145.06
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237150.066
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237155.074
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237160.082
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237165.087
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237170.092
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237175.096
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237180.101
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237185.106
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237190.115
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237195.123
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237200.126
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237205.129
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237210.134
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237215.138
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237220.146
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237225.155
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237230.159
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237235.167
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237240.176
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237245.181
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237246.963
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237246.964
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795237247.411
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795237247.412
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237247.448
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237247.451
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237252.386
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237257.394
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237262.396
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237267.4
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237272.404
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237277.406
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237282.409
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237287.413
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237292.418
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237297.423
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237302.43
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237307.435
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237312.438
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237317.446
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237322.449
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237327.451
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237332.456
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237337.463
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237342.467
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237347.472
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237352.475
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237357.479
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237362.485
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237367.489
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237372.494
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237377.497
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237382.503
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237387.506
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237392.509
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237397.514
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237402.518
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237407.523
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237412.526
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237417.531
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237422.536
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237427.541
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237432.545
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237437.551
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237441.751
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237441.752
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795237442.231
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795237442.232
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237442.257
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237442.258
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237447.203
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237452.207
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237457.212
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237462.215
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237467.218
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237472.22
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237477.225
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237482.229
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237487.23
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237492.232
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237497.234
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237502.237
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237507.241
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237512.246
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237517.251
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237522.254
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237527.262
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237532.267
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237537.271
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237542.277
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237547.281
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237552.288
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237557.292
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237562.295
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237567.309
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237572.315
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237577.317
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237582.319
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237587.321
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237592.322
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237597.324
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237602.326
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237607.328
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237612.33
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237617.336
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237622.34
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237627.347
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237632.352
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237637.358
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237642.362
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237647.366
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237652.37
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237657.374
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237662.378
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237663.264
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237663.265
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795237663.734
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795237663.735
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237663.83
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237663.831
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237668.704
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237668.705
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237673.707
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237673.708
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237678.71
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237678.71
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237683.713
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237683.713
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237688.716
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237688.717
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237693.72
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237693.721
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237698.724
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237698.724
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237703.728
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237703.728
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237708.732
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237708.733
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237713.735
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237713.735
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237718.739
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237718.739
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237723.743
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237723.743
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237728.746
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237728.747
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237733.735
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237733.735
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237738.738
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237738.739
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237743.741
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237743.742
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237748.744
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237748.744
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237753.746
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237753.747
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237758.749
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237758.749
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237763.746
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237763.746
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237768.75
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237768.75
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237773.755
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237773.755
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237778.758
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237778.758
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237783.76
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237783.76
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237788.767
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237788.767
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237793.771
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237793.771
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237798.776
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237798.776
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237803.779
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237803.78
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237808.782
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237808.784
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237813.79
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237813.791
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237818.795
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237818.796
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237823.799
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237823.8
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237828.804
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237828.806
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237833.808
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237833.81
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237838.816
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237838.817
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237843.818
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237843.82
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237848.823
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237848.824
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237853.826
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237853.828
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237858.83
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237858.831
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237863.834
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237863.835
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237868.839
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237868.84
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237873.843
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237873.844
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237878.845
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237878.846
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237883.848
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237883.849
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237888.85
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237888.852
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237893.856
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237893.858
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237898.866
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237898.867
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237903.876
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237903.877
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237908.88
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237908.882
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237913.884
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237913.885
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237918.887
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237918.889
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237923.89
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237923.893
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237928.895
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237928.896
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237933.898
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237933.899
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237938.904
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237938.905
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237943.913
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237943.914
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237948.92
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237948.921
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237953.923
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237953.925
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237958.926
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237958.928
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237963.935
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237963.937
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237965.368
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795237965.37
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237968.941
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237968.942
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237973.947
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237973.949
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237978.951
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237978.953
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237983.955
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237983.958
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237988.958
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237988.961
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237993.962
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237993.965
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237998.966
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795237998.969
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238003.972
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238003.974
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238008.975
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238008.978
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238013.978
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238013.981
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238018.982
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238018.986
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238023.985
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238023.989
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238028.989
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238028.993
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238033.993
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238033.997
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238038.996
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238039.003
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238044.0
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238044.006
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238049.002
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238049.011
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238054.007
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238054.015
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238059.011
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238059.021
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238064.014
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238064.025
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238069.018
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238069.029
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238074.028
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238074.033
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238079.034
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238079.036
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238084.036
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238084.04
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238089.038
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238089.043
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238094.041
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238094.047
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238099.042
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238099.05
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238104.044
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238104.052
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238109.046
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238109.055
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238114.05
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238114.057
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238119.056
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238119.061
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238124.061
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238124.062
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238129.065
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238129.066
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238134.067
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238134.068
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238139.069
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238139.069
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238144.072
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238144.074
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238149.083
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238149.086
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238154.085
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238154.088
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238159.088
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238159.092
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238164.092
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238164.097
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238169.096
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238169.102
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238174.099
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238174.106
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238179.11
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238179.111
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238184.112
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238184.115
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238184.133
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238184.135
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238184.135
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795238184.655
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795238184.655
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238184.717
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238184.717
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238189.632
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238189.633
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238194.636
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238194.637
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238199.641
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238199.641
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238204.643
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238204.644
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238209.648
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238209.648
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238214.652
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238214.652
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238219.654
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238219.655
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238224.658
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238224.659
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238229.661
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238229.662
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238234.664
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238234.666
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238239.668
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238239.669
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238244.67
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238244.671
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238249.675
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238249.675
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238254.676
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238254.678
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238259.677
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238259.68
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238264.679
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238264.681
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238269.684
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238269.685
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238274.689
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238274.69
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238279.692
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238279.694
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238284.696
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238284.697
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238289.699
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238289.701
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238294.703
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238294.704
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238299.706
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238299.707
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238304.71
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238304.711
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238309.713
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238309.715
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238314.717
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238314.719
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238319.72
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238319.722
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238324.724
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238324.726
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238329.728
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238329.729
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238334.732
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238334.733
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238339.735
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238339.737
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238343.583
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238343.583
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238343.584
+  }
+ ]
+}

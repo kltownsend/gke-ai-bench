@@ -1,0 +1,14 @@
+{
+ "window_s": 3600,
+ "form": "good / valid resumes (Substrate SLO guide's SLI form)",
+ "metric": null,
+ "thresholds": {},
+ "restore_histogram": {
+  "p50_s": null,
+  "p90_s": null,
+  "p99_s": null
+ },
+ "errors": [
+  "no resume histogram found under either name; the SLI is not computed"
+ ]
+}

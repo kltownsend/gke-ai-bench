@@ -1,0 +1,68 @@
+{
+ "case": "T13",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 100,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 125557,
+    "output_tokens": 13987,
+    "thinking_tokens": 12493,
+    "cache_read_tokens": 637899,
+    "total_tokens": 139544
+   },
+   "seconds": 89.141992651,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a **finding** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py) / [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)):\n\n- In [`Driver.reschedule`](file:///work/clinicbench/adapters/dcitl_port.py#L563-L575), `re.sub(r\"\\bfrom\\b.*?\\bto\\b\", \" to \", u, flags=re.I)` strips any appointment ID placed between `from` and `to`, and `re.split(r\"\\bto\\b\", u, maxsplit=1, flags=re.I)` splits on the first `\"to\"` (such as `\"to move\"` in `\"I need to move A03...\"`), so `head[0]` no longer contains the appointment number.\n- [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) is called on `head[0]`; finding no `A\\d+` ID, date, time, or provider, it hits `if len(mine) == 1 and not (d or t or provs): return mine[0]` and returns the patient's own appointment instead of `None` (preventing the fallback `resolve_appt(u)` check) or `\"not_yours\"`. The driver then proposes moving that appointment and commits the move when the patient says yes.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.reschedule\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\"], \"cause\": \"Driver.reschedule strips 'from ... to' and splits on the first 'to' (including 'to move'), dropping the appointment number from head[0]. Driver.resolve_appt(head[0]) then finds no ID, date, time, or provider and falls back to returning mine[0] (the patient's own appointment), which the driver proposes and moves on confirmation.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 125557,
+  "output_tokens": 13987,
+  "thinking_tokens": 12493,
+  "cache_read_tokens": 637899
+ },
+ "pods": [
+  {
+   "actor": "lab-ec6948d68082",
+   "created_to_healthy_s": 5.6
+  },
+  {
+   "actor": "lab-ec6948d68082",
+   "call_s": 93.0,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.reschedule",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt"
+   ],
+   "attribution": null,
+   "cause": "Driver.reschedule strips 'from ... to' and splits on the first 'to' (including 'to move'), dropping the appointment number from head[0]. Driver.resolve_appt(head[0]) then finds no ID, date, time, or provider and falls back to returning mine[0] (the patient's own appointment), which the driver proposes and moves on confirmation."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-271jpnf3/clinicbench"
+}

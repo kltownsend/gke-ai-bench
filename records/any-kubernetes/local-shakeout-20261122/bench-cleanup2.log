@@ -1,0 +1,4 @@
++ sh -c cd /home/operator/lab-src/substrate && benchmarking/workloads/deploy.sh --delete
+Deleting workloads...
+namespace "benchmark-workloads" deleted
+workerpool.ate.dev "benchmark-worker" deleted from benchmark-workloads namespace

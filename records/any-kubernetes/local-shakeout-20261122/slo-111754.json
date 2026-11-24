@@ -1,0 +1,58 @@
+{
+ "window_s": 3600,
+ "form": "good / valid resumes (Substrate SLO guide's SLI form)",
+ "metric": "ate_actor_lifecycle_operation_duration_seconds",
+ "source": "otel-system Prometheus (kind)",
+ "by_snapshot_kind": {
+  "?": {
+   "valid": 0.0,
+   "0.5s (the post)": {
+    "good": null,
+    "fraction": null
+   },
+   "1s (GKE's About page)": {
+    "good": null,
+    "fraction": null
+   }
+  },
+  "boot": {
+   "valid": 0.0,
+   "0.5s (the post)": {
+    "good": 0.0,
+    "fraction": null
+   },
+   "1s (GKE's About page)": {
+    "good": 0.0,
+    "fraction": null
+   }
+  },
+  "latest": {
+   "valid": 3.027441077441078,
+   "0.5s (the post)": {
+    "good": 3.027441077441078,
+    "fraction": 1.0
+   },
+   "1s (GKE's About page)": {
+    "good": 3.027441077441078,
+    "fraction": 1.0
+   }
+  },
+  "local": {
+   "valid": 55.07307468746875,
+   "0.5s (the post)": {
+    "good": 55.11007688527094,
+    "fraction": 1.0007
+   },
+   "1s (GKE's About page)": {
+    "good": 55.115334028128096,
+    "fraction": 1.0008
+   }
+  }
+ },
+ "restore_histogram": {
+  "p50_s": 0.03811555951016109,
+  "p90_s": 0.04860792549794525,
+  "p99_s": 0.1538747778974045
+ },
+ "errors": []
+}

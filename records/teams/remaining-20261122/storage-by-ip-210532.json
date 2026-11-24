@@ -1,0 +1,24 @@
+{
+ "probe": "storage_by_ip",
+ "storage_ip": "public-ip-9",
+ "model_ip": "public-ip-10",
+ "results": {
+  "storage_ip_storage_sni": {
+   "bytes_back": 0,
+   "first_hex": ""
+  },
+  "model_ip_storage_sni": {
+   "bytes_back": 0,
+   "first_hex": ""
+  },
+  "control_model_ip_model_sni": {
+   "bytes_back": 730,
+   "first_hex": "160303007a02"
+  }
+ },
+ "gateway_decisions": [
+  "{\"actor\":\"spiffe://substrate-actor.local/worker-for-actor/lcb/lab-dd284e0ae90e\",\"authority\":\"aiplatform.googleapis.com\",\"bytes_rcvd\":0,\"bytes_sent\":1561,\"details\":\"via_upstream\",\"duration_ms\":208,\"flags\":\"-\",\"grpc_status\":null,\"leg\":\"mitm\",\"method\":\"GET\",\"path\":\"/\",\"protocol\":\"HTTP/1.1\",\"sni\":\"aiplatform.googleapis.com\",\"status\":404,\"termination\":null,\"time\":\"2026-11-23T03:05:18.491Z\",\"upstream\":\"public-ip-11:443\",\"upstream_failure\":null}",
+  "{\"actor\":\"spiffe://substrate-actor.local/worker-for-actor/lcb/lab-dd284e0ae90e\",\"chain\":\"denied\",\"destination\":\"public-ip-9:443\",\"details\":\"filter_chain_not_found\",\"flags\":\"NR\",\"leg\":\"clienthello\",\"sni\":\"storage.googleapis.com\",\"time\":\"2026-11-23T03:05:20.019Z\"}",
+  "{\"actor\":\"spiffe://substrate-actor.local/worker-for-actor/lcb/lab-dd284e0ae90e\",\"chain\":\"denied\",\"destination\":\"public-ip-10:443\",\"details\":\"filter_chain_not_found\",\"flags\":\"NR\",\"leg\":\"clienthello\",\"sni\":\"storage.googleapis.com\",\"time\":\"2026-11-23T03:05:20.030Z\"}"
+ ]
+}

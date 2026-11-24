@@ -1,0 +1,119 @@
+{
+ "case": "S01",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "canary-pause",
+ "final_stage": "done",
+ "attempts": 1,
+ "wall_seconds": 417,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 53750,
+    "output_tokens": 2005,
+    "thinking_tokens": 1385,
+    "cache_read_tokens": 22789,
+    "total_tokens": 55755
+   },
+   "seconds": 16.734343096,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The bug is in [store.py](file:///work/clinicbench/store.py#L165-L171), which is frozen instrument code listed in [phase3-freeze.json](file:///work/docs/phase3-freeze.json#L9).\n\nIn [`ToolAPI._cancel`](file:///work/clinicbench/store.py#L165-L171), cancelling an appointment pops it from `self.store.appointments` but updates the freed slot's status to `\"booked\"` instead of `\"open\"`:\n\n```python\na = self.store.appointments.pop(appointment_id)\nself.store.slots[a[\"slot\"]].update(status=\"booked\", held_by=None)\n```\n\nBecause the slot stays `\"booked\"`, [`ToolAPI._list`](file:///work/clinicbench/store.py#L132-L137) never includes it as open and [`ToolAPI._slot_free_for`](file:///work/clinicbench/store.py#L139-L141) causes subsequent book/move/hold calls to reject it with `\"That slot is taken.\"`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/store.py\"], \"symbols\": [\"clinicbench.store.ToolAPI._cancel\"], \"cause\": \"ToolAPI._cancel sets the cancelled appointment's slot status to \\\"booked\\\" instead of \\\"open\\\". As a result, list_slots never returns the slot again and subsequent book, move, or hold calls reject it as taken.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 29456,
+    "output_tokens": 1586,
+    "thinking_tokens": 445,
+    "cache_read_tokens": 99822,
+    "total_tokens": 31042
+   },
+   "seconds": 21.079745007,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed `ToolAPI._cancel` in [clinicbench/store.py](file:///work/clinicbench/store.py#L165-L171) to set the cancelled appointment's slot status to `\"open\"` instead of `\"booked\"`.\n\nVerified via `python3` that cancelling an appointment sets the slot status to `\"open\"`, includes it in `list_slots`, and allows another patient to `hold` and `book` that slot. (`pytest` and `git` are not installed in this environment.)\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 83206,
+  "output_tokens": 3591,
+  "thinking_tokens": 1830,
+  "cache_read_tokens": 122611
+ },
+ "pods": [
+  {
+   "actor": "lab-b03a59ed2c5f",
+   "created_to_healthy_s": 6.8
+  },
+  {
+   "actor": "lab-b03a59ed2c5f",
+   "call_s": 22.1,
+   "exit": 0
+  },
+  {
+   "actor": "lab-b03a59ed2c5f",
+   "call_s": 25.6,
+   "exit": 0
+  },
+  {
+   "actor": "lab-b03a59ed2c5f",
+   "suspend_sync_s": 2.5
+  },
+  {
+   "actor": "lab-b03a59ed2c5f",
+   "resume_to_healthy_s": 5.2
+  }
+ ],
+ "pause_at_approval": {
+  "held_s": 300.0,
+  "suspend_sync_s": 2.5,
+  "resume_to_healthy_s": 5.2,
+  "same_process": true,
+  "memory_mark": true,
+  "counter_held": true,
+  "counter_runs_after": true,
+  "child_state": true,
+  "work_intact": true,
+  "home_intact": true,
+  "restarted": false,
+  "rss_kb_before": 36940,
+  "rss_kb_after": 34152,
+  "monotonic_delta_s": 7.431,
+  "wall_delta_s": 310.165,
+  "workspace_matches_approved": true,
+  "controller_owned": [
+   "docs/contract-changes.md"
+  ],
+  "differs": [],
+  "actor_only_files": [],
+  "effects": "ran on the restored actor's workspace"
+ },
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/store.py"
+   ],
+   "symbols": [
+    "clinicbench.store.ToolAPI._cancel"
+   ],
+   "attribution": null,
+   "cause": "ToolAPI._cancel sets the cancelled appointment's slot status to \"booked\" instead of \"open\". As a result, list_slots never returns the slot again and subsequent book, move, or hold calls reject it as taken."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-wsfksbed/clinicbench"
+}

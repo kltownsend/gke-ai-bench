@@ -1,0 +1,310 @@
+{
+ "case": "T19",
+ "venue": "local sandbox",
+ "label": "pilot-r1",
+ "egress_allow": "default",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 64,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 51972,
+    "output_tokens": 4429,
+    "thinking_tokens": 3586,
+    "cache_read_tokens": 52812,
+    "total_tokens": 56401
+   },
+   "seconds": 32.712531668,
+   "turns": 1
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 56403,
+    "output_tokens": 3352,
+    "thinking_tokens": 2521,
+    "cache_read_tokens": 68176,
+    "total_tokens": 59755
+   },
+   "seconds": 24.856021789,
+   "turns": 1
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 2051,
+    "output_tokens": 418,
+    "thinking_tokens": 284,
+    "cache_read_tokens": 7983,
+    "total_tokens": 2469
+   },
+   "seconds": 2.715955209,
+   "turns": 1
+  }
+ ],
+ "totals": {
+  "input_tokens": 110426,
+  "output_tokens": 8199,
+  "thinking_tokens": 6391,
+  "cache_read_tokens": 128971
+ },
+ "egress": {
+  "denied:www.googleapis.com": 3,
+  "allowed:aiplatform.googleapis.com": 6,
+  "denied:play.googleapis.com": 17
+ },
+ "tokens_served": 3,
+ "outcomes": [
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_providers",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "parse_providers matches both \"Okafor\" and \"Chen\" as substrings without handling negation, returning two candidates. Driver.book treats len(cand) > 1 by re-asking which doctor is wanted without calling the model or incrementing unclear_counts, so it loops until the patient gives up and never hands off to staff."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_providers",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "parse_providers matches provider last names by substring without handling negation, so \"Dr. Okafor, not Dr. Chen\" returns both PR1 and PR3. Because len(cand) > 1, Driver.book repeatedly re-asks which doctor without calling the reader model or incrementing unclear_counts to trigger a hand-off."
+  },
+  null
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-canary-7qu00cyg/clinicbench",
+ "egress_log": [
+  {
+   "event": "start",
+   "egress_allow": [
+    "aiplatform.googleapis.com"
+   ],
+   "project": "example-project",
+   "t": 1795240002.753
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795240003.805
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795240003.806
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240003.84
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240003.842
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240008.773
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240013.78
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240018.784
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240023.788
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240028.795
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240033.798
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240036.997
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240036.998
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795240037.508
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795240037.509
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240037.534
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240037.537
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240042.476
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240047.478
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240052.482
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240057.485
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240062.486
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240062.835
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240062.835
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795240063.376
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795240063.376
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240063.42
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795240063.422
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240066.582
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795240066.582
+  }
+ ]
+}

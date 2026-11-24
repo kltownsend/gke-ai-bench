@@ -1,0 +1,28 @@
+LAST SEEN   TYPE     REASON              OBJECT                                           MESSAGE
+31m         Normal   SuccessfulCreate    replicaset/prometheus-6fbccc8c66                 Created pod: prometheus-6fbccc8c66-mj9j2
+31m         Normal   Scheduled           pod/grafana-7bdbf7b5fd-fl4cc                     Successfully assigned benchmarking/grafana-7bdbf7b5fd-fl4cc to kind-control-plane
+31m         Normal   ScalingReplicaSet   deployment/prometheus                            Scaled up replica set prometheus-6fbccc8c66 from 0 to 1
+31m         Normal   Pulling             pod/grafana-7bdbf7b5fd-fl4cc                     Pulling image "grafana/grafana:10.0.0"
+31m         Normal   Pulling             pod/prometheus-6fbccc8c66-mj9j2                  Pulling image "prom/prometheus:v2.45.0"
+31m         Normal   SuccessfulCreate    replicaset/grafana-7bdbf7b5fd                    Created pod: grafana-7bdbf7b5fd-fl4cc
+31m         Normal   ScalingReplicaSet   deployment/grafana                               Scaled up replica set grafana-7bdbf7b5fd from 0 to 1
+31m         Normal   Scheduled           pod/prometheus-6fbccc8c66-mj9j2                  Successfully assigned benchmarking/prometheus-6fbccc8c66-mj9j2 to kind-control-plane
+31m         Normal   Started             pod/grafana-7bdbf7b5fd-fl4cc                     Container started
+31m         Normal   Created             pod/grafana-7bdbf7b5fd-fl4cc                     Container created
+31m         Normal   Pulled              pod/grafana-7bdbf7b5fd-fl4cc                     Successfully pulled image "grafana/grafana:10.0.0" in 5.935s (5.935s including waiting). Image size: 86167483 bytes.
+31m         Normal   Pulled              pod/prometheus-6fbccc8c66-mj9j2                  Successfully pulled image "prom/prometheus:v2.45.0" in 6.911s (6.911s including waiting). Image size: 88157091 bytes.
+31m         Normal   Created             pod/prometheus-6fbccc8c66-mj9j2                  Container created
+31m         Normal   Started             pod/prometheus-6fbccc8c66-mj9j2                  Container started
+7m24s       Normal   SuccessfulCreate    job/runner-durdir-implicit-resume-38c856         Created pod: runner-durdir-implicit-resume-38c856-sfcd6
+7m24s       Normal   Scheduled           pod/runner-durdir-implicit-resume-38c856-sfcd6   Successfully assigned benchmarking/runner-durdir-implicit-resume-38c856-sfcd6 to kind-control-plane
+7m24s       Normal   Pulling             pod/runner-durdir-implicit-resume-38c856-sfcd6   Pulling image "localhost:5001/locust-test:v1.0.1"
+7m22s       Normal   Started             pod/runner-durdir-implicit-resume-38c856-sfcd6   Container started
+7m22s       Normal   Pulled              pod/runner-durdir-implicit-resume-38c856-sfcd6   Successfully pulled image "localhost:5001/locust-test:v1.0.1" in 1.575s (1.575s including waiting). Image size: 110960401 bytes.
+7m22s       Normal   Created             pod/runner-durdir-implicit-resume-38c856-sfcd6   Container created
+5m6s        Normal   Completed           job/runner-durdir-implicit-resume-38c856         Job completed
+2m16s       Normal   SuccessfulCreate    job/runner-durdir-implicit-resume-19f768         Created pod: runner-durdir-implicit-resume-19f768-sjxxb
+2m16s       Normal   Started             pod/runner-durdir-implicit-resume-19f768-sjxxb   Container started
+2m16s       Normal   Created             pod/runner-durdir-implicit-resume-19f768-sjxxb   Container created
+2m16s       Normal   Pulled              pod/runner-durdir-implicit-resume-19f768-sjxxb   Container image "localhost:5001/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+2m16s       Normal   Scheduled           pod/runner-durdir-implicit-resume-19f768-sjxxb   Successfully assigned benchmarking/runner-durdir-implicit-resume-19f768-sjxxb to kind-control-plane
+0s          Normal   Completed           job/runner-durdir-implicit-resume-19f768         Job completed

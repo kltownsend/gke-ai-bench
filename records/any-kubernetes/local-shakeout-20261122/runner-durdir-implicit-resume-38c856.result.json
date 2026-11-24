@@ -1,0 +1,9 @@
+{
+ "test": "durdir_implicit_resume",
+ "job": "runner-durdir-implicit-resume-38c856",
+ "dest": "/tmp/bench/durdir_implicit_resume",
+ "source": "catalog, verbatim",
+ "complete": true,
+ "worker_nodepools": [],
+ "runner_placement": "its own node (lab-bench-runner, e2-standard-4) in the cluster under test; Google's automation uses a separate cluster (disclosed)"
+}

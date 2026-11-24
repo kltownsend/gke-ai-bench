@@ -1,0 +1,142 @@
+{
+ "case": "T19",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 116,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 29867,
+    "output_tokens": 3066,
+    "thinking_tokens": 2264,
+    "cache_read_tokens": 48564,
+    "total_tokens": 32933
+   },
+   "seconds": 20.41468945,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver (`clinicbench/adapters/dcitl_port.py`, generated from `clinicbench/adapters/lab23_dcitl.py.orig`).\n\n### Root Cause\n1. In [`parse_providers`](file:///work/clinicbench/adapters/dcitl_port.py#L107-L115), provider matching checks `p.name.split()[-1].lower() in t` without handling negation, so `\"Dr. Okafor, not Dr. Chen\"` matches both Dr. Chen and Dr. Okafor (`len(cand) == 2`).\n2. In [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L396-L414), whenever `len(cand) > 1`, the driver sets `w[\"prov_options\"] = cand` and returns `\"We have Dr. Chen and Dr. Okafor for dermatology. Which would you like?\"` directly\u2014it never falls back to `self.m.ask(\"provider\", ...)` on a repeat turn and never calls `self.unclear(...)`, so `unclear_counts` never increments and `human_queue` / `hand_off` is never triggered.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_providers\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"parse_providers matches any provider surname substring without handling negation, so 'Dr. Okafor, not Dr. Chen' returns two candidates. In Driver.book, the len(cand) > 1 branch re-asks the same question every turn without consulting the model or calling unclear(), so unclear_counts never reaches 2 and the patient is never handed to staff.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 60168,
+    "output_tokens": 4704,
+    "thinking_tokens": 3465,
+    "cache_read_tokens": 247508,
+    "total_tokens": 64872
+   },
+   "seconds": 35.593941132,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)):\n\n1. [`parse_providers`](file:///work/clinicbench/adapters/dcitl_port.py#L107-L115) checks `p.name.split()[-1].lower() in t` without handling negation, so `\"Dr. Okafor, not Dr. Chen\"` matches both `PR1` (Dr. Chen) and `PR3` (Dr. Okafor).\n2. [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L396-L414) returns `\"We have Dr. Chen and Dr. Okafor for dermatology. Which would you like?\"` directly whenever `len(cand) > 1`, bypassing both `self.m.ask` and `self.unclear`\u2014so `unclear_counts` is never incremented, `human_queue` is never populated for a staff hand-off, and the loop repeats until the patient gives up.\n\n```json\n{\n  \"kind\": \"finding\",\n  \"files\": [\"clinicbench/adapters/dcitl_port.py\"],\n  \"symbols\": [\n    \"clinicbench.adapters.dcitl_port.parse_providers\",\n    \"clinicbench.adapters.dcitl_port.Driver.book\"\n  ],\n  \"cause\": \"parse_providers matches provider last names by substring without handling negation, so \\\"Dr. Okafor, not Dr. Chen\\\" returns both PR1 and PR3. Driver.book then takes the len(cand) > 1 branch and re-asks without calling self.m.ask or self.unclear, so unclear_counts never increments and the patient is never handed off to staff.\",\n  \"attribution\": null\n}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 44866,
+    "output_tokens": 4592,
+    "thinking_tokens": 3823,
+    "cache_read_tokens": 55721,
+    "total_tokens": 49458
+   },
+   "seconds": 35.744779962,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)).\n\n### Cause\n1. In [`parse_providers`](file:///work/clinicbench/adapters/dcitl_port.py#L107-L115), provider matching checks only whether a provider's last name appears as a substring in `u.lower()`, ignoring negation. For `\"Dr. Okafor, not Dr. Chen\"`, both `Dr. Chen` (`PR1`) and `Dr. Okafor` (`PR3`) match, so `parse_providers` returns both IDs.\n2. In [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L398-L414), when `len(cand) > 1`, it unconditionally stores `prov_options` and re-asks `\"We have Dr. Chen and Dr. Okafor for dermatology. Which would you like?\"` without ever falling back to `self.m.ask(\"provider\", ...)` or calling `self.unclear(\"provider\", ...)`. Because `self.unclear` is never reached, `unclear_counts` never increments and the patient is never handed off to staff.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_providers\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"parse_providers matches any provider last name in the utterance without handling negation, so \\\"Dr. Okafor, not Dr. Chen\\\" returns both dermatologists. Because len(cand) > 1, Driver.book unconditionally re-asks which doctor without calling self.m.ask or self.unclear, so it loops until the patient gives up and never hands off to staff.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 134901,
+  "output_tokens": 12362,
+  "thinking_tokens": 9552,
+  "cache_read_tokens": 351793
+ },
+ "pods": [
+  {
+   "actor": "lab-6725f992c590",
+   "created_to_healthy_s": 6.0
+  },
+  {
+   "actor": "lab-6725f992c590",
+   "call_s": 26.7,
+   "exit": 0
+  },
+  {
+   "actor": "lab-6725f992c590",
+   "call_s": 39.5,
+   "exit": 0
+  },
+  {
+   "actor": "lab-6725f992c590",
+   "call_s": 39.6,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_providers",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "parse_providers matches any provider surname substring without handling negation, so 'Dr. Okafor, not Dr. Chen' returns two candidates. In Driver.book, the len(cand) > 1 branch re-asks the same question every turn without consulting the model or calling unclear(), so unclear_counts never reaches 2 and the patient is never handed to staff."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_providers",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "parse_providers matches provider last names by substring without handling negation, so \"Dr. Okafor, not Dr. Chen\" returns both PR1 and PR3. Driver.book then takes the len(cand) > 1 branch and re-asks without calling self.m.ask or self.unclear, so unclear_counts never increments and the patient is never handed off to staff."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_providers",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "parse_providers matches any provider last name in the utterance without handling negation, so \"Dr. Okafor, not Dr. Chen\" returns both dermatologists. Because len(cand) > 1, Driver.book unconditionally re-asks which doctor without calling self.m.ask or self.unclear, so it loops until the patient gives up and never hands off to staff."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-na7_v0ap/clinicbench"
+}

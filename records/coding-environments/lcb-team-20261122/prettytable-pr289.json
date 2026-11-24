@@ -1,0 +1,12 @@
+{
+ "task": "prettytable-pr289",
+ "repo": "prettytable/prettytable",
+ "t0": 1795381504.416236,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 97394,
+ "install_exit": 1,
+ "install_s": 11.8,
+ "install_tail": "y, set the version in the environment with SETUPTOOLS_SCM_PRETEND_VERSION or VCS_VERSIONING_PRETEND_VERSION, as described in https://setuptools-scm.readthedocs.io/en/latest/config/\n      \n      No distribution name is known here, so the per-distribution SETUPTOOLS_SCM_PRETEND_VERSION_FOR_<DIST> form cannot match; pass a dist name to use it.\n      [end of output]\n  \n  note: This error originates from a subprocess, and is likely not a problem with pip.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nerror: metadata-generation-failed\n\n\u00d7 Encountered error while generating package metadata.\n\u2570\u2500> from file:///work\n\nnote: This is an issue with the package mentioned above, not pip.\nhint: See above for details.\n",
+ "verdict": "RESULT: INSTALL_FAILED (the bench's only run-time exclusion)",
+ "wall_s": 24.6
+}

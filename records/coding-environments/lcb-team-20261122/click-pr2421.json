@@ -1,0 +1,44 @@
+{
+ "task": "click-pr2421",
+ "repo": "pallets/click",
+ "t0": 1795381379.3515,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 21261,
+ "install_exit": 0,
+ "install_s": 49.4,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 10.487,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 19389,
+    "output_tokens": 1556,
+    "thinking_tokens": 873,
+    "cache_read_tokens": 73511,
+    "total_tokens": 20945
+   },
+   "seconds": 23.160071845,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated `add_completion_class` in [shell_completion.py](file:///work/src/click/shell_completion.py#L399-L416) to return `cls` (and updated its return type annotation from `None` to `t.Type[ShellComplete]`), allowing it to be used as a class decorator and return the registered class.\n\n### Verification\n- Ran `./venv/bin/python -m pytest -vv tests/test_shell_completion.py -k \"add_completion_class\"`:\n  - `test_add_completion_class`: PASSED\n  - `test_add_completion_class_with_name`: PASSED\n  - `test_add_completion_class_decorator`: PASSED\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "src/click/shell_completion.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-725965dee9ee",
+   "created_to_healthy_s": 6.7
+  }
+ ],
+ "wall_s": 100.8
+}

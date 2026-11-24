@@ -1,0 +1,27 @@
++ kubectl -n ate-system patch deploy ate-api-server --type=json -p [{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["--grpc-server-cred-bundle=/run/servicedns.podcert.ate.dev/credential-bundle.pem", "--config-file=/run/apiconfig.ate.dev/apiconfig.textproto", "--authentication-config=/etc/ateapi/authentication/authentication.yaml", "--postgres-read-write-connection-string=@env", "--postgres-owner-connection-string=@env", "--postgres-read-write-role=@env", "--postgres-owner-role=@env", "--postgres-schema=@env", "--actor-id-jwt-pool=/run/actor-id-jwt-pool/pool.json", "--actor-jwt-issuer=@env", "--actor-id-ca-pool=/run/actor-id-ca-pool/pool.json", "--atelet-client-cred-bundle=/run/podidentity.podcert.ate.dev/credential-bundle.pem", "--pod-identity-ca-certs=/run/podidentity.podcert.ate.dev/trust-bundle.pem", "--default-egress-gateway-address=atenet-egress.ate-system.svc:443", "--drain-delay=13s", "--drain-timeout=15s", "--objectstore-plugin-socket=/run/objectstore-plugin/control.sock", "--snapshot-location=@env", "--preview=", "--authz-bootstrap-owners=system:serviceaccount:ate-system:ate-client,system:serviceaccount:benchmarking:benchmark-runner,spiffe://cluster.local/ns/benchmarking/sa/benchmark-runner"]}]
+deployment.apps/ate-api-server patched
++ kubectl -n ate-system rollout status deploy/ate-api-server --timeout=300s
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "ate-api-server" rollout to finish: 1 old replicas are pending termination...
+deployment "ate-api-server" successfully rolled out
+atenet-router: --ingress-allowed-spiffe-ids already has spiffe://cluster.local/ns/benchmarking/sa/benchmark-runner
++ kubectl apply -f /home/operator/lab-src/substrate/benchmarking/monitoring.yaml
+namespace/benchmarking unchanged
+serviceaccount/prometheus unchanged
+role.rbac.authorization.k8s.io/prometheus unchanged
+rolebinding.rbac.authorization.k8s.io/prometheus unchanged
+clusterrole.rbac.authorization.k8s.io/prometheus-benchmarking-nodes unchanged
+clusterrolebinding.rbac.authorization.k8s.io/prometheus-benchmarking-nodes unchanged
+clusterrole.rbac.authorization.k8s.io/prometheus-benchmarking-pods unchanged
+clusterrolebinding.rbac.authorization.k8s.io/prometheus-benchmarking-pods unchanged
+configmap/prometheus-config unchanged
+deployment.apps/prometheus unchanged
+service/prometheus unchanged
+configmap/grafana-datasources unchanged
+configmap/grafana-dashboards-provider unchanged
+configmap/grafana-dashboards unchanged
+deployment.apps/grafana unchanged
+service/grafana unchanged

@@ -1,0 +1,8 @@
+suspend:
+lab-agent   tenant-one-205655   lab-agent/lab-agent   ACTOR_STATE_SUSPENDED   <none>                    5         100s
+publish:
+lab-agent   pub-one-205834   TAG_SCOPE_PUBLISHED   Ready   gs://ate-snapshots-example-project-lab-substr-xxxxxxxx/atespaces/lab-agent/tags/5c523187-f0dc-4275-8e67-f11ddd710125   SNAPSHOT_FIDELITY_MEMORY   0s
+team two restores the published tag:
+Error: failed to create actor: rpc error: code = PermissionDenied desc = permission denied: principal "user:system%3Aserviceaccount%3Alab-tenants%3Ateam-two" lacks "can_use_tag" on "tag:lab-agent/pub-one-205834"
+control, team one restores its own published tag:
+lab-agent   p-one-205834   lab-agent/lab-agent   ACTOR_STATE_SUSPENDED   <none>                    1         0s

@@ -1,0 +1,70 @@
+{
+ "case": "T25",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r1",
+ "final_stage": "done",
+ "attempts": 1,
+ "wall_seconds": 152,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 77454,
+    "output_tokens": 7388,
+    "thinking_tokens": 5025,
+    "cache_read_tokens": 405085,
+    "total_tokens": 84842
+   },
+   "seconds": 139.923524635,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Both the driver and the bench instrument behaved as designed; the difference between Arm E and Arm F comes directly from Arm E's design (`CONSENT_IN_CODE = False`).\n\n- In [clinicbench/adapters/dcitl_f.py](file:///work/clinicbench/adapters/dcitl_f.py#L36-L39), `DcitlE` sets `CONSENT_IN_CODE = False`, whereas `DcitlF` ([clinicbench/adapters/dcitl_f.py](file:///work/clinicbench/adapters/dcitl_f.py#L17-L24)) sets `CONSENT_IN_CODE = True`.\n- In [clinicbench/adapters/dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271), when `explicit_confirm(u)` returns `None` during `Driver.book` ([clinicbench/adapters/dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L482-L493)) or `Driver.reschedule` ([clinicbench/adapters/dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L601-L610)), `Driver.consent` queries the reader model. Under Arm E (`consent_in_code=False`), a model `\"yes\"` (including from `AlwaysYes`) returns `True` and commits the booking or move, whereas under Arm F (`consent_in_code=True`), a model `\"yes\"` returns `None` (`unclear`) so only code-parsable confirmation can commit.\n- As documented in [docs/contract-changes.md](file:///work/docs/contract-changes.md#L109-L115) and verified in [clinicbench/selftest/adapter.py](file:///work/clinicbench/selftest/adapter.py#L43-L59), Arm E is intentionally configured to accept model-level consent.\n\n```json\n{\"kind\": \"not_driver\", \"files\": [\"clinicbench/adapters/dcitl_f.py\", \"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_f.DcitlE\", \"clinicbench.adapters.dcitl_port.Driver.consent\", \"clinicbench.adapters.dcitl_port.Driver.book\", \"clinicbench.adapters.dcitl_port.Driver.reschedule\"], \"cause\": \"DcitlE sets CONSENT_IN_CODE = False, so when explicit_confirm returns None in Driver.book or Driver.reschedule, Driver.consent accepts a reader model's 'yes' (including AlwaysYes) and commits the write. DcitlF sets CONSENT_IN_CODE = True, so Driver.consent treats a model 'yes' as unclear and never commits without code-parsable confirmation.\", \"attribution\": \"arm_design\"}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 77454,
+  "output_tokens": 7388,
+  "thinking_tokens": 5025,
+  "cache_read_tokens": 405085
+ },
+ "pods": [
+  {
+   "actor": "lab-f5992b9e5999",
+   "created_to_healthy_s": 6.2
+  },
+  {
+   "actor": "lab-f5992b9e5999",
+   "call_s": 143.9,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "not_driver",
+   "files": [
+    "clinicbench/adapters/dcitl_f.py",
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_f.DcitlE",
+    "clinicbench.adapters.dcitl_port.Driver.consent",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.reschedule"
+   ],
+   "attribution": "arm_design",
+   "cause": "DcitlE sets CONSENT_IN_CODE = False, so when explicit_confirm returns None in Driver.book or Driver.reschedule, Driver.consent accepts a reader model's 'yes' (including AlwaysYes) and commits the write. DcitlF sets CONSENT_IN_CODE = True, so Driver.consent treats a model 'yes' as unclear and never commits without code-parsable confirmation."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-s9x9o_f6/clinicbench"
+}

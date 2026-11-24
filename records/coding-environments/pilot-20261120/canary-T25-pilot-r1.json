@@ -1,0 +1,232 @@
+{
+ "case": "T25",
+ "venue": "local sandbox",
+ "label": "pilot-r1",
+ "egress_allow": "default",
+ "final_stage": "done",
+ "attempts": 2,
+ "wall_seconds": 54,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 10004,
+    "output_tokens": 440,
+    "thinking_tokens": 357,
+    "cache_read_tokens": 0,
+    "total_tokens": 10444
+   },
+   "seconds": 4.190564919,
+   "turns": 1
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 65926,
+    "output_tokens": 6697,
+    "thinking_tokens": 5693,
+    "cache_read_tokens": 68454,
+    "total_tokens": 72623
+   },
+   "seconds": 47.137432592,
+   "turns": 1
+  }
+ ],
+ "totals": {
+  "input_tokens": 75930,
+  "output_tokens": 7137,
+  "thinking_tokens": 6050,
+  "cache_read_tokens": 68454
+ },
+ "egress": {
+  "denied:www.googleapis.com": 2,
+  "allowed:aiplatform.googleapis.com": 4,
+  "denied:play.googleapis.com": 13
+ },
+ "tokens_served": 2,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  null,
+  {
+   "kind": "not_driver",
+   "files": [
+    "clinicbench/adapters/dcitl_f.py",
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_f.DcitlE",
+    "clinicbench.adapters.dcitl_f.DcitlF",
+    "clinicbench.adapters.dcitl_f.AlwaysYes.ask",
+    "clinicbench.adapters.dcitl_port.Driver.consent",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.reschedule"
+   ],
+   "attribution": "arm_design",
+   "cause": "By design, Arm E sets consent_in_code=False so Driver.consent accepts a reader model's 'yes' (including AlwaysYes) to commit Driver.book and Driver.reschedule when explicit_confirm is None. Arm F sets consent_in_code=True, which treats a model 'yes' as unclear and forces code to re-ask."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-canary-sipjr750/clinicbench",
+ "egress_log": [
+  {
+   "event": "start",
+   "egress_allow": [
+    "aiplatform.googleapis.com"
+   ],
+   "project": "example-project",
+   "t": 1795238335.685
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795238337.015
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795238337.017
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238337.04
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238337.042
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238341.723
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238341.723
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795238342.143
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795238342.144
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238342.162
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795238342.164
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238347.119
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238352.12
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238357.124
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238362.128
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238367.133
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238372.138
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238377.14
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238382.147
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238387.152
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238389.72
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795238389.721
+  }
+ ]
+}

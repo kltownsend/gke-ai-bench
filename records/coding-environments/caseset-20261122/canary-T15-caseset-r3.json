@@ -1,0 +1,141 @@
+{
+ "case": "T15",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 190,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 72392,
+    "output_tokens": 6486,
+    "thinking_tokens": 4033,
+    "cache_read_tokens": 392947,
+    "total_tokens": 78878
+   },
+   "seconds": 48.355481812,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "### Triage Summary\n\nIn [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), [`parse_intents`](file:///work/clinicbench/adapters/dcitl_port.py#L90-L104) matches `\\bschedule\\b` as a `\"book\"` intent, so when a rambling patient with the `\"going by my daughter's schedule\"` color string ([truth.py](file:///work/clinicbench/truth.py#L38), [voice.py](file:///work/clinicbench/voice.py#L287-L288)) replies with a slot preference during a `\"reschedule\"` workflow, [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L337-L345) treats `\"book\"` as a pivot (`new != self.wf[\"kind\"]`), discards the open `\"reschedule\"` state, and starts a new booking instead. Under arm F2 ([dcitl_f2.py](file:///work/clinicbench/adapters/dcitl_f2.py#L16-L27)), `clear_confirm` accepts the patient's `\"Yes, that's right, please go ahead.\"` confirmation, committing 1\u20133 new bookings in a loop while the original appointment remains unmoved.\n\nBecause `clinicbench/adapters/dcitl_port.py` is part of the frozen reference driver, this is a `finding`.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_intents\", \"clinicbench.adapters.dcitl_port.Driver.route\"], \"cause\": \"parse_intents matches the word \\\"schedule\\\" in the patient's \\\"going by my daughter's schedule\\\" color string as a \\\"book\\\" intent, causing Driver.route to pivot an open \\\"reschedule\\\" workflow into \\\"book\\\". Under arm F2's clear_confirm rule, those unintended bookings are then confirmed and committed while the original appointment stays unmoved.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 101322,
+    "output_tokens": 8564,
+    "thinking_tokens": 5554,
+    "cache_read_tokens": 422788,
+    "total_tokens": 109886
+   },
+   "seconds": 61.935647188,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), [`parse_intents`](file:///work/clinicbench/adapters/dcitl_port.py#L90-L104) matches the bare word `\\bschedule\\b` as a `\"book\"` intent, and [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L337-L345) treats any different intent returned while a workflow is open as a mid-conversation pivot that replaces `self.wf`.\n\nFor `reschedule_own:lab23:8` (and other patients with `color` `\"I don't drive, so I'm going by my daughter's schedule\"`), answering the reschedule slot prompt includes `\"my daughter's schedule\"`, which triggers a pivot from `\"reschedule\"` to `\"book\"`; under arm F2 (`clear_confirm` in [dcitl_f2.py](file:///work/clinicbench/adapters/dcitl_f2.py#L16-L27)), the patient's `\"Yes, that's right, please go ahead.\"` is accepted as explicit consent, so the driver commits 1\u20133 new bookings instead of moving the existing appointment. Because the cause is in the frozen reference driver (`dcitl_port.py`), this is a `finding`.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_intents\", \"clinicbench.adapters.dcitl_port.Driver.route\"], \"cause\": \"parse_intents matches the noun 'schedule' in the patient's color line (\\\"my daughter's schedule\\\") as a 'book' intent, and Driver.route treats that hit mid-reschedule as a pivot that discards the active reschedule workflow for a new booking. Under arm F2's clear_confirm, the patient's multi-word confirmation then commits 1 to 3 new bookings while leaving the original appointment unmoved.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 62282,
+    "output_tokens": 7428,
+    "thinking_tokens": 4220,
+    "cache_read_tokens": 409712,
+    "total_tokens": 69710
+   },
+   "seconds": 57.228228639,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)):\n\n- [`parse_intents`](file:///work/clinicbench/adapters/dcitl_port.py#L90-L104) matches `\\bschedule\\b` anywhere in a patient's message as a `\"book\"` intent. On `reschedule_own:lab23:8` (and other patients with the same color string), the patient's background color in [truth.py](file:///work/clinicbench/truth.py#L38) (`\"I don't drive, so I'm going by my daughter's schedule\"`) triggers `\"book\"` whenever the patient gives a time.\n- [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L337-L345) sees `new == \"book\" != self.wf[\"kind\"]` (`\"reschedule\"`), treats it as a pivot, drops the reschedule workflow, and starts a new booking instead. Under arm F2 ([`clear_confirm`](file:///work/clinicbench/adapters/dcitl_f2.py#L16-L27)), the patient's `\"Yes, that's right, please go ahead.\"` is accepted as explicit confirmation, committing 1 to 3 new bookings while leaving the original appointment untouched.\n\nBecause `clinicbench/adapters/dcitl_port.py` is part of the frozen reference driver, this is a `finding`.\n\n```json\n{\n  \"kind\": \"finding\",\n  \"files\": [\"clinicbench/adapters/dcitl_port.py\"],\n  \"symbols\": [\n    \"clinicbench.adapters.dcitl_port.parse_intents\",\n    \"clinicbench.adapters.dcitl_port.Driver.route\"\n  ],\n  \"cause\": \"parse_intents matches the noun 'schedule' in the patient's background color ('my daughter's schedule') as a 'book' intent, causing Driver.route to pivot out of the active 'reschedule' workflow and book new appointments instead of moving the existing one.\",\n  \"attribution\": null\n}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 235996,
+  "output_tokens": 22478,
+  "thinking_tokens": 13807,
+  "cache_read_tokens": 1225447
+ },
+ "pods": [
+  {
+   "actor": "lab-058d485b3295",
+   "created_to_healthy_s": 6.0
+  },
+  {
+   "actor": "lab-058d485b3295",
+   "call_s": 53.5,
+   "exit": 0
+  },
+  {
+   "actor": "lab-058d485b3295",
+   "call_s": 65.9,
+   "exit": 0
+  },
+  {
+   "actor": "lab-058d485b3295",
+   "call_s": 61.4,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_intents",
+    "clinicbench.adapters.dcitl_port.Driver.route"
+   ],
+   "attribution": null,
+   "cause": "parse_intents matches the word \"schedule\" in the patient's \"going by my daughter's schedule\" color string as a \"book\" intent, causing Driver.route to pivot an open \"reschedule\" workflow into \"book\". Under arm F2's clear_confirm rule, those unintended bookings are then confirmed and committed while the original appointment stays unmoved."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_intents",
+    "clinicbench.adapters.dcitl_port.Driver.route"
+   ],
+   "attribution": null,
+   "cause": "parse_intents matches the noun 'schedule' in the patient's color line (\"my daughter's schedule\") as a 'book' intent, and Driver.route treats that hit mid-reschedule as a pivot that discards the active reschedule workflow for a new booking. Under arm F2's clear_confirm, the patient's multi-word confirmation then commits 1 to 3 new bookings while leaving the original appointment unmoved."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_intents",
+    "clinicbench.adapters.dcitl_port.Driver.route"
+   ],
+   "attribution": null,
+   "cause": "parse_intents matches the noun 'schedule' in the patient's background color ('my daughter's schedule') as a 'book' intent, causing Driver.route to pivot out of the active 'reschedule' workflow and book new appointments instead of moving the existing one."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-wwrflti4/clinicbench"
+}

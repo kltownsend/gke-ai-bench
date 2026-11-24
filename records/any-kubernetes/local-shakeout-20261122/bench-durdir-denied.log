@@ -1,0 +1,123 @@
++ sh -c cd /home/operator/lab-src/substrate && benchmarking/workloads/deploy.sh --deploy --worker-count 1 --sandbox-class gvisor
+Deploying workloads (worker_count=1, actor_memory=256Mi, actor_cpu=1, worker_memory=unset, storage_class=none, otlp_endpoint=http://opentelemetry-collector.otel-system.svc:4317)...
+2026/11/22 11:08:26 Using base gcr.io/distroless/static-debian13:nonroot@sha256:18f4cc26c9ffa7f20a359298be7deadac5c607c8e03a02b8119f1a5fc2f82c99 for go.ate.dev/substrate/cmd/ateworker-gvisor
+2026/11/22 11:08:26 Building go.ate.dev/substrate/cmd/ateworker-gvisor for linux/amd64
+2026/11/22 11:08:26 Building go.ate.dev/substrate/cmd/ateworker-gvisor for linux/arm64/v8
+2026/11/22 11:08:28 Publishing localhost:5001/ateworker-gvisor-6ba39372e3cc3b4b39febbff4256f962:latest
+2026/11/22 11:08:28 existing manifest: latest@sha256:33f684867674cdd4688c027f22141faf14097e8098d61d35e33f202cce1ded99
+2026/11/22 11:08:28 existing manifest: sha256-75dac2f996ee97b120806abdeb5f0f1f976bd456d8bfed9f25478ac2f250ef6e.sbom@sha256:67df83d80114444e978a7bda866cf751db197ba47bd4703d08b394fe884122ec
+2026/11/22 11:08:28 Published SBOM localhost:5001/ateworker-gvisor-6ba39372e3cc3b4b39febbff4256f962:sha256-75dac2f996ee97b120806abdeb5f0f1f976bd456d8bfed9f25478ac2f250ef6e.sbom
+2026/11/22 11:08:28 existing manifest: sha256-33f684867674cdd4688c027f22141faf14097e8098d61d35e33f202cce1ded99.sbom@sha256:f8e0c4989f562964b9bce3362b3d1f19063505a8adf2cc74803af1d36b0de24d
+2026/11/22 11:08:28 Published SBOM localhost:5001/ateworker-gvisor-6ba39372e3cc3b4b39febbff4256f962:sha256-33f684867674cdd4688c027f22141faf14097e8098d61d35e33f202cce1ded99.sbom
+2026/11/22 11:08:28 existing manifest: sha256-71b24413fb025937d25e9bd2ce21ea7d9f4235d632df457cd36982f4605267ed.sbom@sha256:223b8fb4a548444c121d24843341d37d495927ce576109e5df0a316dcd7f82c1
+2026/11/22 11:08:28 Published SBOM localhost:5001/ateworker-gvisor-6ba39372e3cc3b4b39febbff4256f962:sha256-71b24413fb025937d25e9bd2ce21ea7d9f4235d632df457cd36982f4605267ed.sbom
+2026/11/22 11:08:28 Published localhost:5001/ateworker-gvisor-6ba39372e3cc3b4b39febbff4256f962@sha256:33f684867674cdd4688c027f22141faf14097e8098d61d35e33f202cce1ded99
+namespace/benchmark-workloads created
+workerpool.ate.dev/benchmark-worker created
+Waiting for worker pool to be ready (timeout: 300s)...
+deployment.apps/benchmark-worker condition met
+Waiting for deployment "benchmark-worker" rollout to finish: 0 of 1 updated replicas are available...
+deployment "benchmark-worker" successfully rolled out
+Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.
+ATESPACE              NAME    GOLDEN TAG   ERROR   AGE
+benchmark-workloads   sleep                        0s
+2026/11/22 11:08:31 Using base gcr.io/distroless/static-debian13:latest@sha256:15f8637509792e05b97d83451b0b6ccfa4abd548f997e406ac1e72c87fe1fa78 for go.ate.dev/substrate/cmd/benchmarking/glutton
+2026/11/22 11:08:31 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/amd64
+2026/11/22 11:08:31 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/arm64/v8
+2026/11/22 11:08:32 Publishing localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:latest
+2026/11/22 11:08:32 pushed blob: sha256:2a66252f4e39252457e3736bdef489d7cb7b030bd2475b9809f61e70b743f28d
+2026/11/22 11:08:32 pushed blob: sha256:bee8f73b62716be617ffcc31a85f46bc5ca3c6595e841a92b805f5f604f64e92
+2026/11/22 11:08:32 pushed blob: sha256:c0526e8a900b623d51c31ad8282bf2fdb0cbb59344cfa984275224cc584e8b2e
+2026/11/22 11:08:32 pushed blob: sha256:4a2796d8ea5ef7ae1a64ba20ba56759987f49f2ea2091ddce6bade81c0ad1fa6
+2026/11/22 11:08:32 pushed blob: sha256:7c176ffc8fc341c92cc93b1f366c1111ca5aab45e866e9288fd1fbefc3ac31ad
+2026/11/22 11:08:32 pushed blob: sha256:3b9e805c118bccf5cb80fa81fdc099446c2ae917f0ba7edeef902a493fe47d5e
+2026/11/22 11:08:32 pushed blob: sha256:66745210105cbdf808cbb52219351c2b8791b6b81d4bc647900b4b4b4de3bdaf
+2026/11/22 11:08:32 pushed blob: sha256:5997b6ef7c6a64a2dab828d7fd68c5f5f6a8947aee3b474b55b031ecfbe6bb00
+2026/11/22 11:08:32 pushed blob: sha256:3db5b7b76f4f02718cec84e7725fcf7c83600c82bd17d8300b215e662e8987f7
+2026/11/22 11:08:32 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom: digest: sha256:00f7da9bb6191734579981267431e7e62d1602dd4a2ee6c988817dd0bd6786ff size: 374
+2026/11/22 11:08:32 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom
+2026/11/22 11:08:32 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom: digest: sha256:e1ff2a29f9ea924755bc96d38f06870281c060bb284a530e46f918b442ec5fc0 size: 373
+2026/11/22 11:08:32 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom
+2026/11/22 11:08:32 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom: digest: sha256:c356373d0f47a41509838f8711fa9715fa6c9ae18e00dc354b5d09d136adb586 size: 374
+2026/11/22 11:08:32 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom
+2026/11/22 11:08:33 pushed blob: sha256:df739fbf22e0e0ccb6081dc0214ad44813d3d4cdfcdf85ed99f7195202db1737
+2026/11/22 11:08:33 pushed blob: sha256:389275c86e1bedb37187711bca2544378ae015f87d97e81ab79b95e1092ef3bc
+2026/11/22 11:08:33 pushed blob: sha256:52630fc75a18675c530ed9eba5f55eca09b03e91bd5bc15307918bbc1a7e7296
+2026/11/22 11:08:33 pushed blob: sha256:ebddc55facdc6b1f7e0f30816a5fc7cc62f38abdf76c0a8b0a0ce52085754795
+2026/11/22 11:08:33 pushed blob: sha256:ec1b04bf2eb2122e86781f791b03ea0cf6588694e0f4a88245250224c186cdf0
+2026/11/22 11:08:33 pushed blob: sha256:3214acf345c0cc6bbdb56b698a41ccdefc624a09d6beb0d38b5de0b2303ecaf4
+2026/11/22 11:08:33 pushed blob: sha256:617b009a71d625ef77982b400cb9939dd5ed9809ebf50681a0520b7c08c0ca89
+2026/11/22 11:08:33 pushed blob: sha256:c172f21841dff4c8cf45cde46589c1c2616cefe7e819965e92e6d3475c428aa0
+2026/11/22 11:08:33 pushed blob: sha256:b839dfae01f66e15c6a8b63520557ed315bdfe036342fa7a0c537259f10d7a9a
+2026/11/22 11:08:33 pushed blob: sha256:2cc7ee286bf3a9e6af5f71756d7fc8e22e23ce65fec9047d774511ffcef79fa8
+2026/11/22 11:08:33 pushed blob: sha256:d6b1b89eccacc15c2420b2776d72c1dae334a00805ed9af54bf2f71e4d536f28
+2026/11/22 11:08:33 pushed blob: sha256:5689407c3340e75a085703d3366e55b6105152a2574d971cb884f24228292c1d
+2026/11/22 11:08:33 pushed blob: sha256:2780920e5dbfbe103d03a583ed75345306e572ec5a48cb10361f046767d9f29a
+2026/11/22 11:08:33 pushed blob: sha256:7c12895b777bcaa8ccae0605b4de635b68fc32d60fa08f421dc3818bf55ee212
+2026/11/22 11:08:33 pushed blob: sha256:dd64bf2dd177757451a98fcdc999a339c35dee5d9872d8f4dc69c8f3c4dd0112
+2026/11/22 11:08:33 pushed blob: sha256:a99dd1dd5eaf3e2099256f1a75c8e4c02a1d3a81b8e2bfd1735b1dd166b68a12
+2026/11/22 11:08:33 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6: digest: sha256:59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6 size: 2938
+2026/11/22 11:08:33 pushed blob: sha256:401d177fd1e8a1e0d7a48139788d026e9a2e919ccb122bedd110ac7cf351f53e
+2026/11/22 11:08:33 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51: digest: sha256:888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51 size: 2938
+2026/11/22 11:08:33 localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:latest: digest: sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f size: 898
+2026/11/22 11:08:33 Published localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f
+Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.
+ATESPACE              NAME      GOLDEN TAG   ERROR   AGE
+benchmark-workloads   glutton                        0s
+2026/11/22 11:08:34 Using base gcr.io/distroless/static-debian13:latest@sha256:15f8637509792e05b97d83451b0b6ccfa4abd548f997e406ac1e72c87fe1fa78 for go.ate.dev/substrate/cmd/benchmarking/glutton
+2026/11/22 11:08:34 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/arm64/v8
+2026/11/22 11:08:34 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/amd64
+2026/11/22 11:08:35 Publishing localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:latest
+2026/11/22 11:08:35 existing manifest: latest@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f
+2026/11/22 11:08:35 existing manifest: sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom@sha256:c356373d0f47a41509838f8711fa9715fa6c9ae18e00dc354b5d09d136adb586
+2026/11/22 11:08:35 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom
+2026/11/22 11:08:35 existing manifest: sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom@sha256:00f7da9bb6191734579981267431e7e62d1602dd4a2ee6c988817dd0bd6786ff
+2026/11/22 11:08:35 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom
+2026/11/22 11:08:35 existing manifest: sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom@sha256:e1ff2a29f9ea924755bc96d38f06870281c060bb284a530e46f918b442ec5fc0
+2026/11/22 11:08:35 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom
+2026/11/22 11:08:35 Published localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f
+Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.
+ATESPACE              NAME                  GOLDEN TAG   ERROR   AGE
+benchmark-workloads   glutton-durdir-data                        0s
+2026/11/22 11:08:36 Using base gcr.io/distroless/static-debian13:latest@sha256:15f8637509792e05b97d83451b0b6ccfa4abd548f997e406ac1e72c87fe1fa78 for go.ate.dev/substrate/cmd/benchmarking/glutton
+2026/11/22 11:08:36 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/amd64
+2026/11/22 11:08:36 Building go.ate.dev/substrate/cmd/benchmarking/glutton for linux/arm64/v8
+2026/11/22 11:08:37 Publishing localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:latest
+2026/11/22 11:08:37 existing manifest: latest@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f
+2026/11/22 11:08:37 existing manifest: sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom@sha256:c356373d0f47a41509838f8711fa9715fa6c9ae18e00dc354b5d09d136adb586
+2026/11/22 11:08:37 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-59743416ccb10b0bc2d07061931c404a56359bde7ad7755b2418128126eb75c6.sbom
+2026/11/22 11:08:37 existing manifest: sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom@sha256:00f7da9bb6191734579981267431e7e62d1602dd4a2ee6c988817dd0bd6786ff
+2026/11/22 11:08:37 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-888aa407e0931af7f79d638fbdb9616f7e4a21472f750a790821da7d7fae6a51.sbom
+2026/11/22 11:08:37 existing manifest: sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom@sha256:e1ff2a29f9ea924755bc96d38f06870281c060bb284a530e46f918b442ec5fc0
+2026/11/22 11:08:37 Published SBOM localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524:sha256-c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f.sbom
+2026/11/22 11:08:37 Published localhost:5001/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f
+Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.
+ATESPACE              NAME                  GOLDEN TAG   ERROR   AGE
+benchmark-workloads   glutton-durdir-full                        0s
+Waiting for the benchmark-workloads/sleep golden snapshot...
+Waiting for the benchmark-workloads/glutton golden snapshot...
+Waiting for the benchmark-workloads/glutton-durdir-data golden snapshot...
+Waiting for the benchmark-workloads/glutton-durdir-full golden snapshot...
++ kubectl apply -f -
+namespace/benchmarking unchanged
+serviceaccount/benchmark-runner created
+rolebinding.rbac.authorization.k8s.io/automated-benchmarking-permissions created
+clusterrole.rbac.authorization.k8s.io/benchmark-runner-hardware-discovery created
+clusterrolebinding.rbac.authorization.k8s.io/benchmark-runner-hardware-discovery created
+role.rbac.authorization.k8s.io/benchmark-runner-worker-pods created
+role.rbac.authorization.k8s.io/benchmark-runner-atelet-logs created
+rolebinding.rbac.authorization.k8s.io/benchmark-runner-atelet-logs created
+rolebinding.rbac.authorization.k8s.io/benchmark-runner-worker-pods created
+job.batch/runner-durdir-implicit-resume-38c856 created
++ kubectl -n benchmarking wait --for=condition=complete job/runner-durdir-implicit-resume-38c856 --timeout=1860s
+job.batch/runner-durdir-implicit-resume-38c856 condition met
++ kubectl -n benchmarking logs job/runner-durdir-implicit-resume-38c856 --tail=-1 --all-containers
++ kubectl -n benchmarking describe job runner-durdir-implicit-resume-38c856
++ kubectl -n benchmarking get events --sort-by=.lastTimestamp
++ kubectl -n benchmarking delete job runner-durdir-implicit-resume-38c856 --ignore-not-found
+job.batch "runner-durdir-implicit-resume-38c856" deleted from benchmarking namespace
++ sh -c cd /home/operator/lab-src/substrate && benchmarking/workloads/deploy.sh --delete
+Deleting workloads...
+benchmarking/workloads/deploy.sh: line 188: ACTOR_MEMORY_BYTES: unbound variable
+No resources found
+{"test": "durdir_implicit_resume", "job": "runner-durdir-implicit-resume-38c856", "dest": "/tmp/bench/durdir_implicit_resume", "source": "catalog, verbatim", "complete": true, "worker_nodepools": [], "runner_placement": "its own node (lab-bench-runner, e2-standard-4) in the cluster under test; Google's automation uses a separate cluster (disclosed)"}

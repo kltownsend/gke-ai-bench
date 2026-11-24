@@ -1,0 +1,36 @@
+{
+ "probe": "warm_pool_reuse",
+ "rounds": [
+  {
+   "round": 0,
+   "create_to_healthy_s": 6.61,
+   "worker": "lab-substrate/lab-agent-workers-5dc7c6895f-cbsxt",
+   "delete_s": 3.46
+  },
+  {
+   "round": 1,
+   "create_to_healthy_s": 6.9,
+   "worker": "lab-substrate/lab-agent-workers-5dc7c6895f-vmtsr",
+   "delete_s": 3.28
+  },
+  {
+   "round": 2,
+   "create_to_healthy_s": 7.07,
+   "worker": "lab-substrate/lab-agent-workers-5dc7c6895f-hfrtg",
+   "delete_s": 3.65
+  },
+  {
+   "round": 3,
+   "create_to_healthy_s": 6.56,
+   "worker": "lab-substrate/lab-agent-workers-5dc7c6895f-4cbcf",
+   "delete_s": 3.71
+  },
+  {
+   "round": 4,
+   "create_to_healthy_s": 6.82,
+   "worker": "lab-substrate/lab-agent-workers-5dc7c6895f-vmtsr",
+   "delete_s": 3.37
+  }
+ ],
+ "workers_reused": 1
+}

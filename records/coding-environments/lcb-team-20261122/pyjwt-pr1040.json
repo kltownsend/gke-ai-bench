@@ -1,0 +1,44 @@
+{
+ "task": "pyjwt-pr1040",
+ "repo": "jpadilla/pyjwt",
+ "t0": 1795381749.564767,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 15940,
+ "install_exit": 0,
+ "install_s": 67.7,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 11.641,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 42860,
+    "output_tokens": 5573,
+    "thinking_tokens": 4108,
+    "cache_read_tokens": 232388,
+    "total_tokens": 48433
+   },
+   "seconds": 56.58721124,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed the `iss` claim validation bugs in [api_jwt.py](file:///work/jwt/api_jwt.py):\n\n- **`PyJWT.encode`** ([api_jwt.py](file:///work/jwt/api_jwt.py#L72-L73)): Added a check to raise `TypeError` when `\"iss\"` is present in `payload` and is not a `str`.\n- **`PyJWT._validate_iss`** ([api_jwt.py](file:///work/jwt/api_jwt.py#L425-L436)):\n  - Added a check to raise `InvalidIssuerError` when `payload[\"iss\"]` is not a `str`.\n  - Wrapped the `payload[\"iss\"] not in issuer` membership check in a `try ... except TypeError` block so non-iterable/invalid `issuer` values (such as `int`) raise `InvalidIssuerError` instead of `TypeError`.\n\n### Verification\n- `./venv/bin/python -m pytest -vv tests/test_api_jwt.py`: **77 passed** (including `test_encode_with_non_str_iss` and `test_validate_iss_with_non_str_issuer`).\n- `./venv/bin/python -m pytest -vv`: **297 passed, 4 skipped, 1 failed** (`tests/test_jwks_client.py::TestPyJWKClient::test_get_jwt_set_sslcontext_default` failed due to no network access in this environment).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "jwt/api_jwt.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-397af7f19679",
+   "created_to_healthy_s": 7.5
+  }
+ ],
+ "wall_s": 176.3
+}

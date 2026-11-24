@@ -1,0 +1,180 @@
+{
+ "team": "lcb",
+ "atespace": "lcb",
+ "install_phase": {
+  "pypi_simple": {
+   "reached": true,
+   "status": 200
+  },
+  "files_pythonhosted": {
+   "reached": false,
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  "github": {
+   "reached": false,
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>"
+  },
+  "model_api": {
+   "reached": false,
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>"
+  },
+  "metadata": {
+   "reached": false,
+   "error": "URLError: <urlopen error [Errno 113] No route to host>"
+  },
+  "private_10": "connected",
+  "public_dns_example": {
+   "reached": false,
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>"
+  }
+ },
+ "to_agent_policy_s": 2.981,
+ "agent_phase_api_scope": {
+  "probe": "api_scope",
+  "t": 1795380225.9523656,
+  "uid": 10001,
+  "credential": {
+   "metadata_token": true,
+   "expires_in_s": 3599,
+   "placeholder": true,
+   "metadata_host": "127.0.0.1:8081",
+   "identity": "<agent-service-account>",
+   "scopes": [
+    "https://www.googleapis.com/auth/cloud-platform"
+   ],
+   "real_metadata_token": false,
+   "real_metadata_error": "URLError: <urlopen error [Errno 113] No route to host>",
+   "env_names": [
+    "GPG_KEY"
+   ],
+   "files": {
+    "/home/agent/.config/gcloud/application_default_credentials.json": false,
+    "/nonexistent": false,
+    "/var/run/secrets/kubernetes.io/serviceaccount/token": false
+   }
+  },
+  "positive_control": {
+   "reached": false,
+   "stage": "connect",
+   "detail": "gaierror: [Errno -2] Name or service not known",
+   "ok": false
+  },
+  "routing": {
+   "named": {
+    "reached": false,
+    "stage": "connect",
+    "detail": "gaierror: [Errno -2] Name or service not known",
+    "storage_served": false
+   },
+   "sni": {
+    "reached": false,
+    "stage": "connect",
+    "detail": "gaierror: [Errno -2] Name or service not known",
+    "storage_served": false
+   },
+   "host": {
+    "reached": false,
+    "stage": "connect",
+    "detail": "gaierror: [Errno -2] Name or service not known",
+    "storage_served": false
+   }
+  },
+  "authorization": {
+   "list_lab_buckets": "no route to storage"
+  },
+  "dns_outside_names": {
+   "example.com": "no: gaierror",
+   "lab-dns-probe-1795380225.example.org": "no: gaierror"
+  },
+  "verdict_inputs": {
+   "counts": false,
+   "storage_reached": false,
+   "usable_credential": true,
+   "outside_dns": false
+  }
+ },
+ "agent_phase_escape": {
+  "probe": "escape_suite",
+  "t": 1795380227.2701476,
+  "process": {
+   "Uid": "10001\t10001\t10001\t10001",
+   "Gid": "10001\t10001\t10001\t10001",
+   "CapInh": "0000000000000000",
+   "CapPrm": "0000000000000000",
+   "CapEff": "0000000000000000",
+   "CapBnd": "0000000020000420",
+   "CapAmb": "0000000000000000",
+   "NoNewPrivs": "0",
+   "Seccomp": "0"
+  },
+  "user_namespace": "created",
+  "mounts": [
+   {
+    "target": "/",
+    "opts": "rw",
+    "source": "/"
+   },
+   {
+    "target": "/tmp",
+    "opts": "rw,nosuid",
+    "source": "/"
+   },
+   {
+    "target": "/run/ate/egress-trust-bundle",
+    "opts": "ro",
+    "source": "/"
+   }
+  ],
+  "writable_outside_workspace": [],
+  "sa_token_mounted": false,
+  "metadata_identity": {
+   "status": 200,
+   "body_start": "<agent-service-account>"
+  },
+  "metadata_v1beta1_no_header": {
+   "refused": "HTTPError: HTTP Error 404: Not Found"
+  },
+  "metadata_kube_env": {
+   "refused": "HTTPError: HTTP Error 404: Not Found"
+  },
+  "metadata_real_identity": {
+   "refused": "URLError: <urlopen error [Errno 113] No route to host>"
+  },
+  "gateway": "169.254.17.1",
+  "kubelet_10250": {
+   "refused": "URLError: <urlopen error [Errno 111] Connection refused>"
+  },
+  "kubelet_10255": {
+   "refused": "URLError: <urlopen error [Errno 111] Connection refused>"
+  },
+  "neighbor_dns_resolver": {
+   "refused": "gaierror: [Errno -2] Name or service not known"
+  },
+  "neighbor_dns_direct": {
+   "server": "169.254.17.1",
+   "rcode": 3,
+   "answers": 0,
+   "a": []
+  },
+  "neighbor_canary": {
+   "refused": "URLError: <urlopen error [Errno -2] Name or service not known>"
+  },
+  "direct_tcp_1.1.1.1_443": "connected",
+  "direct_tcp_example_com_443": {
+   "refused": "gaierror: [Errno -2] Name or service not known"
+  }
+ },
+ "cross_team_model_call": {
+  "reached": true,
+  "http_status": 403,
+  "body_start": "egress denied",
+  "ok": false
+ },
+ "cross_team_verdict": "ISOLATED: team one's credential was not injected",
+ "venue_events": [
+  {
+   "actor": "lab-275efa284148",
+   "created_to_healthy_s": 6.4
+  }
+ ]
+}

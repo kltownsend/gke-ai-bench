@@ -1,0 +1,140 @@
+{
+ "case": "T24",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 176,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 87378,
+    "output_tokens": 7827,
+    "thinking_tokens": 6442,
+    "cache_read_tokens": 469689,
+    "total_tokens": 95205
+   },
+   "seconds": 54.252470444,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **`finding`** in the frozen driver.\n\nIn [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L319-L335), `Driver.step` has no retry limit, escalation (`self.unclear`), or clean close when `self.pid is None` and identity verification fails (or `ident` is empty). On every turn, it returns the same `\"I couldn't verify your identity... Could you confirm your full name and date of birth (or member id)?\"` prompt, which [hearing.py](file:///work/clinicbench/hearing.py#L49-L50) reads as `questions: [\"identity\"]` and [policy.py](file:///work/clinicbench/policy.py#L173-L191) (`PatientPolicy.identity_parts`) answers with the same fixed invalid/incomplete `identity` truth until `self.patience` hits `0` and the patient emits `give_up`.\n\nPer [contract-changes.md](file:///work/docs/contract-changes.md#L61-L65) (C2), `identity` sessions are designed to be closed cleanly (or handed off) by the clinician rather than looping until the patient gives up, so the instrument (`PatientPolicy`, `truth.py`, `DriverHearing`, `scorer.py`) is behaving as designed.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.step\"], \"cause\": \"Driver.step has no failure counter, escalation, or clean close when identity verification fails while self.pid is None, so it re-asks for identity details on every turn. Because identity-type truths only carry fixed invalid or incomplete credentials by design, the patient repeats them until patience runs out and gives up.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 93816,
+    "output_tokens": 7203,
+    "thinking_tokens": 5837,
+    "cache_read_tokens": 478910,
+    "total_tokens": 101019
+   },
+   "seconds": 50.903242469,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver (`dcitl_port.py`, ported from `lab23_dcitl.py.orig`).\n\n- **Instrument behavior (as designed):** In [`truth.py`](file:///work/clinicbench/truth.py#L264-L272), `identity` truths are generated with defective or missing credentials (`no_credentials`, `first_name_only`, `wrong_dob`, `unknown_member`, `other_name_no_dob`) and `handoff_ok=True`, so [`PatientPolicy.identity_parts`](file:///work/clinicbench/policy.py#L173-L191) intentionally repeats the same configured identifiers when re-asked. Per [`contract-changes.md`](file:///work/docs/contract-changes.md#L63-L65) (C2), the clinician is expected to either close cleanly with a stated reason or hand off rather than looping until the patient gives up.\n- **Driver cause:** In [`Driver.step`](file:///work/clinicbench/adapters/dcitl_port.py#L319-L335) (and [`lab23_dcitl.py.orig`](file:///work/clinicbench/adapters/lab23_dcitl.py.orig#L312-L328)), the `self.pid is None` identity gate never calls `self.unclear(...)` and has no retry limit, hand-off, or close path. Whenever `verify_identity` fails or no usable identifiers are found, it unconditionally re-asks for name/DOB/member ID on every turn until `PatientPolicy.patience` hits 0 and the patient emits `give_up`.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.step\"], \"cause\": \"Driver.step has no retry limit, unclear() escalation, or close path when identity verification fails, so it re-asks for credentials on every turn until the patient's patience runs out and they give up.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 85812,
+    "output_tokens": 7463,
+    "thinking_tokens": 5938,
+    "cache_read_tokens": 342185,
+    "total_tokens": 93275
+   },
+   "seconds": 49.894904545,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In `identity` scenarios, [truth.py](file:///work/clinicbench/truth.py#L264-L272) assigns the patient a non-verifiable credential mode (`no_credentials`, `first_name_only`, `wrong_dob`, `unknown_member`, or `other_name_no_dob`) and [PatientPolicy.identity_parts](file:///work/clinicbench/policy.py#L173-L191) deterministically returns those same identifiers whenever asked. Per [contract-changes.md](file:///work/docs/contract-changes.md#L63-L65) (C2), the clinic is expected to cleanly close or hand off when identity cannot be verified rather than letting the patient run out of patience and give up.\n\nHowever, in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L319-L335), ported from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig#L312-L328)), `Driver.step` has no failure counter, `unclear()` escalation, or close path when `self.pid is None` and `verify_identity` fails or no valid credentials are parsed. It repeatedly asks `\"Could you confirm your full name and date of birth (or member id)?\"` on every turn until `PatientPolicy.respond` exhausts `self.patience` and emits `give_up`.\n\nBecause this behavior is in the frozen driver (`dcitl_port.py` / `lab23_dcitl.py.orig`) while the instrument (`policy.py`, `truth.py`, `scorer.py`) behaves as designed, this is a `finding`.\n\n```json\n{\n  \"kind\": \"finding\",\n  \"files\": [\n    \"clinicbench/adapters/dcitl_port.py\",\n    \"clinicbench/adapters/lab23_dcitl.py.orig\"\n  ],\n  \"symbols\": [\n    \"clinicbench.adapters.dcitl_port.Driver.step\"\n  ],\n  \"cause\": \"When identity verification fails or no usable credentials are provided, Driver.step never tracks failed attempts, escalates via Driver.unclear, or closes the conversation, instead re-asking for identity indefinitely. Because the patient in identity scenarios has no valid credentials to substitute, the loop continues until the patient's patience runs out and they give up.\",\n  \"attribution\": null\n}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 267006,
+  "output_tokens": 22493,
+  "thinking_tokens": 18217,
+  "cache_read_tokens": 1290784
+ },
+ "pods": [
+  {
+   "actor": "lab-3813b28429f2",
+   "created_to_healthy_s": 5.9
+  },
+  {
+   "actor": "lab-3813b28429f2",
+   "call_s": 58.0,
+   "exit": 0
+  },
+  {
+   "actor": "lab-3813b28429f2",
+   "call_s": 54.8,
+   "exit": 0
+  },
+  {
+   "actor": "lab-3813b28429f2",
+   "call_s": 53.7,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.step"
+   ],
+   "attribution": null,
+   "cause": "Driver.step has no failure counter, escalation, or clean close when identity verification fails while self.pid is None, so it re-asks for identity details on every turn. Because identity-type truths only carry fixed invalid or incomplete credentials by design, the patient repeats them until patience runs out and gives up."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.step"
+   ],
+   "attribution": null,
+   "cause": "Driver.step has no retry limit, unclear() escalation, or close path when identity verification fails, so it re-asks for credentials on every turn until the patient's patience runs out and they give up."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.step"
+   ],
+   "attribution": null,
+   "cause": "When identity verification fails or no usable credentials are provided, Driver.step never tracks failed attempts, escalates via Driver.unclear, or closes the conversation, instead re-asking for identity indefinitely. Because the patient in identity scenarios has no valid credentials to substitute, the loop continues until the patient's patience runs out and they give up."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-qnk734pr/clinicbench"
+}

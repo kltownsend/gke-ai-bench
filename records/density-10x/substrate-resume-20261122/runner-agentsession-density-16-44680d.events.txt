@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON             OBJECT                                            MESSAGE
+11m         Normal   Scheduled          pod/runner-agentsession-density-16-44680d-84n49   Successfully assigned benchmarking/runner-agentsession-density-16-44680d-84n49 to gke-lab-substrate-lab-bench-runner-87e64a2a-1f0n
+24m         Normal   Scheduled          pod/runner-agentsession-density-8-683c58-lsfpk    Successfully assigned benchmarking/runner-agentsession-density-8-683c58-lsfpk to gke-lab-substrate-lab-bench-runner-87e64a2a-1f0n
+51m         Normal   Completed          job/runner-agentsession-4-46de2a                  Job completed
+24m         Normal   SuccessfulCreate   job/runner-agentsession-density-8-683c58          Created pod: runner-agentsession-density-8-683c58-lsfpk
+24m         Normal   Created            pod/runner-agentsession-density-8-683c58-lsfpk    Container created
+24m         Normal   Started            pod/runner-agentsession-density-8-683c58-lsfpk    Container started
+24m         Normal   Pulled             pod/runner-agentsession-density-8-683c58-lsfpk    Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+13m         Normal   Completed          job/runner-agentsession-density-8-683c58          Job completed
+11m         Normal   SuccessfulCreate   job/runner-agentsession-density-16-44680d         Created pod: runner-agentsession-density-16-44680d-84n49
+11m         Normal   Created            pod/runner-agentsession-density-16-44680d-84n49   Container created
+11m         Normal   Started            pod/runner-agentsession-density-16-44680d-84n49   Container started
+11m         Normal   Pulled             pod/runner-agentsession-density-16-44680d-84n49   Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+2s          Normal   Completed          job/runner-agentsession-density-16-44680d         Job completed

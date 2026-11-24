@@ -1,0 +1,155 @@
+{
+ "case": "S06",
+ "venue": "local sandbox",
+ "label": "pilot-r1",
+ "egress_allow": "default",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 38,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 67766,
+    "output_tokens": 4321,
+    "thinking_tokens": 3331,
+    "cache_read_tokens": 186603,
+    "total_tokens": 72087
+   },
+   "seconds": 36.097115712,
+   "turns": 1
+  }
+ ],
+ "totals": {
+  "input_tokens": 67766,
+  "output_tokens": 4321,
+  "thinking_tokens": 3331,
+  "cache_read_tokens": 186603
+ },
+ "egress": {
+  "denied:www.googleapis.com": 1,
+  "allowed:aiplatform.googleapis.com": 2,
+  "denied:play.googleapis.com": 9
+ },
+ "tokens_served": 1,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench/adapters/dcitl_port.py, explicit_confirm matches r\"\\bi confirmed\\b\" instead of r\"\\bi confirm\\b\" (unlike lab23_dcitl.py.orig), so \"I confirm\" returns None. Under Arm F (consent_in_code=True), Driver.consent treats a model \"yes\" as None, causing Driver.unclear to re-ask for confirmation and hand off to staff after two unclear replies."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-canary-rlit2ndc/clinicbench",
+ "egress_log": [
+  {
+   "event": "start",
+   "egress_allow": [
+    "aiplatform.googleapis.com"
+   ],
+   "project": "example-project",
+   "t": 1795236933.966
+  },
+  {
+   "event": "metadata",
+   "path": "/computeMetadata/v1/instance/service-accounts/default/token",
+   "decision": "token served",
+   "email": "<agent-service-account>",
+   "t": 1795236935.118
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "www.googleapis.com",
+   "port": "443",
+   "t": 1795236935.119
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795236935.148
+  },
+  {
+   "event": "egress",
+   "decision": "allowed",
+   "host": "aiplatform.googleapis.com",
+   "t": 1795236935.15
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236940.076
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236945.081
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236950.085
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236955.089
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236960.096
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236965.102
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236970.103
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236971.663
+  },
+  {
+   "event": "egress",
+   "decision": "denied",
+   "host": "play.googleapis.com",
+   "port": "443",
+   "t": 1795236971.663
+  }
+ ]
+}

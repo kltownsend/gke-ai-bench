@@ -1,0 +1,90 @@
+{
+ "case": "S03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 143,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 40844,
+    "output_tokens": 4487,
+    "thinking_tokens": 3320,
+    "cache_read_tokens": 168943,
+    "total_tokens": 45331
+   },
+   "seconds": 29.479720326,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a bug in the frozen instrument code in [truth.py](file:///work/clinicbench/truth.py#L121-L136), not in the driver, patient voice, or reader model.\n\nIn [`_booking`](file:///work/clinicbench/truth.py#L130-L134), when `basis == \"self_pay\"`, `selfpay_max` is initialized as:\n\n```python\nselfpay_max=cost - rng.choice([0, 50, 100, 200])\n```\n\nBecause it subtracts rather than adds, 75% of the choices (and 28/40 `selfpay_booking` truths in the `lab23` set) set `selfpay_max < cost`. When the clinician states the price, [`PatientPolicy.respond`](file:///work/clinicbench/policy.py#L410-L420) sees `pay[\"selfpay_max\"] < cost`, retracts `selfpay_willing` to `\"no\"`, and emits `too_much`, causing the patient to refuse the booking (whereas `selfpay_retraction` is the type intended to set `selfpay_max` below `cost` at [truth.py](file:///work/clinicbench/truth.py#L232-L239)).\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/truth.py\"], \"symbols\": [\"clinicbench.truth._booking\"], \"cause\": \"In clinicbench.truth._booking, selfpay_max is set to cost - rng.choice([0, 50, 100, 200]) instead of adding, leaving selfpay_max below cost for most selfpay_booking truths. When the price is stated, PatientPolicy.respond sees selfpay_max < cost and retracts selfpay_willing to 'no', causing the patient to refuse the booking.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 32198,
+    "output_tokens": 2018,
+    "thinking_tokens": 1140,
+    "cache_read_tokens": 118798,
+    "total_tokens": 34216
+   },
+   "seconds": 39.256425836,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed [truth.py](file:///work/clinicbench/truth.py#L130-L135) in `_booking`: changed `selfpay_max=cost - rng.choice([0, 50, 100, 200])` to `selfpay_max=cost + rng.choice([0, 50, 100, 200])`.\n\nVerified with `python3` against `clinicbench.truth.generate_set(\"lab23\")`:\n- All 40 `selfpay_booking` truths now have `selfpay_willing == \"yes\"` and `selfpay_max >= W.SELF_PAY[spec]`.\n- All 40 `selfpay_retraction` truths still have `selfpay_max < W.SELF_PAY[spec]`.\n- `pytest` is not installed in this environment, so the `tests/` suite was not run.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 73042,
+  "output_tokens": 6505,
+  "thinking_tokens": 4460,
+  "cache_read_tokens": 287741
+ },
+ "pods": [
+  {
+   "actor": "lab-d9f5ad7e62fa",
+   "created_to_healthy_s": 5.9
+  },
+  {
+   "actor": "lab-d9f5ad7e62fa",
+   "call_s": 33.4,
+   "exit": 0
+  },
+  {
+   "actor": "lab-d9f5ad7e62fa",
+   "call_s": 43.2,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth._booking"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth._booking, selfpay_max is set to cost - rng.choice([0, 50, 100, 200]) instead of adding, leaving selfpay_max below cost for most selfpay_booking truths. When the price is stated, PatientPolicy.respond sees selfpay_max < cost and retracts selfpay_willing to 'no', causing the patient to refuse the booking."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-riyt2wwu/clinicbench"
+}

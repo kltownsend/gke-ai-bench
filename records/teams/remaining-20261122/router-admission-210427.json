@@ -1,0 +1,12 @@
+{
+ "probe": "router_admission",
+ "identity": "spiffe://cluster.local/ns/benchmarking/sa/benchmark-runner",
+ "results": {
+  "lab-agent/p-one-205834": {
+   "error": "error: cannot exec into a container in a completed pod; current phase is Failed\n"
+  },
+  "lcb/tenant-two-205655": {
+   "error": "error: cannot exec into a container in a completed pod; current phase is Failed\n"
+  }
+ }
+}

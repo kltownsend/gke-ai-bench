@@ -1,0 +1,15 @@
+{
+ "window_s": 1800,
+ "form": "good / valid resumes (Substrate SLO guide's SLI form)",
+ "metric": "ate_actor_lifecycle_operation_duration_seconds",
+ "source": "Google Managed Prometheus",
+ "by_snapshot_kind": {},
+ "restore_histogram": {
+  "p50_s": null,
+  "p90_s": null,
+  "p99_s": null
+ },
+ "errors": [
+  "no resumes in the window; the SLI is not computed"
+ ]
+}

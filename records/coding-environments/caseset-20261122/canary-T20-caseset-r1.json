@@ -1,0 +1,146 @@
+{
+ "case": "T20",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r1",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 113,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 39788,
+    "output_tokens": 3908,
+    "thinking_tokens": 2813,
+    "cache_read_tokens": 93310,
+    "total_tokens": 43696
+   },
+   "seconds": 26.314944865,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a **finding** in the frozen DCITL driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), generated from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)):\n\n1. [`parse_time`](file:///work/clinicbench/adapters/dcitl_port.py#L118-L131) matches `3:30` in `\"on Wednesday at 3:30 in the afternoon\"`, ignores `\"in the afternoon\"` because it only checks for `am`/`pm`/`a.m.`/`p.m.`, and returns `\"03:30\"` instead of `\"15:30\"`.\n2. [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) filters the patient's appointments for `d = \"2026-07-08\"` and `t = \"03:30\"`, finds no match against the `15:30` appointment, and returns `\"not_yours\"`, causing [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L533-L544) to reply via [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) that the appointment isn't under their record while listing the `15:30` appointment.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_time\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\", \"clinicbench.adapters.dcitl_port.Driver.cancel\"], \"cause\": \"parse_time only recognizes am/pm suffixes and ignores 'in the afternoon', so '3:30 in the afternoon' parses as '03:30' instead of '15:30'. Driver.resolve_appt then finds no matching appointment for the patient and returns 'not_yours', triggering the not_yours reply that lists the 15:30 appointment.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43504,
+    "output_tokens": 4582,
+    "thinking_tokens": 3373,
+    "cache_read_tokens": 114988,
+    "total_tokens": 48086
+   },
+   "seconds": 30.089090626,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is in the frozen reference driver (`clinicbench/adapters/dcitl_port.py`, generated from `clinicbench/adapters/lab23_dcitl.py.orig`), so it is a **`finding`** and no files should be changed.\n\n### Cause\n1. In [`parse_time`](file:///work/clinicbench/adapters/dcitl_port.py#L118-L131), the regex only checks for `am`/`pm`/`a.m.`/`p.m.` suffixes and does not recognize `\"in the afternoon\"`, so `\"on Wednesday at 3:30 in the afternoon\"` parses as `\"03:30\"` instead of `\"15:30\"`.\n2. In [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527), filtering the patient's appointments by `start.endswith(\"03:30\")` yields no hits against the `15:30` slot, so `resolve_appt` returns `\"not_yours\"` and [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) tells the patient the appointment isn't under their record while listing the `15:30` appointment.\n\n```json\n{\n  \"kind\": \"finding\",\n  \"files\": [\n    \"clinicbench/adapters/dcitl_port.py\",\n    \"clinicbench/adapters/lab23_dcitl.py.orig\"\n  ],\n  \"symbols\": [\n    \"clinicbench.adapters.dcitl_port.parse_time\",\n    \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\"\n  ],\n  \"cause\": \"parse_time only handles am/pm suffixes and ignores 'in the afternoon', so '3:30 in the afternoon' parses as '03:30'. Driver.resolve_appt then fails to match the patient's 15:30 appointment and returns 'not_yours', triggering the wrong-record reply that lists the same 15:30 appointment.\",\n  \"attribution\": null\n}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 33654,
+    "output_tokens": 4413,
+    "thinking_tokens": 3274,
+    "cache_read_tokens": 98623,
+    "total_tokens": 38067
+   },
+   "seconds": 28.817947532,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), ported from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)):\n\n1. [`parse_time`](file:///work/clinicbench/adapters/dcitl_port.py#L118-L131) only recognizes `am`/`pm`/`a.m.`/`p.m.` after the digits and ignores `\"in the afternoon\"`, so `\"3:30 in the afternoon\"` parses as `\"03:30\"` instead of `\"15:30\"`.\n2. [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) filters `self.my_appts()` with `start.endswith(\"03:30\")`, gets no hits while `d` and `t` are truthy, and returns `\"not_yours\"`, which causes [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L533-L554) to call [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) and reject the request while listing the `15:30` appointment.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_time\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\", \"clinicbench.adapters.dcitl_port.Driver.cancel\", \"clinicbench.adapters.dcitl_port.Driver.not_yours\"], \"cause\": \"parse_time only checks for am/pm suffixes and ignores phrases like 'in the afternoon', so '3:30 in the afternoon' parses as '03:30'. Driver.resolve_appt then fails to match the patient's '15:30' slot and returns 'not_yours', causing Driver.cancel to emit the not-under-your-record refusal while listing the 15:30 appointment.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 116946,
+  "output_tokens": 12903,
+  "thinking_tokens": 9460,
+  "cache_read_tokens": 306921
+ },
+ "pods": [
+  {
+   "actor": "lab-bd17e94940b6",
+   "created_to_healthy_s": 7.3
+  },
+  {
+   "actor": "lab-bd17e94940b6",
+   "call_s": 32.0,
+   "exit": 0
+  },
+  {
+   "actor": "lab-bd17e94940b6",
+   "call_s": 34.8,
+   "exit": 0
+  },
+  {
+   "actor": "lab-bd17e94940b6",
+   "call_s": 33.5,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_time",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt",
+    "clinicbench.adapters.dcitl_port.Driver.cancel"
+   ],
+   "attribution": null,
+   "cause": "parse_time only recognizes am/pm suffixes and ignores 'in the afternoon', so '3:30 in the afternoon' parses as '03:30' instead of '15:30'. Driver.resolve_appt then finds no matching appointment for the patient and returns 'not_yours', triggering the not_yours reply that lists the 15:30 appointment."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_time",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt"
+   ],
+   "attribution": null,
+   "cause": "parse_time only handles am/pm suffixes and ignores 'in the afternoon', so '3:30 in the afternoon' parses as '03:30'. Driver.resolve_appt then fails to match the patient's 15:30 appointment and returns 'not_yours', triggering the wrong-record reply that lists the same 15:30 appointment."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_time",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt",
+    "clinicbench.adapters.dcitl_port.Driver.cancel",
+    "clinicbench.adapters.dcitl_port.Driver.not_yours"
+   ],
+   "attribution": null,
+   "cause": "parse_time only checks for am/pm suffixes and ignores phrases like 'in the afternoon', so '3:30 in the afternoon' parses as '03:30'. Driver.resolve_appt then fails to match the patient's '15:30' slot and returns 'not_yours', causing Driver.cancel to emit the not-under-your-record refusal while listing the 15:30 appointment."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-p3l3g3ln/clinicbench"
+}

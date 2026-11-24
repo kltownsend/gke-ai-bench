@@ -1,0 +1,41 @@
+{
+ "window_s": 3600,
+ "form": "good / valid resumes (Substrate SLO guide's SLI form)",
+ "metric": "ate.actor.lifecycle.operation.duration (resume)",
+ "source": "Google Managed Prometheus",
+ "by_snapshot_kind": {
+  "boot": {
+   "valid": 1.0,
+   "0.5s (the post)": {
+    "fraction": 0.0
+   },
+   "1s (GKE's About page)": {
+    "fraction": 0.0
+   }
+  },
+  "latest": {
+   "valid": 3.0,
+   "0.5s (the post)": {
+    "fraction": 0.5
+   },
+   "1s (GKE's About page)": {
+    "fraction": 0.75
+   }
+  },
+  "local": {
+   "valid": 46.0,
+   "0.5s (the post)": {
+    "fraction": 1.0
+   },
+   "1s (GKE's About page)": {
+    "fraction": 1.0
+   }
+  }
+ },
+ "restore_histogram": {
+  "p50_s": 0.07857142857142857,
+  "p90_s": 0.1360000000000001,
+  "p99_s": 3.800000000000008
+ },
+ "errors": []
+}

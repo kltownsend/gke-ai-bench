@@ -1,0 +1,44 @@
+{
+ "task": "dateutil-pr390",
+ "repo": "dateutil/dateutil",
+ "t0": 1795381684.520684,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 62813,
+ "install_exit": 0,
+ "install_s": 48.3,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 10.181,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 51799,
+    "output_tokens": 6343,
+    "thinking_tokens": 5193,
+    "cache_read_tokens": 232970,
+    "total_tokens": 58142
+   },
+   "seconds": 50.542907294,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed the bug in [`_tzinfo._fromutc`](file:///work/dateutil/tz/_common.py#L204-L240) in [dateutil/tz/_common.py](file:///work/dateutil/tz/_common.py).\n\n### Root Cause\nIn `_tzinfo._fromutc`, `dtdst = enfold(dt, fold=1).dst()` was previously inside the `if delta:` block (`delta = dtoff - dtdst`). For time zones with a standard UTC offset of `0` (such as `Europe/London`), `delta` is `timedelta(0)` during an ambiguous time, so `dtdst` was not recomputed with `fold=1`. As a result, `dtdst` remained `+1h` (BST) instead of `0h` (GMT), shifting `2013-10-27 01:30 UTC` to `02:30` instead of `01:30` (`fold=1`).\n\n### Fix\nMoved `dtdst = enfold(dt, fold=1).dst()` (and its `None` check) outside `if delta:` so `dtdst` is always evaluated with `fold=1` even when `delta` is zero.\n\n### Verification\n- `./venv/bin/python -m pytest -vv dateutil/test/test_tz.py -k testFoldLondon`: all 6 `testFoldLondon` tests passed (`TzLocalNixTest`, `GettzTest`, `ZoneInfoGettzTest`, `TZRangeTest`, `TZStrTest`, `TZICalTest`).\n- `./venv/bin/python -m pytest dateutil/test/test_tz.py -k \"not testTZSetDoesntCorrupt\"`: 274 passed, 42 skipped (`TZTest::testTZSetDoesntCorrupt` fails on Python 3.13 due to an unrelated `collections.Callable` reference in `dateutil/parser.py`).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "dateutil/tz/_common.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-f96f196cc619",
+   "created_to_healthy_s": 6.8
+  }
+ ],
+ "wall_s": 143.6
+}

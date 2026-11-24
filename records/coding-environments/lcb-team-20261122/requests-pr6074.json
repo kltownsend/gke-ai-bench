@@ -1,0 +1,44 @@
+{
+ "task": "requests-pr6074",
+ "repo": "psf/requests",
+ "t0": 1795381529.436555,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 30882,
+ "install_exit": 0,
+ "install_s": 71.0,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 11.647,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43600,
+    "output_tokens": 3507,
+    "thinking_tokens": 2222,
+    "cache_read_tokens": 259022,
+    "total_tokens": 47107
+   },
+   "seconds": 65.170782351,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Waiting for the full `tests/test_requests.py` test run to complete.\nFixed the bug in [`requests/sessions.py`](file:///work/requests/sessions.py#L707-L710) inside `Session.merge_environment_settings`:\n\n- **Cause:** When `REQUESTS_CA_BUNDLE` was unset or empty and `CURL_CA_BUNDLE` was set to `''` (empty string), `os.environ.get('REQUESTS_CA_BUNDLE') or os.environ.get('CURL_CA_BUNDLE')` evaluated to `''` instead of `None`. Because `'' is not None`, `merge_setting(verify, self.verify)` returned `''` instead of falling back to `self.verify` (`True`).\n- **Fix:** Added `or None` to the fallback expression so empty environment variable values fall back to `None` and `merge_setting` uses `self.verify`:\n  ```python\n  if verify is True or verify is None:\n      verify = (os.environ.get('REQUESTS_CA_BUNDLE') or\n                os.environ.get('CURL_CA_BUNDLE') or\n                None)\n  ```\n\n### Verification\n- `./venv/bin/python -m pytest -vv tests/test_requests.py -k test_env_cert_bundles`: **8 passed** (including `test_env_cert_bundles[env4-True]` and `test_env_cert_bundles[env5-True]`).\n- `./venv/bin/python -m pytest -v tests/test_requests.py`: **295 passed, 1 xfailed**, with 6 unrelated failures and 1 error due to Python 3.13 `ssl.wrap_socket` removal in `pytest-httpbin` (`test_pyopenssl_redirect`, `test_auth_is_stripped_on_http_downgrade`, `test_https_warnings`) and offline `TARPIT` timeout tests (`TestTimeout::test_connect_timeout`, `TestTimeout::test_total_timeout_connect`).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "requests/sessions.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-9f458f76dd8c",
+   "created_to_healthy_s": 6.4
+  }
+ ],
+ "wall_s": 219.9
+}

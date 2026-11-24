@@ -1,0 +1,44 @@
+{
+ "task": "h2-pr1313",
+ "repo": "python-hyper/h2",
+ "t0": 1795381829.6130161,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 30240,
+ "install_exit": 0,
+ "install_s": 51.8,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 9.682,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43499,
+    "output_tokens": 1303,
+    "thinking_tokens": 719,
+    "cache_read_tokens": 132099,
+    "total_tokens": 44802
+   },
+   "seconds": 15.6210071,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed the bug in [utilities.py](file:///work/src/h2/utilities.py#L101) inside `_secure_headers`:\n\n- Changed `header[0] in b\"cookie\"` to `header[0] == b\"cookie\"` so that header names that are merely substrings of `b\"cookie\"` (such as `b\"cook\"`, `b\"okie\"`, `b\"cooki\"`) are not mistakenly marked as never-indexed.\n\nVerified with `./venv/bin/python -m pytest -vv tests/test_header_indexing.py tests/test_utility_functions.py`: all 324 tests passed (including all 16 `TestSecureHeaders::test_non_cookie_substring_headers_can_be_indexed` cases).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "src/h2/utilities.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-a132156bfa46",
+   "created_to_healthy_s": 6.2
+  }
+ ],
+ "wall_s": 109.9
+}

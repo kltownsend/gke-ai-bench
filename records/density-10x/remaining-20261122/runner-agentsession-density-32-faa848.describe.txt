@@ -1,0 +1,79 @@
+Name:                        runner-agentsession-density-32-faa848
+Namespace:                   benchmarking
+Selector:                    batch.kubernetes.io/controller-uid=bcf2ee15-0edf-4765-8e5f-c76579533773
+Labels:                      app=substrate-benchmark-runner
+                             batch.kubernetes.io/controller-uid=bcf2ee15-0edf-4765-8e5f-c76579533773
+                             batch.kubernetes.io/job-name=runner-agentsession-density-32-faa848
+                             controller-uid=bcf2ee15-0edf-4765-8e5f-c76579533773
+                             job-name=runner-agentsession-density-32-faa848
+                             tag=20778a6d
+                             test-name=agentsession_density_32
+Annotations:                 <none>
+Parallelism:                 1
+Completions:                 1
+Completion Mode:             NonIndexed
+Suspend:                     false
+Backoff Limit:               0
+TTL Seconds After Finished:  86400
+Start Time:                  Sun, 22 Nov 2026 20:00:57 -0600
+Completed At:                Sun, 22 Nov 2026 20:12:21 -0600
+Duration:                    11m
+Pods Statuses:               0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=substrate-benchmark-runner
+                    batch.kubernetes.io/controller-uid=bcf2ee15-0edf-4765-8e5f-c76579533773
+                    batch.kubernetes.io/job-name=runner-agentsession-density-32-faa848
+                    controller-uid=bcf2ee15-0edf-4765-8e5f-c76579533773
+                    job-name=runner-agentsession-density-32-faa848
+                    tag=20778a6d
+                    test-name=agentsession_density_32
+  Service Account:  benchmark-runner
+  Containers:
+   runner:
+    Image:      us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1
+    Port:       8001/TCP (boomer-metrics)
+    Host Port:  0/TCP (boomer-metrics)
+    Command:
+      python3
+      /app/runner.py
+    Args:
+      -f
+      /app/tests/agentsession.py
+      -t
+      10m
+      -u
+      32
+      --tag
+      20778a6d
+      --name
+      agentsession_density_32
+      --dest
+      gs://lab-bench-results-xxxxxxxx/agentsession_density_32/20261122T200054
+      --resume-mode
+      implicit
+      --lifecycle-mode
+      sync
+      --agentsession-phase-in
+      60
+      --metadata
+      {"cluster_name": "lab-substrate", "project_id": "example-project", "lab_test": "agentsession_density_32"}
+    Requests:
+      cpu:     1
+      memory:  1Gi
+    Environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT:  http://opentelemetry-collector.gke-managed-otel.svc.cluster.local:4317
+    Mounts:
+      /run/podidentity.podcert.ate.dev from podidentity (ro)
+      /run/servicedns-ca from servicedns-ca (ro)
+  Volumes:
+   servicedns-ca:
+    Type:  Projected (a volume that contains injected data from multiple sources)
+   podidentity:
+    Type:          Projected (a volume that contains injected data from multiple sources)
+  Node-Selectors:  ate.dev/benchmarking=true
+  Tolerations:     ate.dev/benchmarking=true:NoSchedule
+Events:
+  Type    Reason            Age    From            Message
+  ----    ------            ----   ----            -------
+  Normal  SuccessfulCreate  18m    job-controller  Created pod: runner-agentsession-density-32-faa848-77z7b
+  Normal  Completed         6m39s  job-controller  Job completed

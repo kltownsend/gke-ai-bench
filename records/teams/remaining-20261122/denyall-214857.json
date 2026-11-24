@@ -1,0 +1,16 @@
+{
+ "probe": "test_actor_no_egress",
+ "policy": "rules: []",
+ "results": {
+  "model_api": {
+   "error": "URLError"
+  },
+  "pypi": {
+   "error": "URLError"
+  },
+  "example": {
+   "error": "URLError"
+  },
+  "tcp_1_1_1_1_443": "connected"
+ }
+}

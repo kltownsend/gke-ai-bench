@@ -1,0 +1,325 @@
+==== Run config ====
+  name:           durdir_implicit_resume
+  tag:            20778a6d
+  files:          /app/tests/durdir.py
+  test_file:      /app/tests/durdir.py
+  duration:       1m
+  users:          1
+  uses_boomer:    True
+  empty stats ok: False
+  dest_prefix:    /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d
+  work_dir:       /tmp/20261122T170910Z-locust-runner
+  extra flags:
+    --durdir-template glutton-durdir-data
+    --resume-mode implicit
+    --durdir-file-size-bytes 8388608
+    --min-wait-time 1.0
+    --max-wait-time 1.0
+====================
+Running: /usr/bin/python3 -m locust --headless -f /app/tests/durdir.py -t 1m -u 1 --csv /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume --csv-full-history --master --expect-workers 1 --boomer-config-port 5560 --durdir-template glutton-durdir-data --resume-mode implicit --durdir-file-size-bytes 8388608 --min-wait-time 1.0 --max-wait-time 1.0
+Running: /app/boomer-worker --user-class durdir --config-json {"min_wait_time": 1.0, "max_wait_time": 1.0, "durdir_file_size_bytes": 8388608, "resume_mode": "implicit", "durdir_template": "glutton-durdir-data"} --master-web-port 5560
+[boomer] {"time":"2026-11-22T17:09:10.891728638Z","level":"INFO","msg":"dynconfig fetch enabled","url":"http://127.0.0.1:5560/boomer-config","poll_interval":10000000000}
+[boomer] {"time":"2026-11-22T17:09:10.891818638Z","level":"INFO","msg":"registered boomer task","user_class":"DurdirUser","user_class_flag":"durdir"}
+[boomer] {"time":"2026-11-22T17:09:10.891831471Z","level":"INFO","msg":"new slave runner"}
+[boomer] {"time":"2026-11-22T17:09:10.891832888Z","level":"INFO","msg":"Boomer is built with gomq support."}
+[locust] [2026-11-22 17:09:11,049] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.main: Starting Locust 2.46.7
+[locust] [2026-11-22 17:09:11,052] runner-durdir-implicit-resume-38c856-sfcd6/INFO/common.trace: Tracing initialized for substrate-locust with initial probability 0.0
+[locust] [2026-11-22 17:09:11,053] runner-durdir-implicit-resume-38c856-sfcd6/INFO/common.boomer_config: Serving /boomer-config on 127.0.0.1:5560 for boomer workers
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         0     0(0.00%) |      0       0       0      0 |    0.00        0.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:11.142751388Z","level":"INFO","msg":"Boomer is connected to master(tcp://127.0.0.1:5557) press Ctrl+c to quit."}
+[locust] [2026-11-22 17:09:11,143] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.runners: runner-durdir-implicit-resume-38c856-sfcd6_df34d99dae464e1cbac3d7352292533d (index 0) reported as ready. 1 workers connected.
+[locust] [2026-11-22 17:09:12,054] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.main: Run time limit set to 60 seconds
+[locust] [2026-11-22 17:09:12,055] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.runners: Sending spawn jobs of 1 users at 1.00 spawn rate to 1 ready workers
+[locust] [2026-11-22 17:09:12,055] runner-durdir-implicit-resume-38c856-sfcd6/INFO/common.trace: Test started, updated trace probability to 0.0
+[boomer] {"time":"2026-11-22T17:09:12.05640243Z","level":"INFO","msg":"dynconfig applied","trigger":"spawn","trace_probability":0,"config":"{WaitTime:{MinWait:1s MaxWait:1s} Lifecycle:{ResumeMode:implicit LifecycleMode:async} FileSize:8388608 ReadMode:data Template:glutton-durdir-data}"}
+[boomer] {"time":"2026-11-22T17:09:12.05644493Z","level":"INFO","msg":"The total number of clients required is  1"}
+[boomer] {"time":"2026-11-22T17:09:12.056447138Z","level":"INFO","msg":"The current number of clients is 0, 1 clients will be added"}
+[boomer] {"time":"2026-11-22T17:09:12.065763263Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] [2026-11-22 17:09:12,065] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.runners: All users spawned: {"DurdirUser": 1} (1 total users)
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         0     0(0.00%) |      0       0       0      0 |    0.00        0.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:13.069441916Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:14.071137167Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                     3   3(100.00%) |      3       1       9      1 |    0.00        0.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         3   3(100.00%) |      3       1       9      1 |    0.00        0.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:15.073859834Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:16.076104168Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                     3   3(100.00%) |      3       1       9      1 |    0.00        0.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         3   3(100.00%) |      3       1       9      1 |    0.00        0.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:17.07935071Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:18.083240544Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                     6   6(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         6   6(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:19.086643752Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:20.089602128Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                     9   9(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         9   9(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:21.092366628Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:22.095293379Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                     9   9(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                         9   9(100.00%) |      2       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:23.099425629Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:24.101712755Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    12  12(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        12  12(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:25.10402488Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:26.110404256Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    15  15(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        15  15(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:27.116745923Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:28.11971459Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    15  15(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        15  15(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:29.123019591Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:30.124659133Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    18  18(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        18  18(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:31.126404508Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:32.129177925Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    21  21(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        21  21(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:33.132328676Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:34.134292843Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    21  21(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        21  21(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:35.136988218Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:36.138309927Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    24  24(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        24  24(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:37.142629094Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:38.149182553Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    26  26(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        26  26(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:39.152245554Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:40.153244763Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    26  26(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        26  26(100.00%) |      1       1       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:41.155691888Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:42.158401972Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    29  29(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        29  29(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:43.16048125Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:44.162330708Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    32  32(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        32  32(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:45.164192209Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:46.169486543Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    32  32(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        32  32(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:47.172682585Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:48.175222044Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    35  35(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        35  35(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:49.176672711Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:50.179691878Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    38  38(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        38  38(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:51.182728212Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:52.184256504Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    38  38(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        38  38(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:53.186415463Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:54.188899338Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    41  41(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        41  41(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:55.190197005Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:56.196912839Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    44  44(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        44  44(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:57.199601756Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:09:58.200892882Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    44  44(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        44  44(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:09:59.202751549Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:00.203950049Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    47  47(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        47  47(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:01.206493383Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:02.208546717Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    50  50(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        50  50(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:03.210105926Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:04.21214001Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    50  50(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        50  50(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:05.214385218Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:06.217500552Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    53  53(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        53  53(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:07.219241386Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:08.221427178Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    56  56(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        56  56(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:09.223561845Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[boomer] {"time":"2026-11-22T17:10:10.226032971Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    56  56(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        56  56(100.00%) |      1       0       9      1 |    1.00        1.00
+[locust] 
+[boomer] {"time":"2026-11-22T17:10:11.228955763Z","level":"WARN","msg":"durdir on_start failed; goroutine will retry next iter","err":"rpc error: code = PermissionDenied desc = permission denied: principal \"user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner\" lacks \"can_create_atespace\" on \"global:root\""}
+[locust] [2026-11-22 17:10:12,056] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.main: --run-time limit reached, shutting down
+[boomer] {"time":"2026-11-22T17:10:12.056874722Z","level":"INFO","msg":"Recv quit message from master, all the goroutines are stopped"}
+[boomer] {"time":"2026-11-22T17:10:12.056929513Z","level":"INFO","msg":"shutdown"}
+[boomer] {"time":"2026-11-22T17:10:12.05693768Z","level":"INFO","msg":"boomer exited; suspending+deleting actors"}
+[locust] [2026-11-22 17:10:12,057] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.runners: Worker 'runner-durdir-implicit-resume-38c856-sfcd6_df34d99dae464e1cbac3d7352292533d' (index 0) quit. 0 workers ready.
+[locust] [2026-11-22 17:10:12,057] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.runners: The last worker quit, stopping test.
+[locust] [2026-11-22 17:10:13,061] runner-durdir-implicit-resume-38c856-sfcd6/INFO/locust.main: Shutting down (exit code 1)
+[locust] Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust] grpc     CreateAtespace                                                                    59  59(100.00%) |      0       0       9      1 |    1.02        1.02
+[locust] --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+[locust]          Aggregated                                                                        59  59(100.00%) |      0       0       9      1 |    1.02        1.02
+[locust] 
+[locust] Response time percentiles (approximated)
+[locust] Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+[locust] --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+[locust] grpc     CreateAtespace                                                                          1      1      1      1      1      2      2      9      9      9      9     59
+[locust] --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+[locust]          Aggregated                                                                              1      1      1      1      1      2      2      9      9      9      9     59
+[locust] 
+[locust] Error report
+[locust] # occurrences      Error                                                                                               
+[locust] ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+[locust] 59                 grpc CreateAtespace: rpc error: code = PermissionDenied desc = permission denied: principal "user:spiffe%3A//cluster.local/ns/benchmarking/sa/benchmark-runner" lacks "can_create_atespace" on "global:root"
+[locust] ------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+[locust] 
+Locust exited with code 1
+Stopping boomer...
+Boomer exited with code 0
+Appended trial_summary to /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume.jsonl
+[ServerTelemetry] Waiting 69s for the atelet's last export to be scraped...
+[ServerTelemetry] Harvesting Prometheus metrics from http://prometheus.benchmarking.svc.cluster.local:9090 over [1795367350, 1795367413]...
+[ServerTelemetry] Detected steady-state window: [1795367353, 1795367411] (58s), atelet-exported reads (snapshots, active actors) at [1795367388, 1795367446]
+[ServerTelemetry] Wrote server summary artifact to /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_server_summary.json
+[ServerTelemetry] Appended server_summary row to /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume.jsonl
+Appended 13 phase breakdown rows from 8 records
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_status.json -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/status.json
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_logs.txt -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/logs.txt
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_traces.txt -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/traces.txt
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume.jsonl -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/stats.jsonl
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_stats.csv -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/stats.csv
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_exceptions.csv -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/exceptions.csv
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_failures.csv -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/failures.csv
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_stats_history.csv -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/stats_history.csv
+Uploaded /tmp/20261122T170910Z-locust-runner/durdir_implicit_resume_server_summary.json -> /tmp/bench/durdir_implicit_resume/runs/durdir_implicit_resume/run_date=2026-11-22/run_ts=1795367350/run_tag=20778a6d/server_summary.json

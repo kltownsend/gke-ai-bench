@@ -1,0 +1,80 @@
+{
+ "probe": "density_control",
+ "label": "density-control-clean",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/glutton-4b3667ae99a537903d62dbe4a02d5524@sha256:c2263dbd26e47d125689d3f0369e251d7c5e7eb08a32257731439892f51d941f",
+ "runtime": "standard (no runtimeClass)",
+ "requests_and_limits": {
+  "cpu": "1",
+  "memory": "1Gi"
+ },
+ "nodepool": "substrate-node-pool",
+ "selector": null,
+ "nodes": [
+  {
+   "name": "gke-lab-substrate-substrate-node-pool-897da1f7-2vx9",
+   "machine_type": "c3-standard-4",
+   "allocatable": {
+    "ate.dev/kvm": "4096",
+    "cpu": "3920m",
+    "ephemeral-storage": "46999673501",
+    "hugepages-1Gi": "0",
+    "hugepages-2Mi": "0",
+    "memory": "14073792Ki",
+    "pods": "110"
+   }
+  },
+  {
+   "name": "gke-lab-substrate-substrate-node-pool-897da1f7-gf87",
+   "machine_type": "c3-standard-4",
+   "allocatable": {
+    "ate.dev/kvm": "4096",
+    "cpu": "3920m",
+    "ephemeral-storage": "46999673501",
+    "hugepages-1Gi": "0",
+    "hugepages-2Mi": "0",
+    "memory": "14073792Ki",
+    "pods": "110"
+   }
+  }
+ ],
+ "steps": [
+  {
+   "replicas": 2,
+   "pods": 2,
+   "ready": 2,
+   "pending": 0,
+   "per_node": {
+    "gke-lab-substrate-substrate-node-pool-897da1f7-gf87": 1,
+    "gke-lab-substrate-substrate-node-pool-897da1f7-2vx9": 1
+   }
+  },
+  {
+   "replicas": 4,
+   "pods": 4,
+   "ready": 4,
+   "pending": 0,
+   "per_node": {
+    "gke-lab-substrate-substrate-node-pool-897da1f7-gf87": 2,
+    "gke-lab-substrate-substrate-node-pool-897da1f7-2vx9": 2
+   }
+  },
+  {
+   "replicas": 6,
+   "pods": 6,
+   "ready": 5,
+   "pending": 1,
+   "per_node": {
+    "gke-lab-substrate-substrate-node-pool-897da1f7-gf87": 2,
+    "gke-lab-substrate-substrate-node-pool-897da1f7-2vx9": 3
+   }
+  }
+ ],
+ "frontier": {
+  "ready": 5,
+  "per_node": {
+   "gke-lab-substrate-substrate-node-pool-897da1f7-gf87": 2,
+   "gke-lab-substrate-substrate-node-pool-897da1f7-2vx9": 3
+  },
+  "first_pending_at_replicas": 6
+ }
+}

@@ -1,0 +1,90 @@
+{
+ "case": "S03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r1",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 115,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43163,
+    "output_tokens": 3593,
+    "thinking_tokens": 2773,
+    "cache_read_tokens": 113580,
+    "total_tokens": 46756
+   },
+   "seconds": 25.048069284,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In [clinicbench/truth.py](file:///work/clinicbench/truth.py#L130-L134), `clinicbench.truth._booking` sets `selfpay_max = cost - rng.choice([0, 50, 100, 200])` for `basis == \"self_pay\"`, which makes `selfpay_max < cost` in 75% of `selfpay_booking` truths (unlike `double_booking`, which adds `+ 100`, and `selfpay_retraction`, which explicitly overrides `selfpay_max` below cost). Consequently, when the clinician states the price, [PatientPolicy.respond](file:///work/clinicbench/policy.py#L410-L424) sees `selfpay_max < cost`, emits `too_much`, and flips `selfpay_willing` to `\"no\"`, causing the patient to refuse the booking.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/truth.py\"], \"symbols\": [\"clinicbench.truth._booking\"], \"cause\": \"In clinicbench.truth._booking, self-pay truths set selfpay_max = cost - rng.choice([0, 50, 100, 200]) instead of adding to cost, so 75% of selfpay_booking patients have selfpay_max < cost. When the clinician states the price, PatientPolicy.respond sees selfpay_max < cost, emits too_much, and flips selfpay_willing to \\\"no\\\", causing the patient to refuse.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 26656,
+    "output_tokens": 1604,
+    "thinking_tokens": 735,
+    "cache_read_tokens": 71807,
+    "total_tokens": 28260
+   },
+   "seconds": 15.121377875,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated [`clinicbench/truth.py`](file:///work/clinicbench/truth.py#L130-L135) in `_booking`:\n\n- Changed `selfpay_max=cost - rng.choice([0, 50, 100, 200])` to `selfpay_max=cost + rng.choice([0, 50, 100, 200])`.\n\n### Verification\n- `pytest` and `git` are not installed in this environment (`pytest: command not found`, `git: command not found`).\n- Verified with `python3` across 40 `selfpay_booking` and 40 `selfpay_retraction` generated truths (`lab23:0`\u2013`lab23:39`): all `selfpay_booking` records have `selfpay_max >= cost` and `selfpay_willing == \"yes\"`, and all `selfpay_retraction` records still have `selfpay_max < cost`.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 69819,
+  "output_tokens": 5197,
+  "thinking_tokens": 3508,
+  "cache_read_tokens": 185387
+ },
+ "pods": [
+  {
+   "actor": "lab-dc1ac42d9681",
+   "created_to_healthy_s": 6.1
+  },
+  {
+   "actor": "lab-dc1ac42d9681",
+   "call_s": 29.7,
+   "exit": 0
+  },
+  {
+   "actor": "lab-dc1ac42d9681",
+   "call_s": 18.9,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth._booking"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth._booking, self-pay truths set selfpay_max = cost - rng.choice([0, 50, 100, 200]) instead of adding to cost, so 75% of selfpay_booking patients have selfpay_max < cost. When the clinician states the price, PatientPolicy.respond sees selfpay_max < cost, emits too_much, and flips selfpay_willing to \"no\", causing the patient to refuse."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-oyoj_lvx/clinicbench"
+}

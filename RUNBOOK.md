@@ -4,9 +4,10 @@ Written so a coding agent can follow it step by step, and a person can check eac
 first: every step below that meters asks for a yes before it runs, and every session ends parked.
 
 What you get from this: your own measurements on your own project, with the same probes, judge, cases and
-settings the lab used. You won't get the lab's published numbers back exactly. Its raw run records aren't in
-this repository, its verdicts come from rulings that aren't either, and your project, region, quota, model
-behavior and timing will differ. Compare your numbers with the site's as two runs of the same instrument.
+settings the lab used. You won't get the lab's published numbers back exactly: its verdicts come from rulings
+that aren't in this repository, and your project, region, quota, model behavior and timing will differ. Its
+run records are, sanitized, in `records/` (its README says what was changed); compare your numbers with
+those as two runs of the same instrument.
 
 Use a Google Cloud project with nothing else of value in it. The agent runs code nobody reviewed, and some
 steps turn its own permission prompts off on purpose.

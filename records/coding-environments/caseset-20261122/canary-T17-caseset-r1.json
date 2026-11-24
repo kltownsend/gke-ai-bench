@@ -1,0 +1,142 @@
+{
+ "case": "T17",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r1",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 189,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 46699,
+    "output_tokens": 7442,
+    "thinking_tokens": 6127,
+    "cache_read_tokens": 91350,
+    "total_tokens": 54141
+   },
+   "seconds": 49.46210397,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The cause is in the frozen reference driver's deterministic self-pay parser, [`explicit_selfpay`](file:///work/clinicbench/adapters/dcitl_port.py#L170-L178), so this is a **finding** (no files edited).\n\n### Cause\n- In [`clinicbench/voice.py`](file:///work/clinicbench/voice.py#L115-L124), `Voice._selfpay` produces clear self-pay choices including `\"I'll self-pay\"`, `\"I'll pay for it myself\"`, and `\"That's fine, I'll just pay for it myself\"`.\n- In [`clinicbench/adapters/dcitl_port.py`](file:///work/clinicbench/adapters/dcitl_port.py#L170-L178), `explicit_selfpay` requires **both** a noun/phrase match (`\\b(self-pay|self pay|out of pocket|pay myself)\\b`) **and** an affirmative verb/phrase match (`\\b(i choose|i'll pay|i will pay|i'll do|i want|choose|paying|go with|yes)\\b`):\n  - `\"I'll self-pay\"` matches `self-pay` in the first regex, but fails the second regex.\n  - `\"I'll pay for it myself\"` matches `i'll pay` in the second regex, but fails `pay myself` in the first regex because of `\"for it\"` in between (and `\"That's fine, I'll just pay for it myself\"` fails both).\n- Because `explicit_selfpay` returns `None`, [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L422-L431) falls back to `self.consent(\"selfpay\", ...)`. Under Arm F (`consent_in_code=True`), [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271) treats a model `\"yes\"` as `None`, causing `Driver.book` to re-ask `\"Please answer yes or no.\"` via `self.unclear(\"selfpay\", ...)` (and escalate after two unclear turns).\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_selfpay\", \"clinicbench.adapters.dcitl_port.Driver.book\", \"clinicbench.adapters.dcitl_port.Driver.consent\"], \"cause\": \"explicit_selfpay requires matching both a self-pay phrase regex and an affirmative verb regex, so \\\"I'll self-pay\\\" fails the verb regex and \\\"I'll pay for it myself\\\" fails the \\\"pay myself\\\" phrase regex. Returning None causes Driver.book to fall back to Driver.consent, which under Arm F's consent_in_code=True discards a model \\\"yes\\\" and re-asks the patient.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 44287,
+    "output_tokens": 8392,
+    "thinking_tokens": 6858,
+    "cache_read_tokens": 194786,
+    "total_tokens": 52679
+   },
+   "seconds": 64.650194771,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)), so no files should be changed.\n\n### Cause\nIn [voice.py](file:///work/clinicbench/voice.py#L115-L124), `Voice._selfpay` intentionally produces `\"I'll self-pay\"` (terse), `\"I'll pay for it myself\"` (default), and `\"That's fine, I'll just pay for it myself\"` (rambling). In [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L170-L178), `explicit_selfpay` requires both `\\b(self-pay|self pay|out of pocket|pay myself)\\b` and `\\b(i choose|i'll pay|i will pay|i'll do|i want|choose|paying|go with|yes)\\b`:\n- `\"I'll self-pay\"` matches the first pattern but not the second (`i'll self-pay` is missing).\n- `\"I'll pay for it myself\"` matches the second pattern (`i'll pay`) but not the first (`for it` separates `pay` and `myself`).\n\nBecause `explicit_selfpay` returns `None`, [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L422-L443) either asks the self-pay question again (if `asked_selfpay` is not yet set) or calls [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271), which under Arm F (`consent_in_code=True`) treats any model `\"yes\"` as `None` and triggers `self.unclear(\"selfpay\", ...)` instead of setting `w[\"selfpay\"] = True`.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_selfpay\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"explicit_selfpay in dcitl_port.py requires both a phrase like 'pay myself'/'self-pay' and an affirmative verb like 'i'll pay'/'i'll do', so it returns None for 'I'll self-pay' and 'I'll pay for it myself'. In Driver.book under consent_in_code=True, a None result either asks for self-pay again or falls through to unclear() because Driver.consent ignores a model 'yes'.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43887,
+    "output_tokens": 6164,
+    "thinking_tokens": 4587,
+    "cache_read_tokens": 185699,
+    "total_tokens": 50051
+   },
+   "seconds": 47.665195902,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The cause is in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)):\n\n- [`explicit_selfpay`](file:///work/clinicbench/adapters/dcitl_port.py#L170-L178) requires both `\\b(self-pay|self pay|out of pocket|pay myself)\\b` and `\\b(i choose|i'll pay|i will pay|i'll do|i want|choose|paying|go with|yes)\\b`.\n  - `\"I'll self-pay\"` matches the first pattern but not the second.\n  - `\"I'll pay for it myself\"` (and `\"That's fine, I'll just pay for it myself\"`) fails the first pattern because `\"for it\"` separates `\"pay\"` and `\"myself\"`.\n  - Both return `None` instead of `True`.\n- In [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L422-L435), when `explicit_selfpay(u)` returns `None` after `asked_selfpay` is set, it calls [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271), which under Arm F (`consent_in_code=True`) ignores a model `\"yes\"` and returns `None`, causing `Driver.book` to re-ask via `self.unclear(\"selfpay\", ...)`.\n\nThe patient phrasings in [`Voice._selfpay`](file:///work/clinicbench/voice.py#L115-L124) are working as designed, and no files were modified.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_selfpay\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"explicit_selfpay requires both a self-pay phrase (self-pay|self pay|out of pocket|pay myself) and a separate choice verb (i choose|i'll pay|...), so \\\"I'll self-pay\\\" fails the verb check and \\\"I'll pay for it myself\\\" fails the phrase check, returning None. In Driver.book under Arm F (consent_in_code=True), falling back to Driver.consent discards a model \\\"yes\\\" as None and re-asks via self.unclear.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 134873,
+  "output_tokens": 21998,
+  "thinking_tokens": 17572,
+  "cache_read_tokens": 471835
+ },
+ "pods": [
+  {
+   "actor": "lab-7920c7e26c5c",
+   "created_to_healthy_s": 7.2
+  },
+  {
+   "actor": "lab-7920c7e26c5c",
+   "call_s": 54.4,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7920c7e26c5c",
+   "call_s": 69.8,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7920c7e26c5c",
+   "call_s": 53.4,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_selfpay",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.consent"
+   ],
+   "attribution": null,
+   "cause": "explicit_selfpay requires matching both a self-pay phrase regex and an affirmative verb regex, so \"I'll self-pay\" fails the verb regex and \"I'll pay for it myself\" fails the \"pay myself\" phrase regex. Returning None causes Driver.book to fall back to Driver.consent, which under Arm F's consent_in_code=True discards a model \"yes\" and re-asks the patient."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_selfpay",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "explicit_selfpay in dcitl_port.py requires both a phrase like 'pay myself'/'self-pay' and an affirmative verb like 'i'll pay'/'i'll do', so it returns None for 'I'll self-pay' and 'I'll pay for it myself'. In Driver.book under consent_in_code=True, a None result either asks for self-pay again or falls through to unclear() because Driver.consent ignores a model 'yes'."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_selfpay",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "explicit_selfpay requires both a self-pay phrase (self-pay|self pay|out of pocket|pay myself) and a separate choice verb (i choose|i'll pay|...), so \"I'll self-pay\" fails the verb check and \"I'll pay for it myself\" fails the phrase check, returning None. In Driver.book under Arm F (consent_in_code=True), falling back to Driver.consent discards a model \"yes\" as None and re-asks via self.unclear."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-dfthy361/clinicbench"
+}

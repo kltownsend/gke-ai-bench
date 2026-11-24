@@ -1,0 +1,90 @@
+{
+ "case": "T03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 185,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 40783,
+    "output_tokens": 4792,
+    "thinking_tokens": 3469,
+    "cache_read_tokens": 118789,
+    "total_tokens": 45575
+   },
+   "seconds": 32.592159042,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a bug in the frozen instrument code in [truth.py](file:///work/clinicbench/truth.py#L177-L187).\n\nIn [`clinicbench.truth.build`](file:///work/clinicbench/truth.py#L160-L285), when constructing a `change_of_mind` patient's `schedule_change` event, `cand` collects all open slots for the doctor(s) except `dropped`, without filtering out slots excluded by `t[\"schedule\"][\"hard_limits\"]`. When `t[\"schedule\"][\"works\"]` originally has only one slot (`t[\"schedule\"][\"works\"][1:]` is empty), `new_works` falls back to `rng.sample(cand, 1)`, which can select a slot ruled out by the patient's own `hard_limits` (e.g., reproduced on `change_of_mind:lab23:50`, `lab23:78`, `lab23:95`).\n\n```json\n{\n  \"kind\": \"fix\",\n  \"files\": [\"clinicbench/truth.py\"],\n  \"symbols\": [\"clinicbench.truth.build\"],\n  \"cause\": \"In clinicbench.truth.build, the change_of_mind branch constructs candidate replacement slots (cand) without filtering out slots excluded by t[\\\"schedule\\\"][\\\"hard_limits\\\"]. When the patient only had one initial working slot and falls back to rng.sample(cand, 1), the schedule_change event can assign a new working slot that violates the patient's own hard limits.\",\n  \"attribution\": null\n}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 50723,
+    "output_tokens": 5566,
+    "thinking_tokens": 3213,
+    "cache_read_tokens": 292993,
+    "total_tokens": 56289
+   },
+   "seconds": 66.648943708,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed the `change_of_mind` candidate slot filtering in [truth.py](file:///work/clinicbench/truth.py#L177-L188).\n\n### Change\n- In `build()` ([truth.py](file:///work/clinicbench/truth.py#L179-L183)), collected all slots excluded by `t[\"schedule\"][\"hard_limits\"]` into `excluded` and filtered `cand` with `s not in excluded` (with a safe fallback `if cand else []` for `rng.sample`).\n\n### Verification\n- Checked 10,000 `change_of_mind` seeds (`lab23:0`\u2013`lab23:9999`, including `lab23:50` which previously violated `hard_limits`): `0 violations across 10000 lab23 change_of_mind seeds`.\n- Ran `python3 -m clinicbench.selftest`: `SELFTEST PASS` (`golden: 57/57 pass`, `mutation: 556/556 pass`, `stub grid: 10368/10368 sessions pass`, `adapter: 3456/3456 sessions pass`).\n- Note: `pytest` is not installed in this environment, so `tests/` was not run via pytest.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 91506,
+  "output_tokens": 10358,
+  "thinking_tokens": 6682,
+  "cache_read_tokens": 411782
+ },
+ "pods": [
+  {
+   "actor": "lab-78059bd42e13",
+   "created_to_healthy_s": 6.0
+  },
+  {
+   "actor": "lab-78059bd42e13",
+   "call_s": 36.2,
+   "exit": 0
+  },
+  {
+   "actor": "lab-78059bd42e13",
+   "call_s": 70.4,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth.build"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth.build, the change_of_mind branch constructs candidate replacement slots (cand) without filtering out slots excluded by t[\"schedule\"][\"hard_limits\"]. When the patient only had one initial working slot and falls back to rng.sample(cand, 1), the schedule_change event can assign a new working slot that violates the patient's own hard limits."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-c_u2g2c2/clinicbench"
+}

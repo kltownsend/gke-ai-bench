@@ -1,0 +1,90 @@
+{
+ "case": "T06",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "done",
+ "attempts": 1,
+ "wall_seconds": 297,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 26226,
+    "output_tokens": 4004,
+    "thinking_tokens": 2444,
+    "cache_read_tokens": 114630,
+    "total_tokens": 30230
+   },
+   "seconds": 161.036811596,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In [`clinicbench/scorer.py`](file:///work/clinicbench/scorer.py#L399-L400), `process` builds the required read-back field set as `need = {\"action\", \"slot\", \"doctor\"} | ({\"cost\"} if w[\"component\"][\"action\"] == \"book\" else set())` and checks `need <= {k for k, v in readback.items() if v is not None}`. Because `cancel` read-backs only state `action` and `appt` (no `slot` or `doctor`) and covered `book` read-backs have `cost=None` (only `self_pay` bookings state a cost), both are marked incomplete even when complete.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/scorer.py\"], \"symbols\": [\"clinicbench.scorer.process\"], \"cause\": \"clinicbench.scorer.process requires 'slot' and 'doctor' for all write actions including 'cancel' (which only has 'action' and 'appt') and requires a non-None 'cost' for all 'book' actions including 'covered' bookings (which have cost=None). As a result, complete read-backs for cancels and covered bookings are flagged as incomplete.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 40332,
+    "output_tokens": 4240,
+    "thinking_tokens": 2744,
+    "cache_read_tokens": 171585,
+    "total_tokens": 44572
+   },
+   "seconds": 95.588806426,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated `process` in [scorer.py](file:///work/clinicbench/scorer.py#L399-L405) so that the required read-back fields (`need`) depend on the write action and booking basis:\n\n- `cancel`: requires `{\"action\", \"appt\"}` instead of `{\"action\", \"slot\", \"doctor\"}`.\n- `book` with `basis == \"self_pay\"`: requires `{\"action\", \"slot\", \"doctor\", \"cost\"}`.\n- `book` with `basis != \"self_pay\"` (e.g. `\"covered\"`) and `move`: requires `{\"action\", \"slot\", \"doctor\"}`.\n\n### Verification\n- `python3 -m clinicbench.selftest`: passed (`golden: 46/46`, `mutation: 658/658`, `stub grid: 10368/10368`).\n- Verified `tier2[\"process\"][\"writes\"]` across `prober` and `handoff` on the stub grid: `cancel_ok=576` (`cancel_bad=0`), `cov_ok=1520` (`cov_bad=0`), `sp_ok=216` (`sp_bad=0`).\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 66558,
+  "output_tokens": 8244,
+  "thinking_tokens": 5188,
+  "cache_read_tokens": 286215
+ },
+ "pods": [
+  {
+   "actor": "lab-5abd1ceac615",
+   "created_to_healthy_s": 6.5
+  },
+  {
+   "actor": "lab-5abd1ceac615",
+   "call_s": 165.0,
+   "exit": 0
+  },
+  {
+   "actor": "lab-5abd1ceac615",
+   "call_s": 98.9,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/scorer.py"
+   ],
+   "symbols": [
+    "clinicbench.scorer.process"
+   ],
+   "attribution": null,
+   "cause": "clinicbench.scorer.process requires 'slot' and 'doctor' for all write actions including 'cancel' (which only has 'action' and 'appt') and requires a non-None 'cost' for all 'book' actions including 'covered' bookings (which have cost=None). As a result, complete read-backs for cancels and covered bookings are flagged as incomplete."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-svjmy25e/clinicbench"
+}

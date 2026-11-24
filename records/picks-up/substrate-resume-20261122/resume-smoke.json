@@ -1,0 +1,265 @@
+{
+ "probe": "resume",
+ "label": "smoke",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "template": "lab-agent (MEMORY fidelity, 2 CPU, 2 GiB)",
+ "started": 1795369981.212388,
+ "baselines": {
+  "healthz_kept_connection_s": {
+   "n": 10,
+   "samples": [
+    0.9279,
+    0.0612,
+    0.0589,
+    0.0583,
+    0.0648,
+    0.0632,
+    0.0556,
+    0.0587,
+    0.0579,
+    0.0615
+   ],
+   "median": 0.06005,
+   "min": 0.0556,
+   "max": 0.9279,
+   "empirical_p95": 0.9279
+  },
+  "healthz_fresh_connection_s": {
+   "n": 10,
+   "samples": [
+    1.0058,
+    0.993,
+    0.9607,
+    0.9985,
+    1.1329,
+    0.9823,
+    0.9917,
+    0.9862,
+    0.8912,
+    0.9818
+   ],
+   "median": 0.98895,
+   "min": 0.8912,
+   "max": 1.1329,
+   "empirical_p95": 1.1329
+  }
+ },
+ "summary": {
+  "storage": {
+   "wake_first_touch_s": {
+    "n": 0,
+    "samples": []
+   },
+   "idle_s": {
+    "n": 0,
+    "samples": []
+   },
+   "errors": 0
+  },
+  "explicit": {
+   "suspend_sync_s": {
+    "n": 3,
+    "samples": [
+     2.5588,
+     4.0021,
+     2.1822
+    ],
+    "median": 2.5588,
+    "min": 2.1822,
+    "max": 4.0021,
+    "empirical_p95": 4.0021
+   },
+   "lab_resume_to_first_response_s": {
+    "n": 3,
+    "samples": [
+     3.1385,
+     3.6854,
+     3.1768
+    ],
+    "median": 3.1768,
+    "min": 3.1385,
+    "max": 3.6854,
+    "empirical_p95": 3.6854
+   }
+  },
+  "wake": {
+   "suspend_sync_s": {
+    "n": 3,
+    "samples": [
+     2.8139,
+     2.4181,
+     2.036
+    ],
+    "median": 2.4181,
+    "min": 2.036,
+    "max": 2.8139,
+    "empirical_p95": 2.8139
+   },
+   "wake_first_touch_s": {
+    "n": 3,
+    "samples": [
+     0.1892,
+     0.1896,
+     0.1875
+    ],
+    "median": 0.1892,
+    "min": 0.1875,
+    "max": 0.1896,
+    "empirical_p95": 0.1896
+   },
+   "errors": 0
+  },
+  "continuity": {
+   "same_process": "6/6",
+   "memory_mark": "6/6",
+   "counter_held": "6/6",
+   "counter_runs_after": "6/6",
+   "child_state": "6/6",
+   "work_intact": "6/6",
+   "home_intact": "6/6"
+  },
+  "under_500ms_count": {
+   "lab_resume_to_first_response": "0/3",
+   "wake_first_touch": "3/3",
+   "storage_wake_first_touch": "0/0"
+  },
+  "note": "No pass rule is applied here; the SLO reading comes from the runtime's own histogram (google_bench.py slo), by snapshot kind."
+ },
+ "cycles": [
+  {
+   "i": 0,
+   "mode": "explicit",
+   "suspend_sync_s": 2.5588,
+   "resume_cli_s": 2.0167,
+   "cli_return_to_serving_s": 1.1218,
+   "lab_resume_to_first_response_s": 3.1385,
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 46436,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 5.499,
+   "wall_delta_s": 7.996
+  },
+  {
+   "i": 1,
+   "mode": "wake",
+   "suspend_sync_s": 2.8139,
+   "proxy_alive_after_suspend": true,
+   "wake_first_touch_s": 0.1892,
+   "wake_connection": "kept (opened before the suspend)",
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 32960,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 5.343,
+   "wall_delta_s": 6.208
+  },
+  {
+   "i": 2,
+   "mode": "explicit",
+   "suspend_sync_s": 4.0021,
+   "resume_cli_s": 2.2301,
+   "cli_return_to_serving_s": 1.4553,
+   "lab_resume_to_first_response_s": 3.6854,
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 32976,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 8.112,
+   "wall_delta_s": 10.786
+  },
+  {
+   "i": 3,
+   "mode": "wake",
+   "suspend_sync_s": 2.4181,
+   "proxy_alive_after_suspend": true,
+   "wake_first_touch_s": 0.1896,
+   "wake_connection": "kept (opened before the suspend)",
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 32976,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 5.393,
+   "wall_delta_s": 6.072
+  },
+  {
+   "i": 4,
+   "mode": "explicit",
+   "suspend_sync_s": 2.1822,
+   "resume_cli_s": 2.0369,
+   "cli_return_to_serving_s": 1.1399,
+   "lab_resume_to_first_response_s": 3.1768,
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 32976,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 4.91,
+   "wall_delta_s": 7.353
+  },
+  {
+   "i": 5,
+   "mode": "wake",
+   "suspend_sync_s": 2.036,
+   "proxy_alive_after_suspend": true,
+   "wake_first_touch_s": 0.1875,
+   "wake_connection": "kept (opened before the suspend)",
+   "same_process": true,
+   "memory_mark": true,
+   "counter_held": true,
+   "counter_runs_after": true,
+   "child_state": true,
+   "work_intact": true,
+   "home_intact": true,
+   "restarted": false,
+   "rss_kb_before": 32976,
+   "rss_kb_after": 32928,
+   "monotonic_delta_s": 4.508,
+   "wall_delta_s": 5.095
+  }
+ ],
+ "venue_events": [
+  {
+   "actor": "lab-89ed5ab2b591",
+   "created_to_healthy_s": 11.7
+  },
+  {
+   "actor": "lab-89ed5ab2b591",
+   "call_s": 4.1,
+   "exit": 0
+  }
+ ],
+ "atelet_logs": [
+  "atelet-smoke-atelet-b4nqs.log",
+  "atelet-smoke-atelet-c6cbg.log"
+ ]
+}

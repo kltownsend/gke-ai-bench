@@ -1,0 +1,142 @@
+{
+ "case": "T21",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 86,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 32472,
+    "output_tokens": 2514,
+    "thinking_tokens": 1696,
+    "cache_read_tokens": 48566,
+    "total_tokens": 34986
+   },
+   "seconds": 17.199346164,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The cause is in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), ported from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)):\n\n- In [`explicit_confirm`](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167), the unanchored regex `re.search(r\"\\bi confirm\\b\", t)` matches `\"i confirm\"` inside `\"Before I confirm, is that covered?\"` and returns `True`.\n- In [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L482-L493), `c = explicit_confirm(u)` evaluates to `True`, so the driver skips `self.consent(...)` and immediately calls `self.commit_booking()`, writing the appointment.\n\nBecause `dcitl_port.py` is part of the frozen reference driver, this is a `finding` (no files edited).\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"explicit_confirm uses an unanchored re.search(r\\\"\\\\bi confirm\\\\b\\\", t), which matches inside the conditional question \\\"Before I confirm, is that covered?\\\" and returns True, causing Driver.book to call commit_booking() without consent.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 49321,
+    "output_tokens": 3656,
+    "thinking_tokens": 2684,
+    "cache_read_tokens": 137237,
+    "total_tokens": 52977
+   },
+   "seconds": 26.716896337,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen reference driver: [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py) (generated from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)) must not be modified.\n\nIn [`explicit_confirm`](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167), `re.search(r\"\\bi confirm\\b\", t)` matches the substring `\"i confirm\"` anywhere in the patient's message without checking for surrounding context (such as `\"before i confirm\"` or a question). When the patient replies `\"Before I confirm, is that covered?\"` to the read-back, [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L482-L493) receives `True` from `explicit_confirm`, skips `self.consent(...)`, and immediately calls `self.commit_booking()`.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"explicit_confirm matches the substring '\\\\bi confirm\\\\b' anywhere in the utterance, so 'Before I confirm, is that covered?' evaluates to True and causes Driver.book to call commit_booking() immediately without asking consent.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 38271,
+    "output_tokens": 2747,
+    "thinking_tokens": 1854,
+    "cache_read_tokens": 87417,
+    "total_tokens": 41018
+   },
+   "seconds": 18.314102634,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is in the frozen driver (`clinicbench/adapters/dcitl_port.py`, ported from `clinicbench/adapters/lab23_dcitl.py.orig`), so this is a **finding**.\n\nIn [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167), `explicit_confirm` checks `re.search(r\"\\bi confirm\\b\", t)` without anchoring or excluding conditional/question phrasing. On `\"Before I confirm, is that covered?\"`, `CLAIM` does not match, `explicit_confirm` matches `\"i confirm\"` and returns `True`, and [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L482-L493) immediately calls `self.commit_booking()` instead of asking for confirmation or escalating.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.book\"], \"cause\": \"explicit_confirm matches the unanchored pattern \\\\bi confirm\\\\b anywhere in the utterance, so \\\"Before I confirm, is that covered?\\\" returns True and causes Driver.book to commit the booking immediately.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 120064,
+  "output_tokens": 8917,
+  "thinking_tokens": 6234,
+  "cache_read_tokens": 273220
+ },
+ "pods": [
+  {
+   "actor": "lab-44107ad7c903",
+   "created_to_healthy_s": 6.7
+  },
+  {
+   "actor": "lab-44107ad7c903",
+   "call_s": 20.8,
+   "exit": 0
+  },
+  {
+   "actor": "lab-44107ad7c903",
+   "call_s": 32.0,
+   "exit": 0
+  },
+  {
+   "actor": "lab-44107ad7c903",
+   "call_s": 22.5,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "explicit_confirm uses an unanchored re.search(r\"\\bi confirm\\b\", t), which matches inside the conditional question \"Before I confirm, is that covered?\" and returns True, causing Driver.book to call commit_booking() without consent."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "explicit_confirm matches the substring '\\bi confirm\\b' anywhere in the utterance, so 'Before I confirm, is that covered?' evaluates to True and causes Driver.book to call commit_booking() immediately without asking consent."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.book"
+   ],
+   "attribution": null,
+   "cause": "explicit_confirm matches the unanchored pattern \\bi confirm\\b anywhere in the utterance, so \"Before I confirm, is that covered?\" returns True and causes Driver.book to commit the booking immediately."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-i1gly2_3/clinicbench"
+}

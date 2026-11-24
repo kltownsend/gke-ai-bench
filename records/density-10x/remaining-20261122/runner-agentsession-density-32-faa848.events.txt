@@ -1,0 +1,29 @@
+LAST SEEN   TYPE      REASON              OBJECT                                            MESSAGE
+30m         Normal    Scheduled           pod/runner-agentsession-density-16-176b7f-57kkd   Successfully assigned benchmarking/runner-agentsession-density-16-176b7f-57kkd to gke-lab-substrate-lab-bench-runner-8810963d-cx59
+32m         Normal    Scheduled           pod/grafana-7bdbf7b5fd-h8bln                      Successfully assigned benchmarking/grafana-7bdbf7b5fd-h8bln to gke-lab-substrate-substrate-node-pool-897da1f7-2vx9
+32m         Normal    Scheduled           pod/prometheus-6fbccc8c66-prfj5                   Successfully assigned benchmarking/prometheus-6fbccc8c66-prfj5 to gke-lab-substrate-lab-bench-runner-8810963d-cx59
+18m         Normal    Scheduled           pod/runner-agentsession-density-32-faa848-77z7b   Successfully assigned benchmarking/runner-agentsession-density-32-faa848-77z7b to gke-lab-substrate-lab-bench-runner-8810963d-cx59
+32m         Normal    ScalingReplicaSet   deployment/prometheus                             Scaled up replica set prometheus-6fbccc8c66 from 0 to 1
+32m         Normal    SuccessfulCreate    replicaset/prometheus-6fbccc8c66                  Created pod: prometheus-6fbccc8c66-prfj5
+32m         Normal    SuccessfulCreate    replicaset/grafana-7bdbf7b5fd                     Created pod: grafana-7bdbf7b5fd-h8bln
+32m         Normal    ScalingReplicaSet   deployment/grafana                                Scaled up replica set grafana-7bdbf7b5fd from 0 to 1
+32m         Normal    Pulling             pod/prometheus-6fbccc8c66-prfj5                   Pulling image "prom/prometheus:v2.45.0"
+32m         Normal    Pulling             pod/grafana-7bdbf7b5fd-h8bln                      Pulling image "grafana/grafana:10.0.0"
+32m         Normal    Pulled              pod/grafana-7bdbf7b5fd-h8bln                      Successfully pulled image "grafana/grafana:10.0.0" in 3.564s (3.564s including waiting). Image size: 93331092 bytes.
+32m         Normal    Created             pod/grafana-7bdbf7b5fd-h8bln                      Container created
+32m         Normal    Started             pod/grafana-7bdbf7b5fd-h8bln                      Container started
+32m         Normal    Started             pod/prometheus-6fbccc8c66-prfj5                   Container started
+32m         Normal    Created             pod/prometheus-6fbccc8c66-prfj5                   Container created
+32m         Normal    Pulled              pod/prometheus-6fbccc8c66-prfj5                   Successfully pulled image "prom/prometheus:v2.45.0" in 8.207s (8.207s including waiting). Image size: 93719161 bytes.
+30m         Normal    SuccessfulCreate    job/runner-agentsession-density-16-176b7f         Created pod: runner-agentsession-density-16-176b7f-57kkd
+30m         Warning   FailedMount         pod/runner-agentsession-density-16-176b7f-57kkd   MountVolume.SetUp failed for volume "podidentity" : credential bundle is not issued yet
+30m         Normal    Pulling             pod/runner-agentsession-density-16-176b7f-57kkd   Pulling image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1"
+30m         Normal    Pulled              pod/runner-agentsession-density-16-176b7f-57kkd   Successfully pulled image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" in 12.387s (12.387s including waiting). Image size: 115216581 bytes.
+30m         Normal    Created             pod/runner-agentsession-density-16-176b7f-57kkd   Container created
+30m         Normal    Started             pod/runner-agentsession-density-16-176b7f-57kkd   Container started
+19m         Normal    Completed           job/runner-agentsession-density-16-176b7f         Job completed
+18m         Normal    SuccessfulCreate    job/runner-agentsession-density-32-faa848         Created pod: runner-agentsession-density-32-faa848-77z7b
+18m         Normal    Pulled              pod/runner-agentsession-density-32-faa848-77z7b   Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+18m         Normal    Created             pod/runner-agentsession-density-32-faa848-77z7b   Container created
+18m         Normal    Started             pod/runner-agentsession-density-32-faa848-77z7b   Container started
+6m39s       Normal    Completed           job/runner-agentsession-density-32-faa848         Job completed

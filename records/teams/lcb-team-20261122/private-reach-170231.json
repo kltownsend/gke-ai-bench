@@ -1,0 +1,78 @@
+{
+ "probe": "private_reach",
+ "t": 1795388522.766777,
+ "neighbor_pod_ip": "10.96.2.9",
+ "neighbor_cluster_ip": "34.118.233.253",
+ "policy": "install (infra/substrate/team-lcb/egress-install.yaml)",
+ "actor": "lab-820abc0eea22",
+ "results": {
+  "1_http_pod_ip": {
+   "target": "10.96.2.9:8080",
+   "connect": "ok",
+   "bytes_back": 156,
+   "first_hex": "485454502f312e302034303320466f72",
+   "canary_returned": false,
+   "http_status_line": "HTTP/1.0 403 Forbidden",
+   "tls_server_hello": false,
+   "forwarded": false,
+   "text_start": "HTTP/1.0 403 Forbidden\r\ncontent-type: text/plain\r\ncontent-length: 13\r\ndate: Sun, 22 Nov 2026 23:02:10 GMT\r\nserver: envoy\r\nconnection: close\r\n\r\negress denied"
+  },
+  "2_http_pod_ip_host_pypi": {
+   "target": "10.96.2.9:8080",
+   "connect": "ok",
+   "bytes_back": 156,
+   "first_hex": "485454502f312e302034303320466f72",
+   "canary_returned": false,
+   "http_status_line": "HTTP/1.0 403 Forbidden",
+   "tls_server_hello": false,
+   "forwarded": false,
+   "text_start": "HTTP/1.0 403 Forbidden\r\ncontent-type: text/plain\r\ncontent-length: 13\r\ndate: Sun, 22 Nov 2026 23:02:10 GMT\r\nserver: envoy\r\nconnection: close\r\n\r\negress denied"
+  },
+  "3_tls_sni_pypi_to_pod_ip": {
+   "target": "10.96.2.9:8080",
+   "connect": "ok",
+   "bytes_back": 0,
+   "first_hex": "",
+   "canary_returned": false,
+   "http_status_line": null,
+   "tls_server_hello": false,
+   "forwarded": false,
+   "text_start": ""
+  },
+  "4_tls_sni_pypi_to_10_0_0_1": {
+   "target": "10.0.0.1:443",
+   "connect": "ok",
+   "read_error": "TimeoutError",
+   "bytes_back": 4674,
+   "first_hex": "16030304ba020004b60303cdcd546d2b",
+   "canary_returned": false,
+   "http_status_line": null,
+   "tls_server_hello": true,
+   "forwarded": true,
+   "text_start": "\u0016\u0003\u0003\u0004\u00ba\u0002\u0000\u0004\u00b6\u0003\u0003\u00cd\u00cdTm+$J\u00fb\u001b\u00dc\u0018\u00b7\u00db\u00c4\u00a3\b\u00cc\u008f\u00ae\u00e9\u001e\u00dd\u0019\u00ed\u000e\u0003\u00af\u0089\u00ca\u00bcn\u00a0 \u00eb\u001dhd\u00d5h\u00aa\u00c4\u00a1v\u00a6\u0090\u0011\u0096\"\u00a6\u0096R\u00ef4\u00c0F\u0097\u000bz\u00b7Y\u0081<\u00f7F3\u0013\u0001\u0000\u0004n\u0000+\u0000\u0002\u0003\u0004\u00003\u0004d\u0011\u00ec\u0004`\u000b\b\u00fe[\u00daWB\u00d0&|\u00da\u00ec\u00b8S)\u00c2\u00c2\u00e7\u0097\n\u00a3\u00a9\u0000KOk\u00ba>\u009d}S\u00ef\u00f6<x3}\u001d\u0004\u00d2K\u0093>I\u00b9\u00c7\u00fc\u00ae\u00db\u00dc\u008e\u00f9/\u0098s\u00bd\u00a2\u00e4tn/\u0016\u001c\u009a\u00c5"
+  },
+  "5_http_cluster_ip": {
+   "target": "34.118.233.253:8080",
+   "connect": "ok",
+   "bytes_back": 156,
+   "first_hex": "485454502f312e302034303320466f72",
+   "canary_returned": false,
+   "http_status_line": "HTTP/1.0 403 Forbidden",
+   "tls_server_hello": false,
+   "forwarded": false,
+   "text_start": "HTTP/1.0 403 Forbidden\r\ncontent-type: text/plain\r\ncontent-length: 13\r\ndate: Sun, 22 Nov 2026 23:02:18 GMT\r\nserver: envoy\r\nconnection: close\r\n\r\negress denied"
+  },
+  "6_control_tls_pypi_by_name": {
+   "target": "pypi.org:443",
+   "connect": "ok",
+   "read_error": "TimeoutError",
+   "bytes_back": 4674,
+   "first_hex": "16030304ba020004b6030393c73e10f4",
+   "canary_returned": false,
+   "http_status_line": null,
+   "tls_server_hello": true,
+   "forwarded": false,
+   "text_start": "\u0016\u0003\u0003\u0004\u00ba\u0002\u0000\u0004\u00b6\u0003\u0003\u0093\u00c7>\u0010\u00f4\u00b0U\u00d7V\u00c2\u00edS\u00aalx\u00e1\u00ad\u00bf\u0094\u0083\u00c4\u00b4\u00804qK\u0001\u00f6\u00fek\u0099Z \u00e1\u009f\u00f3\u00da\u00eb}O1e\u0007|\u0098\u001f2\u00c7\u000e\u008a\u00fc\u00fc\u00f7\u0080\u00f6\u00e0xjG\u0017\u0082x4\u00e0\u00df\u0013\u0001\u0000\u0004n\u0000+\u0000\u0002\u0003\u0004\u00003\u0004d\u0011\u00ec\u0004`\u00f7]F\u009e:\u00eb\u00af\u00caI\u0091!\u008cCB[\u00d9\u00efQ\u00b7\u00ff6\u00f4\u0082x\u00e6\u0097\u00e14\u00eca\u00a0\u0000\u0082\u0005TuP\u00e8\u00b1\u00f0\u00cc\u00ec\u00bcc%\u00d3\u0003\u0004\u00a0\u00f56\u00ef\u0083\u0084\u00f29UZ\u00dd\u009e3b\u00a9\u009a\""
+  }
+ }
+}

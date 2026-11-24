@@ -1,0 +1,44 @@
+{
+ "task": "more-itertools-pr1082",
+ "repo": "more-itertools/more-itertools",
+ "t0": 1795381929.669396,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 163686,
+ "install_exit": 0,
+ "install_s": 36.2,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 4.983,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 32436,
+    "output_tokens": 1235,
+    "thinking_tokens": 478,
+    "cache_read_tokens": 110479,
+    "total_tokens": 33671
+   },
+   "seconds": 24.535739306,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Waiting for the full test suite to finish running.\nFixed the bug in [`product_index`](file:///work/more_itertools/more.py#L4319-L4341) in [more_itertools/more.py](file:///work/more_itertools/more.py#L4332-L4335):\n\n- Changed `len(element) != len(args)` to `len(elements) != len(args)` so that `product_index` checks the length of the materialized tuple `elements` rather than calling `len()` on the raw `element` input (which fails with `TypeError` when `element` is an iterator).\n\n### Verification\n- `python3 -m unittest tests.test_more.ProductIndexTests`: 8 tests passed (including `test_iterator_input` in [tests/test_more.py](file:///work/tests/test_more.py#L4950-L4954)).\n- `python3 -m unittest discover`: 853 tests ran, OK (5 skipped).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "more_itertools/more.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-6054d919c56d",
+   "created_to_healthy_s": 6.5
+  }
+ ],
+ "wall_s": 94.9
+}

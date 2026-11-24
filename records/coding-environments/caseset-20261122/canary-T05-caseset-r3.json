@@ -1,0 +1,92 @@
+{
+ "case": "T05",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 266,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 63508,
+    "output_tokens": 14302,
+    "thinking_tokens": 13036,
+    "cache_read_tokens": 251426,
+    "total_tokens": 77810
+   },
+   "seconds": 91.952030421,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The root cause is a bug in the frozen instrument's template voice, [voice.py](file:///work/clinicbench/voice.py#L240-L242):\n\n- In `Voice.say`, the `k == \"insist\"` branch hardcodes booking-specific phrases (`\"Can you just book it?\"`, `\"Please just put me in.\"`, `\"Just book it, please.\"`) without checking the patient's actual intent (unlike `Voice._clear_yes`, which selects `\"cancel it\"`, `\"move it\"`, or `\"book it\"` based on the action).\n- When a rescheduling patient (`reschedule_own` or `unconfirmed_reschedule`) emits `act = \"insist\"` under pressure settings in [policy.py](file:///work/clinicbench/policy.py#L501-L506), `Voice.say` can output `\"Can you just book it?\"` or `\"Just book it, please.\"`.\n- In [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L340-L345), `parse_intents` matches `\"book\"`, and `Driver.route` treats it as a workflow pivot (`new != self.wf[\"kind\"]`), replacing `\"reschedule\"` with `\"book\"` and creating a second appointment.\n\nBecause `clinicbench/voice.py` is frozen instrument code listed in [phase3-freeze.json](file:///work/docs/phase3-freeze.json#L11) (and not part of the frozen driver), this is a `fix`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/voice.py\"], \"symbols\": [\"clinicbench.voice.Voice.say\"], \"cause\": \"Voice.say renders the 'insist' part with hardcoded booking phrases ('Can you just book it?', 'Please just put me in.', 'Just book it, please.') regardless of the patient's intent. For a rescheduling patient under pressure, this causes the driver's router to see a 'book' intent and pivot from reschedule to a new booking.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 66881,
+    "output_tokens": 10557,
+    "thinking_tokens": 6942,
+    "cache_read_tokens": 562484,
+    "total_tokens": 77438
+   },
+   "seconds": 98.927179473,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated `Voice.say` in [voice.py](file:///work/clinicbench/voice.py) so that `\"insist\"` parts are rendered according to the patient's intents rather than using hardcoded booking phrases.\n\n### Changes\n- Added [`Voice._insist`](file:///work/clinicbench/voice.py#L170-L183) and used it in [`Voice.say`](file:///work/clinicbench/voice.py#L256-L257) for `k == \"insist\"`:\n  - `{\"move\"}`: `\"Can you just move it?\"`, `\"Please just reschedule it.\"`, `\"Just move it, please.\"`\n  - `{\"cancel\"}`: `\"Can you just cancel it?\"`, `\"Please just cancel it.\"`, `\"Just cancel it, please.\"`\n  - `{\"ask_coverage\"}`: `\"Can you just check my coverage?\"`, `\"Please just check if it's covered.\"`, `\"Just check my coverage, please.\"`\n  - `\"book\" in acts and \"cancel\" not in acts`: keeps the existing booking phrases (`\"Can you just book it?\"`, `\"Please just put me in.\"`, `\"Just book it, please.\"`).\n  - Other/mixed intents (e.g., `two_requests`): neutral phrases (`\"Can you just take care of it?\"`, `\"Please just help me with this.\"`, `\"Just get it done, please.\"`).\n\n### Verification\n- `python3 -m clinicbench.selftest`: passed (`golden: 57/57`, `mutation: 556/556`, `stub grid: 10368/10368`, `adapter: 3456/3456`, `SELFTEST PASS`).\n- Targeted check with `Voice.say(..., [{\"k\": \"insist\"}])` and `clinicbench.adapters.dcitl_port.parse_intents`: confirmed `reschedule_own` and `unconfirmed_reschedule` under pressure parse as `[\"reschedule\"]` (never `\"book\"`), and `cancel_own`, `eligibility_question`, and `two_requests` never trigger `\"book\"`. (Note: `pytest` and `git` are not installed in this environment.)\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 130389,
+  "output_tokens": 24859,
+  "thinking_tokens": 19978,
+  "cache_read_tokens": 813910
+ },
+ "pods": [
+  {
+   "actor": "lab-5822a9cc1062",
+   "created_to_healthy_s": 6.0
+  },
+  {
+   "actor": "lab-5822a9cc1062",
+   "call_s": 101.9,
+   "exit": 0,
+   "wait": "poll"
+  },
+  {
+   "actor": "lab-5822a9cc1062",
+   "call_s": 113.8,
+   "exit": 0,
+   "wait": "poll"
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/voice.py"
+   ],
+   "symbols": [
+    "clinicbench.voice.Voice.say"
+   ],
+   "attribution": null,
+   "cause": "Voice.say renders the 'insist' part with hardcoded booking phrases ('Can you just book it?', 'Please just put me in.', 'Just book it, please.') regardless of the patient's intent. For a rescheduling patient under pressure, this causes the driver's router to see a 'book' intent and pivot from reschedule to a new booking."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-xpulu3hy/clinicbench"
+}

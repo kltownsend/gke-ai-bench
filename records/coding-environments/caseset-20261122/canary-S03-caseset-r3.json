@@ -1,0 +1,90 @@
+{
+ "case": "S03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 116,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 46272,
+    "output_tokens": 4338,
+    "thinking_tokens": 3229,
+    "cache_read_tokens": 109614,
+    "total_tokens": 50610
+   },
+   "seconds": 32.639756842,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The cause is a sign bug in [truth.py](file:///work/clinicbench/truth.py#L130-L134) inside `_booking`:\n\n```python\n    if basis == \"self_pay\":\n        cost = W.SELF_PAY[spec]\n        t[\"payment\"].update(claim=\"dont_submit\", selfpay_willing=\"yes\",\n                            selfpay_max=cost - rng.choice([0, 50, 100, 200]),\n                            conditional_on_coverage=rng.random() < 0.5)\n```\n\nBecause `selfpay_max` subtracts `rng.choice([0, 50, 100, 200])` instead of adding it, 75% of `selfpay_booking` patients are generated with `selfpay_max < cost`. Once the clinician states the price, `PatientPolicy.respond` in [policy.py](file:///work/clinicbench/policy.py#L410-L427) sees `selfpay_max < cost`, flips `selfpay_willing` to `\"no\"`, and `PatientPolicy._in_truth` in [policy.py](file:///work/clinicbench/policy.py#L314-L316) refuses the booking offer. (By contrast, `selfpay_retraction` in [truth.py](file:///work/clinicbench/truth.py#L232-L239) explicitly overrides `selfpay_max` to `cost - rng.choice([50, 100])` after calling `_booking`.)\n\nSince [truth.py](file:///work/clinicbench/truth.py) is frozen instrument code listed in [phase3-freeze.json](file:///work/docs/phase3-freeze.json#L8), this is a `fix`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/truth.py\"], \"symbols\": [\"clinicbench.truth._booking\"], \"cause\": \"In clinicbench.truth._booking, selfpay_max is set to cost - rng.choice([0, 50, 100, 200]) instead of adding the offset, so 75% of selfpay_booking patients have a maximum below the visit cost and retract self-pay willingness as soon as the price is stated.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 28481,
+    "output_tokens": 1456,
+    "thinking_tokens": 718,
+    "cache_read_tokens": 85669,
+    "total_tokens": 29937
+   },
+   "seconds": 14.207200777,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed `selfpay_max` in `_booking` in [truth.py](file:///work/clinicbench/truth.py#L130-L134) by adding the random offset instead of subtracting it (`cost + rng.choice([0, 50, 100, 200])`).\n\n### Verification\n- Verified with `python3` that `clinicbench.truth.build(\"selfpay_booking\", ...)` produces `selfpay_max >= cost` for 20/20 sampled seeds, while `selfpay_retraction` still produces `selfpay_max < cost` for 20/20 sampled seeds.\n- Note: `pytest` is not installed in the container environment, so the `tests/` suite could not be executed.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 74753,
+  "output_tokens": 5794,
+  "thinking_tokens": 3947,
+  "cache_read_tokens": 195283
+ },
+ "pods": [
+  {
+   "actor": "lab-bd43dec82d86",
+   "created_to_healthy_s": 6.3
+  },
+  {
+   "actor": "lab-bd43dec82d86",
+   "call_s": 36.6,
+   "exit": 0
+  },
+  {
+   "actor": "lab-bd43dec82d86",
+   "call_s": 18.0,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth._booking"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth._booking, selfpay_max is set to cost - rng.choice([0, 50, 100, 200]) instead of adding the offset, so 75% of selfpay_booking patients have a maximum below the visit cost and retract self-pay willingness as soon as the price is stated."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-7yq7qfqw/clinicbench"
+}

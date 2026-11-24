@@ -1,0 +1,76 @@
+{"i": 0, "mode": "explicit", "suspend_sync_s": 0.1942, "resume_cli_s": 0.0986, "cli_return_to_serving_s": 0.041, "lab_resume_to_first_response_s": 0.1396, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34688, "rss_kb_after": 34236, "monotonic_delta_s": 1.007, "wall_delta_s": 1.196}
+{"i": 1, "mode": "wake", "suspend_sync_s": 0.2217, "proxy_alive_after_suspend": true, "wake_first_touch_s": 0.1554, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34256, "rss_kb_after": 34236, "monotonic_delta_s": 0.925, "wall_delta_s": 1.197}
+{"i": 2, "mode": "explicit", "suspend_sync_s": 0.2377, "resume_cli_s": 0.1065, "cli_return_to_serving_s": 0.0187, "lab_resume_to_first_response_s": 0.1252, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34256, "rss_kb_after": 34236, "monotonic_delta_s": 0.966, "wall_delta_s": 1.195}
+{"i": 3, "mode": "wake", "suspend_sync_s": 0.2116, "proxy_alive_after_suspend": true, "wake_first_touch_s": 0.1827, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34256, "rss_kb_after": 34236, "monotonic_delta_s": 0.911, "wall_delta_s": 1.198}
+{"i": 4, "mode": "explicit", "suspend_sync_s": 0.2191, "resume_cli_s": 0.1011, "cli_return_to_serving_s": 0.0165, "lab_resume_to_first_response_s": 0.1176, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34256, "rss_kb_after": 34236, "monotonic_delta_s": 0.963, "wall_delta_s": 1.192}
+{"i": 5, "mode": "wake", "suspend_sync_s": 0.2103, "proxy_alive_after_suspend": true, "wake_first_touch_s": 0.1781, "same_process": true, "memory_mark": true, "counter_held": true, "counter_runs_after": true, "child_state": true, "work_intact": true, "home_intact": true, "restarted": false, "rss_kb_before": 34256, "rss_kb_after": 34236, "monotonic_delta_s": 0.905, "wall_delta_s": 1.2}
+{
+ "explicit": {
+  "suspend_sync_s": {
+   "n": 3,
+   "samples": [
+    0.1942,
+    0.2377,
+    0.2191
+   ],
+   "median": 0.2191,
+   "min": 0.1942,
+   "max": 0.2377,
+   "empirical_p95": 0.2377
+  },
+  "lab_resume_to_first_response_s": {
+   "n": 3,
+   "samples": [
+    0.1396,
+    0.1252,
+    0.1176
+   ],
+   "median": 0.1252,
+   "min": 0.1176,
+   "max": 0.1396,
+   "empirical_p95": 0.1396
+  }
+ },
+ "wake": {
+  "suspend_sync_s": {
+   "n": 3,
+   "samples": [
+    0.2217,
+    0.2116,
+    0.2103
+   ],
+   "median": 0.2116,
+   "min": 0.2103,
+   "max": 0.2217,
+   "empirical_p95": 0.2217
+  },
+  "wake_first_touch_s": {
+   "n": 3,
+   "samples": [
+    0.1554,
+    0.1827,
+    0.1781
+   ],
+   "median": 0.1781,
+   "min": 0.1554,
+   "max": 0.1827,
+   "empirical_p95": 0.1827
+  },
+  "errors": 0
+ },
+ "continuity": {
+  "same_process": "6/6",
+  "memory_mark": "6/6",
+  "counter_held": "6/6",
+  "counter_runs_after": "6/6",
+  "child_state": "6/6",
+  "work_intact": "6/6",
+  "home_intact": "6/6"
+ },
+ "under_500ms_count": {
+  "lab_resume_to_first_response": "3/3",
+  "wake_first_touch": "3/3"
+ },
+ "note": "No pass rule is applied here; the rule for the post's 500 ms claim is the lab owner's call."
+}
+runs/local-shakeout-20261122/resume-smoke.json

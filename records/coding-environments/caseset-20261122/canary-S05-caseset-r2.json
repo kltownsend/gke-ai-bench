@@ -1,0 +1,66 @@
+{
+ "case": "S05",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 117,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 72120,
+    "output_tokens": 3726,
+    "thinking_tokens": 2722,
+    "cache_read_tokens": 98772,
+    "total_tokens": 75846
+   },
+   "seconds": 104.282535723,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is caused by a bug in the frozen driver at [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L118-L131): in `parse_time`, the check `if ap == \"pm\" and h <= 12:` adds 12 hours when `h == 12`, turning `\"12:30 pm\"` into `\"24:30\"` instead of `\"12:30\"` (whereas [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig#L122) has `h < 12`). As a result, `Driver.match_slot` finds no slot ending in `\"24:30\"` even when a `12:30` slot is open.\n\nBecause the cause is in `clinicbench/adapters/dcitl_port.py` (part of the frozen reference driver), this is a `finding` and no files were modified.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.parse_time\"], \"cause\": \"In clinicbench/adapters/dcitl_port.py, parse_time uses `if ap == \\\"pm\\\" and h <= 12:` instead of `h < 12`, converting \\\"12:30 pm\\\" to \\\"24:30\\\" rather than \\\"12:30\\\". Consequently, Driver.match_slot fails to match open 12:30 slots.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 72120,
+  "output_tokens": 3726,
+  "thinking_tokens": 2722,
+  "cache_read_tokens": 98772
+ },
+ "pods": [
+  {
+   "actor": "lab-d5ec7f02c92a",
+   "created_to_healthy_s": 6.3
+  },
+  {
+   "actor": "lab-d5ec7f02c92a",
+   "call_s": 108.9,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.parse_time"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench/adapters/dcitl_port.py, parse_time uses `if ap == \"pm\" and h <= 12:` instead of `h < 12`, converting \"12:30 pm\" to \"24:30\" rather than \"12:30\". Consequently, Driver.match_slot fails to match open 12:30 slots."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-o58rr1yp/clinicbench"
+}

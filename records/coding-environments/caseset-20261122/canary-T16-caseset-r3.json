@@ -1,0 +1,150 @@
+{
+ "case": "T16",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 437,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43897,
+    "output_tokens": 9266,
+    "thinking_tokens": 8076,
+    "cache_read_tokens": 170364,
+    "total_tokens": 53163
+   },
+   "seconds": 295.444835771,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "### Triage Summary\n\n- **What happens:** For patients with `verbosity == \"rambling\"`, [`Voice._clear_yes`](file:///work/clinicbench/voice.py#L91-L99) generates `\"Yes, that's right, please go ahead.\"` (7 word tokens).\n- **Why Arm F drops the booking:**\n  1. In [`explicit_confirm`](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167), a leading `yes`/`yep`/`yeah`/`confirmed` only counts as `True` when `len(re.findall(r\"\\w+\", t)) <= 4`. Because `\"Yes, that's right, please go ahead.\"` has 7 words, `explicit_confirm` returns `None`.\n  2. [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L482-L493) then falls back to [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271). Under Arm F ([`DcitlF`](file:///work/clinicbench/adapters/dcitl_f.py#L17-L33), where `CONSENT_IN_CODE = True`), `Driver.consent` ignores a `\"yes\"` from the model and returns `None`.\n  3. [`Driver.unclear`](file:///work/clinicbench/adapters/dcitl_port.py#L297-L306) re-asks once (`\"Please reply yes or no: ...\"`), receives the same 7-word reply on the next turn, and on `n >= 2` queues a staff hand-off without committing the booking.\n- **Classification:** This is a **`finding`** in the frozen reference driver ([`dcitl_port.py`](file:///work/clinicbench/adapters/dcitl_port.py) / [`dcitl_f.py`](file:///work/clinicbench/adapters/dcitl_f.py)), so nothing is changed.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/dcitl_f.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.consent\", \"clinicbench.adapters.dcitl_port.Driver.book\", \"clinicbench.adapters.dcitl_port.Driver.unclear\", \"clinicbench.adapters.dcitl_f.DcitlF\"], \"cause\": \"explicit_confirm rejects \\\"Yes, that's right, please go ahead.\\\" because it exceeds the 4-word limit on leading yes-replies, returning None. Under Arm F (consent_in_code=True), Driver.consent ignores the model's \\\"yes\\\" and also returns None, so Driver.book hits Driver.unclear twice and hands off to staff without booking.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 47947,
+    "output_tokens": 9323,
+    "thinking_tokens": 8112,
+    "cache_read_tokens": 267788,
+    "total_tokens": 57270
+   },
+   "seconds": 64.030572336,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In [voice.py](file:///work/clinicbench/voice.py#L91-L99), `Voice._clear_yes` emits `\"Yes, that's right, please go ahead.\"` when `verbosity == \"rambling\"`. This is intentional frozen instrument behavior (Option B).\n\nIn the frozen reference driver [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167), `explicit_confirm` only accepts `yes`/`yep`/`yeah`/`confirmed` replies with at most 4 word tokens (`len(re.findall(r\"\\w+\", t)) <= 4`). Because `\"Yes, that's right, please go ahead.\"` has 7 word tokens, `explicit_confirm` returns `None`:\n\n1. [`Driver.book`](file:///work/clinicbench/adapters/dcitl_port.py#L482-L490) falls back to [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271), which under Arm F (`consent_in_code=True`) discards a model `\"yes\"` and returns `None`.\n2. [`Driver.unclear`](file:///work/clinicbench/adapters/dcitl_port.py#L297-L306) re-asks `\"Please reply yes or no: book ...\"`.\n3. The patient repeats `\"Yes, that's right, please go ahead.\"`, `explicit_confirm` returns `None` again, and on the second unclear (`n >= 2`) `Driver.unclear` queues the patient to `human_queue` and hands off to staff with nothing booked.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.consent\", \"clinicbench.adapters.dcitl_port.Driver.book\", \"clinicbench.adapters.dcitl_port.Driver.unclear\"], \"cause\": \"In the frozen driver, explicit_confirm rejects 'Yes, that's right, please go ahead.' because it enforces a 4-word limit on yes-prefixed confirmations. Under Arm F (consent_in_code=True), Driver.consent discards the model's 'yes', so Driver.book hits Driver.unclear twice and hands the patient off to staff without booking.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 54020,
+    "output_tokens": 7833,
+    "thinking_tokens": 6489,
+    "cache_read_tokens": 181152,
+    "total_tokens": 61853
+   },
+   "seconds": 51.289639474,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **`finding`** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py) / [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)), not a bug in the instrument.\n\n### Cause\n- In [voice.py](file:///work/clinicbench/voice.py#L91-L99), `Voice._clear_yes` produces `\"Yes, that's right, please go ahead.\"` as the designed clear-yes response when `verbosity == \"rambling\"`.\n- In [dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L156-L167) (and [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig#L151-L162)), `explicit_confirm` only accepts a leading `yes`/`yep`/`yeah`/`confirmed` if `len(re.findall(r\"\\w+\", t)) <= 4`. `\"Yes, that's right, please go ahead.\"` has 7 word tokens, so `explicit_confirm` returns `None`.\n- In [Driver.book](file:///work/clinicbench/adapters/dcitl_port.py#L482-L490) (and similarly `cancel`/`reschedule`), `c is None` falls back to [`Driver.consent`](file:///work/clinicbench/adapters/dcitl_port.py#L264-L271), which under Arm F (`consent_in_code=True`) discards any model `\"yes\"` as `None`. [`Driver.unclear`](file:///work/clinicbench/adapters/dcitl_port.py#L297-L306) then re-asks `\"Please reply yes or no: ...\"` once and, on the second identical reply (`n >= 2`), queues a staff handoff with nothing booked.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.explicit_confirm\", \"clinicbench.adapters.dcitl_port.Driver.consent\", \"clinicbench.adapters.dcitl_port.Driver.book\", \"clinicbench.adapters.dcitl_port.Driver.unclear\"], \"cause\": \"In the frozen driver, explicit_confirm rejects any leading 'yes' reply longer than four word tokens, so a rambling patient's 7-word clear yes (\\\"Yes, that's right, please go ahead.\\\") returns None. Because Arm F's Driver.consent discards model 'yes' answers, Driver.book treats both replies as unclear and Driver.unclear hands off to staff without booking.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 145864,
+  "output_tokens": 26422,
+  "thinking_tokens": 22677,
+  "cache_read_tokens": 619304
+ },
+ "pods": [
+  {
+   "actor": "lab-578585eb764b",
+   "created_to_healthy_s": 7.4
+  },
+  {
+   "actor": "lab-578585eb764b",
+   "call_s": 300.6,
+   "exit": 0
+  },
+  {
+   "actor": "lab-578585eb764b",
+   "call_s": 68.3,
+   "exit": 0
+  },
+  {
+   "actor": "lab-578585eb764b",
+   "call_s": 56.2,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/dcitl_f.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.consent",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.unclear",
+    "clinicbench.adapters.dcitl_f.DcitlF"
+   ],
+   "attribution": null,
+   "cause": "explicit_confirm rejects \"Yes, that's right, please go ahead.\" because it exceeds the 4-word limit on leading yes-replies, returning None. Under Arm F (consent_in_code=True), Driver.consent ignores the model's \"yes\" and also returns None, so Driver.book hits Driver.unclear twice and hands off to staff without booking."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.consent",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.unclear"
+   ],
+   "attribution": null,
+   "cause": "In the frozen driver, explicit_confirm rejects 'Yes, that's right, please go ahead.' because it enforces a 4-word limit on yes-prefixed confirmations. Under Arm F (consent_in_code=True), Driver.consent discards the model's 'yes', so Driver.book hits Driver.unclear twice and hands the patient off to staff without booking."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.explicit_confirm",
+    "clinicbench.adapters.dcitl_port.Driver.consent",
+    "clinicbench.adapters.dcitl_port.Driver.book",
+    "clinicbench.adapters.dcitl_port.Driver.unclear"
+   ],
+   "attribution": null,
+   "cause": "In the frozen driver, explicit_confirm rejects any leading 'yes' reply longer than four word tokens, so a rambling patient's 7-word clear yes (\"Yes, that's right, please go ahead.\") returns None. Because Arm F's Driver.consent discards model 'yes' answers, Driver.book treats both replies as unclear and Driver.unclear hands off to staff without booking."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-4z095aej/clinicbench"
+}

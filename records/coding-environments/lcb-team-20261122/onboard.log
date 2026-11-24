@@ -1,0 +1,57 @@
++ kubectl create namespace lcb-creds
++ kubectl apply -f <lab-checkout>/infra/substrate/team-lcb/namespace-policy.yaml
++ kubectl -n ate-system rollout restart deployment/k8s-credential-provider
++ kubectl -n ate-system rollout status deployment/k8s-credential-provider --timeout=180s
++ kubectl ate create atespace lcb
++ kubectl ate create actor-template -f - (team two's template)
+Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.
+ATESPACE   NAME        GOLDEN TAG   ERROR   AGE
+lcb        lcb-agent                        0s
+{
+ "onboarding": [
+  {
+   "step": "namespace for team two's credential",
+   "s": 0.4,
+   "rc": 0
+  },
+  {
+   "step": "team two's token Secret",
+   "s": 2.0,
+   "rc": 0
+  },
+  {
+   "step": "the provider's grant, both teams",
+   "s": 0.7,
+   "rc": 0
+  },
+  {
+   "step": "provider restart",
+   "s": 0.6,
+   "rc": 0
+  },
+  {
+   "step": "provider ready",
+   "s": 4.0,
+   "rc": 0
+  },
+  {
+   "step": "atespace",
+   "s": 1.7,
+   "rc": 0
+  },
+  {
+   "step": "template and its golden snapshot",
+   "s": 15.3,
+   "rc": 0
+  }
+ ],
+ "objects_added": [
+  "namespace lcb-creds",
+  "Secret lcb-creds/lab-agent-token",
+  "one entry in the provider's grant ConfigMap",
+  "atespace lcb",
+  "actor template lcb/lcb-agent"
+ ],
+ "platform_code_changed": "none",
+ "worker_pool": "team one's, shared"
+}

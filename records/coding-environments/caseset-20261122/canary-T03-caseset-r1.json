@@ -1,0 +1,90 @@
+{
+ "case": "T03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r1",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 340,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 29990,
+    "output_tokens": 5537,
+    "thinking_tokens": 4046,
+    "cache_read_tokens": 137986,
+    "total_tokens": 35527
+   },
+   "seconds": 126.561801212,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "In [truth.py](file:///work/clinicbench/truth.py#L177-L187), when `build` constructs a `change_of_mind` truth whose initial `schedule[\"works\"]` has only one slot, `t[\"schedule\"][\"works\"][1:]` is empty and `new_works` falls back to `rng.sample(cand, 1)`. The candidate list `cand` only excludes `dropped` and does not filter out slots already excluded by `t[\"schedule\"][\"hard_limits\"]` (for example, `change_of_mind:shakedown:0` picks `08:30` despite `hard_limits` containing `\"not before 10\"`).\n\nBecause [truth.py](file:///work/clinicbench/truth.py) is frozen instrument code listed in [phase3-freeze.json](file:///work/docs/phase3-freeze.json#L8), this is a `fix`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/truth.py\"], \"symbols\": [\"clinicbench.truth.build\"], \"cause\": \"In clinicbench.truth.build, the change_of_mind fallback candidate list `cand` only excludes the dropped slot and does not filter out slots excluded by `t[\\\"schedule\\\"][\\\"hard_limits\\\"]`. When the patient starts with a single working slot, `rng.sample(cand, 1)` can select a new slot that violates the patient's own hard limit.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 33955,
+    "output_tokens": 3874,
+    "thinking_tokens": 1832,
+    "cache_read_tokens": 128125,
+    "total_tokens": 37829
+   },
+   "seconds": 134.42368105,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated `build` in [clinicbench/truth.py](file:///work/clinicbench/truth.py#L177-L184) for `change_of_mind` truths so that the fallback candidate list `cand` excludes slots listed in `t[\"schedule\"][\"hard_limits\"]` (`excluded = {s for lim in t[\"schedule\"][\"hard_limits\"] for s in lim[\"excludes\"]}`), and guards `rng.sample(cand, 1)` when `cand` is empty.\n\n### Verification\n- Ran `truth.generate_set(\"lab23\")` and 5,000 `change_of_mind` seeds (`lab23:0` through `lab23:4999`) via `python3 -c`: `hits=0`, `empty=0` (previously 19 violations in the first 500 seeds).\n- Note: `pytest` is not installed in this environment, so the `tests/` suite could not be executed.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 63945,
+  "output_tokens": 9411,
+  "thinking_tokens": 5878,
+  "cache_read_tokens": 266111
+ },
+ "pods": [
+  {
+   "actor": "lab-3e8a27863415",
+   "created_to_healthy_s": 6.0
+  },
+  {
+   "actor": "lab-3e8a27863415",
+   "call_s": 130.5,
+   "exit": 0
+  },
+  {
+   "actor": "lab-3e8a27863415",
+   "call_s": 138.4,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth.build"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth.build, the change_of_mind fallback candidate list `cand` only excludes the dropped slot and does not filter out slots excluded by `t[\"schedule\"][\"hard_limits\"]`. When the patient starts with a single working slot, `rng.sample(cand, 1)` can select a new slot that violates the patient's own hard limit."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-ui7y4bp2/clinicbench"
+}

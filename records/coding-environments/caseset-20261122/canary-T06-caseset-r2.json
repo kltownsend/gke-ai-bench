@@ -1,0 +1,92 @@
+{
+ "case": "T06",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "done",
+ "attempts": 1,
+ "wall_seconds": 124,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 38193,
+    "output_tokens": 3963,
+    "thinking_tokens": 2126,
+    "cache_read_tokens": 127084,
+    "total_tokens": 42156
+   },
+   "seconds": 34.958439379,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The tier 2 read-back completeness check in [scorer.py](file:///work/clinicbench/scorer.py#L399-L400) (`clinicbench.scorer.process`) applies the wrong required-field set to `cancel` and covered `book` writes:\n\n1. **`cancel` writes:** `need` unconditionally requires `{\"action\", \"slot\", \"doctor\"}`, even though a `cancel` component only has `action` and `appt` (see [scorer.py](file:///work/clinicbench/scorer.py#L139-L140) and [stubs.py](file:///work/clinicbench/stubs.py#L340)).\n2. **Covered `book` writes:** `need` adds `\"cost\"` whenever `w[\"component\"][\"action\"] == \"book\"`, without checking `w[\"component\"][\"basis\"] == \"self_pay\"`, whereas covered bookings have `cost: None` (see [stubs.py](file:///work/clinicbench/stubs.py#L399-L400)).\n\nBecause `complete` checks `need <= {k for k, v in readback.items() if v is not None}`, every `cancel` read-back and every covered `book` read-back is marked `False` (`Prober` on the selftest sample: 2/2 cancels and 7/7 covered bookings flagged incomplete, while 1/1 self-pay bookings and 2/2 moves pass). Since `clinicbench/scorer.py` is instrument code, this is a `fix`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/scorer.py\"], \"symbols\": [\"clinicbench.scorer.process\"], \"cause\": \"clinicbench.scorer.process unconditionally requires 'slot' and 'doctor' for all writes (including 'cancel', which only has 'action' and 'appt') and requires non-None 'cost' for all 'book' writes regardless of whether 'basis' is 'covered' or 'self_pay'.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 34857,
+    "output_tokens": 3718,
+    "thinking_tokens": 2203,
+    "cache_read_tokens": 129877,
+    "total_tokens": 38575
+   },
+   "seconds": 39.422410174,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated [`process`](file:///work/clinicbench/scorer.py#L399-L402) in [clinicbench/scorer.py](file:///work/clinicbench/scorer.py) so that the tier 2 read-back completeness check requires:\n- `{\"action\", \"appt\"}` for `\"cancel\"` writes (instead of `\"slot\"` and `\"doctor\"`).\n- `{\"action\", \"slot\", \"doctor\"}` for `\"move\"` and `\"covered\"` `\"book\"` writes.\n- `{\"action\", \"slot\", \"doctor\", \"cost\"}` only when `\"action\" == \"book\"` and `\"basis\" == \"self_pay\"`.\n\n### Verification\n- `clinicbench.selftest.run_all(verbose=True)`: `SELFTEST PASS` (`golden: 46/46`, `mutation: 658/658`, `stub grid: 10368/10368`).\n- Verified `tier2[\"process\"][\"writes\"]` on `prober` sessions returns `readback=True` and `readback_matches_write=True` for `('book', 'covered')`, `('book', 'self_pay')`, `('cancel', None)`, and `('move', None)`, while a `self_pay` booking with `cost=None` still returns `readback=False`. (Note: `pytest` and `git` are not installed in this environment.)\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 73050,
+  "output_tokens": 7681,
+  "thinking_tokens": 4329,
+  "cache_read_tokens": 256961
+ },
+ "pods": [
+  {
+   "actor": "lab-edd42a263bf2",
+   "created_to_healthy_s": 6.2
+  },
+  {
+   "actor": "lab-edd42a263bf2",
+   "call_s": 47.9,
+   "exit": 0,
+   "wait": "poll"
+  },
+  {
+   "actor": "lab-edd42a263bf2",
+   "call_s": 47.1,
+   "exit": 0,
+   "wait": "poll"
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/scorer.py"
+   ],
+   "symbols": [
+    "clinicbench.scorer.process"
+   ],
+   "attribution": null,
+   "cause": "clinicbench.scorer.process unconditionally requires 'slot' and 'doctor' for all writes (including 'cancel', which only has 'action' and 'appt') and requires non-None 'cost' for all 'book' writes regardless of whether 'basis' is 'covered' or 'self_pay'."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-fd5mbkh2/clinicbench"
+}

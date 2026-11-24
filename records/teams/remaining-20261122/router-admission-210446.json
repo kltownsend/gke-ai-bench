@@ -1,0 +1,22 @@
+{
+ "probe": "router_admission",
+ "identity": "spiffe://cluster.local/ns/benchmarking/sa/benchmark-runner",
+ "results": {
+  "lab-agent/p-one-205834": {
+   "connect_status": "HTTP/1.1 200 OK",
+   "get_status": "HTTP/1.1 200 OK",
+   "tls_s": 0.0102,
+   "connect_s": 0.0417,
+   "get_s": 1.0152,
+   "total_s": 1.0671
+  },
+  "lcb/tenant-two-205655": {
+   "connect_status": "HTTP/1.1 200 OK",
+   "get_status": "HTTP/1.1 200 OK",
+   "tls_s": 0.0046,
+   "connect_s": 0.0425,
+   "get_s": 1.0169,
+   "total_s": 1.0639
+  }
+ }
+}

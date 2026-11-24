@@ -1,0 +1,34 @@
+LAST SEEN   TYPE     REASON              OBJECT                                           MESSAGE
+39m         Normal   SuccessfulCreate    replicaset/prometheus-6fbccc8c66                 Created pod: prometheus-6fbccc8c66-mj9j2
+39m         Normal   Pulling             pod/grafana-7bdbf7b5fd-fl4cc                     Pulling image "grafana/grafana:10.0.0"
+39m         Normal   SuccessfulCreate    replicaset/grafana-7bdbf7b5fd                    Created pod: grafana-7bdbf7b5fd-fl4cc
+39m         Normal   ScalingReplicaSet   deployment/grafana                               Scaled up replica set grafana-7bdbf7b5fd from 0 to 1
+39m         Normal   Scheduled           pod/prometheus-6fbccc8c66-mj9j2                  Successfully assigned benchmarking/prometheus-6fbccc8c66-mj9j2 to kind-control-plane
+39m         Normal   Pulling             pod/prometheus-6fbccc8c66-mj9j2                  Pulling image "prom/prometheus:v2.45.0"
+39m         Normal   ScalingReplicaSet   deployment/prometheus                            Scaled up replica set prometheus-6fbccc8c66 from 0 to 1
+39m         Normal   Scheduled           pod/grafana-7bdbf7b5fd-fl4cc                     Successfully assigned benchmarking/grafana-7bdbf7b5fd-fl4cc to kind-control-plane
+39m         Normal   Pulled              pod/grafana-7bdbf7b5fd-fl4cc                     Successfully pulled image "grafana/grafana:10.0.0" in 5.935s (5.935s including waiting). Image size: 86167483 bytes.
+39m         Normal   Created             pod/grafana-7bdbf7b5fd-fl4cc                     Container created
+39m         Normal   Started             pod/grafana-7bdbf7b5fd-fl4cc                     Container started
+39m         Normal   Created             pod/prometheus-6fbccc8c66-mj9j2                  Container created
+39m         Normal   Started             pod/prometheus-6fbccc8c66-mj9j2                  Container started
+39m         Normal   Pulled              pod/prometheus-6fbccc8c66-mj9j2                  Successfully pulled image "prom/prometheus:v2.45.0" in 6.911s (6.911s including waiting). Image size: 88157091 bytes.
+15m         Normal   SuccessfulCreate    job/runner-durdir-implicit-resume-38c856         Created pod: runner-durdir-implicit-resume-38c856-sfcd6
+15m         Normal   Pulling             pod/runner-durdir-implicit-resume-38c856-sfcd6   Pulling image "localhost:5001/locust-test:v1.0.1"
+15m         Normal   Scheduled           pod/runner-durdir-implicit-resume-38c856-sfcd6   Successfully assigned benchmarking/runner-durdir-implicit-resume-38c856-sfcd6 to kind-control-plane
+15m         Normal   Started             pod/runner-durdir-implicit-resume-38c856-sfcd6   Container started
+15m         Normal   Created             pod/runner-durdir-implicit-resume-38c856-sfcd6   Container created
+15m         Normal   Pulled              pod/runner-durdir-implicit-resume-38c856-sfcd6   Successfully pulled image "localhost:5001/locust-test:v1.0.1" in 1.575s (1.575s including waiting). Image size: 110960401 bytes.
+13m         Normal   Completed           job/runner-durdir-implicit-resume-38c856         Job completed
+10m         Normal   SuccessfulCreate    job/runner-durdir-implicit-resume-19f768         Created pod: runner-durdir-implicit-resume-19f768-sjxxb
+10m         Normal   Created             pod/runner-durdir-implicit-resume-19f768-sjxxb   Container created
+10m         Normal   Started             pod/runner-durdir-implicit-resume-19f768-sjxxb   Container started
+10m         Normal   Pulled              pod/runner-durdir-implicit-resume-19f768-sjxxb   Container image "localhost:5001/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+10m         Normal   Scheduled           pod/runner-durdir-implicit-resume-19f768-sjxxb   Successfully assigned benchmarking/runner-durdir-implicit-resume-19f768-sjxxb to kind-control-plane
+8m22s       Normal   Completed           job/runner-durdir-implicit-resume-19f768         Job completed
+4m16s       Normal   SuccessfulCreate    job/runner-agentsession-4-5b9c99                 Created pod: runner-agentsession-4-5b9c99-h4kwd
+4m16s       Normal   Scheduled           pod/runner-agentsession-4-5b9c99-h4kwd           Successfully assigned benchmarking/runner-agentsession-4-5b9c99-h4kwd to kind-control-plane
+4m15s       Normal   Started             pod/runner-agentsession-4-5b9c99-h4kwd           Container started
+4m15s       Normal   Created             pod/runner-agentsession-4-5b9c99-h4kwd           Container created
+4m15s       Normal   Pulled              pod/runner-agentsession-4-5b9c99-h4kwd           Container image "localhost:5001/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+0s          Normal   Completed           job/runner-agentsession-4-5b9c99                 Job completed

@@ -1,0 +1,85 @@
+{
+ "probe": "cross_team",
+ "t": 1795398232.733449,
+ "team_one": {
+  "actor": "lab-9f65b15e8a95",
+  "worker_pod": "lab-substrate/lab-agent-workers-5dc7c6895f-cl85j",
+  "pid": 1,
+  "boot": "16b40f293c8242f7ba71f8a094552e4a"
+ },
+ "targets": {
+  "worker_ip": "10.96.3.3",
+  "port": 8080,
+  "router_ip": "34.118.239.200",
+  "router_ports": [
+   "443",
+   "8444"
+  ],
+  "actor": "lab-9f65b15e8a95",
+  "actor_ref": "lab-agent/lab-9f65b15e8a95",
+  "buckets": [
+   "ate-snapshots-example-project-lab-substr-xxxxxxxx",
+   "ate-snapshots-example-project-lab-substr-xxxxxxxx-assets"
+  ]
+ },
+ "team_two_actor": "lab-063af0a123b2",
+ "to_agent_policy_s": 5.363,
+ "results": {
+  "1_worker_ip_actor_port": {
+   "status": 403,
+   "body": "egress denied",
+   "team_one_state_returned": false
+  },
+  "2_worker_ip_443": {
+   "error": "URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1032)>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "3_router_443": {
+   "status": 403,
+   "body": "egress denied",
+   "team_one_state_returned": false
+  },
+  "3_router_8444": {
+   "status": 403,
+   "body": "egress denied",
+   "team_one_state_returned": false
+  },
+  "4_actor_name_as_host": {
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "5_gcs_json_list_a252d3": {
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "6_gcs_xml_a252d3": {
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "7_via_model_host_a252d3": {
+   "status": 403,
+   "body": "egress denied",
+   "team_one_state_returned": false
+  },
+  "5_gcs_json_list_assets": {
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "6_gcs_xml_assets": {
+   "error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+   "team_one_state_returned": false,
+   "body": ""
+  },
+  "7_via_model_host_assets": {
+   "status": 403,
+   "body": "egress denied",
+   "team_one_state_returned": false
+  }
+ },
+ "reached_team_one": false
+}

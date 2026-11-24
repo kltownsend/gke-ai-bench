@@ -1,0 +1,90 @@
+{
+ "case": "T03",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 374,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 69661,
+    "output_tokens": 5751,
+    "thinking_tokens": 4039,
+    "cache_read_tokens": 166547,
+    "total_tokens": 75412
+   },
+   "seconds": 188.400990147,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The bug is in [truth.py](file:///work/clinicbench/truth.py#L177-L187) inside `clinicbench.truth.build`. For `change_of_mind` patients, when the initial `schedule[\"works\"]` has only one slot, `t[\"schedule\"][\"works\"][1:]` is empty and `new_works` falls back to `rng.sample(cand, 1)`. However, `cand` only excludes `dropped` and does not filter out slots excluded by `t[\"schedule\"][\"hard_limits\"]` (or `t[\"doctor\"][\"refuses\"]`), so the post-event `schedule[\"works\"]` can contain a slot that violates the patient's own hard limit.\n\nBecause [truth.py](file:///work/clinicbench/truth.py) is frozen instrument code listed in [phase3-freeze.json](file:///work/docs/phase3-freeze.json#L8), this is a `fix`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/truth.py\"], \"symbols\": [\"clinicbench.truth.build\"], \"cause\": \"In clinicbench.truth.build, when a change_of_mind patient has only one initial working slot, the replacement slot is sampled from cand which only excludes the dropped slot and does not filter out slots excluded by t['schedule']['hard_limits']. As a result, the post-change schedule can assign a working slot that violates the patient's own hard limit.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 41957,
+    "output_tokens": 4423,
+    "thinking_tokens": 2568,
+    "cache_read_tokens": 201778,
+    "total_tokens": 46380
+   },
+   "seconds": 99.987196931,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Waiting for the `clinicbench.selftest` verification task to finish.\nFixed the `change_of_mind` replacement slot sampling in [truth.py](file:///work/clinicbench/truth.py#L177-L183).\n\n### Change\n- In `clinicbench.truth.build`, collected `excl = {s for lim in t[\"schedule\"][\"hard_limits\"] for s in lim[\"excludes\"]}` and filtered `s not in excl` when building `cand` for `change_of_mind` patients.\n\n### Verification\n- Verified across `lab23` (`25` seeds) and `shakedown` (`2000` seeds) `change_of_mind` records that `events[0][\"schedule\"][\"works\"]` is non-empty and contains no slots excluded by `events[0][\"schedule\"][\"hard_limits\"]`.\n- Ran `clinicbench.selftest.run_all`: `SELFTEST PASS` (golden `57/57`, mutation `556/556`, stub grid `10368/10368`, adapter `3456/3456`). Note: `pytest` and `git` are not installed in this environment, so `tests/` was not run via `pytest`.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 111618,
+  "output_tokens": 10174,
+  "thinking_tokens": 6607,
+  "cache_read_tokens": 368325
+ },
+ "pods": [
+  {
+   "actor": "lab-ede2d0736d66",
+   "created_to_healthy_s": 7.6
+  },
+  {
+   "actor": "lab-ede2d0736d66",
+   "call_s": 192.5,
+   "exit": 0
+  },
+  {
+   "actor": "lab-ede2d0736d66",
+   "call_s": 104.0,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "pending"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/truth.py"
+   ],
+   "symbols": [
+    "clinicbench.truth.build"
+   ],
+   "attribution": null,
+   "cause": "In clinicbench.truth.build, when a change_of_mind patient has only one initial working slot, the replacement slot is sampled from cand which only excludes the dropped slot and does not filter out slots excluded by t['schedule']['hard_limits']. As a result, the post-change schedule can assign a working slot that violates the patient's own hard limit."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-3tlqrql6/clinicbench"
+}

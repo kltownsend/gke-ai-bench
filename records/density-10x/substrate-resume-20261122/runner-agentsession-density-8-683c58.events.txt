@@ -1,0 +1,13 @@
+LAST SEEN   TYPE     REASON             OBJECT                                           MESSAGE
+49m         Normal   Scheduled          pod/runner-agentsession-4-46de2a-46m55           Successfully assigned benchmarking/runner-agentsession-4-46de2a-46m55 to gke-lab-substrate-lab-bench-runner-87e64a2a-1f0n
+11m         Normal   Scheduled          pod/runner-agentsession-density-8-683c58-lsfpk   Successfully assigned benchmarking/runner-agentsession-density-8-683c58-lsfpk to gke-lab-substrate-lab-bench-runner-87e64a2a-1f0n
+49m         Normal   SuccessfulCreate   job/runner-agentsession-4-46de2a                 Created pod: runner-agentsession-4-46de2a-46m55
+49m         Normal   Pulled             pod/runner-agentsession-4-46de2a-46m55           Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+49m         Normal   Created            pod/runner-agentsession-4-46de2a-46m55           Container created
+49m         Normal   Started            pod/runner-agentsession-4-46de2a-46m55           Container started
+38m         Normal   Completed          job/runner-agentsession-4-46de2a                 Job completed
+11m         Normal   SuccessfulCreate   job/runner-agentsession-density-8-683c58         Created pod: runner-agentsession-density-8-683c58-lsfpk
+11m         Normal   Pulled             pod/runner-agentsession-density-8-683c58-lsfpk   Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+11m         Normal   Created            pod/runner-agentsession-density-8-683c58-lsfpk   Container created
+11m         Normal   Started            pod/runner-agentsession-density-8-683c58-lsfpk   Container started
+3s          Normal   Completed          job/runner-agentsession-density-8-683c58         Job completed

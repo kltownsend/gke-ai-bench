@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON             OBJECT                                            MESSAGE
+11m         Normal   Scheduled          pod/runner-agentsession-density-64-1830a3-l88jg   Successfully assigned benchmarking/runner-agentsession-density-64-1830a3-l88jg to gke-lab-substrate-lab-bench-runner-8810963d-cx59
+50m         Normal   Scheduled          pod/runner-agentsession-density-32-faa848-77z7b   Successfully assigned benchmarking/runner-agentsession-density-32-faa848-77z7b to gke-lab-substrate-lab-bench-runner-8810963d-cx59
+51m         Normal   Completed          job/runner-agentsession-density-16-176b7f         Job completed
+50m         Normal   SuccessfulCreate   job/runner-agentsession-density-32-faa848         Created pod: runner-agentsession-density-32-faa848-77z7b
+50m         Normal   Pulled             pod/runner-agentsession-density-32-faa848-77z7b   Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+50m         Normal   Created            pod/runner-agentsession-density-32-faa848-77z7b   Container created
+50m         Normal   Started            pod/runner-agentsession-density-32-faa848-77z7b   Container started
+38m         Normal   Completed          job/runner-agentsession-density-32-faa848         Job completed
+11m         Normal   SuccessfulCreate   job/runner-agentsession-density-64-1830a3         Created pod: runner-agentsession-density-64-1830a3-l88jg
+11m         Normal   Pulled             pod/runner-agentsession-density-64-1830a3-l88jg   Container image "us-central1-docker.pkg.dev/example-project/lab-images/locust-test:v1.0.1" already present on machine and can be accessed by the pod
+11m         Normal   Created            pod/runner-agentsession-density-64-1830a3-l88jg   Container created
+11m         Normal   Started            pod/runner-agentsession-density-64-1830a3-l88jg   Container started
+2s          Normal   Completed          job/runner-agentsession-density-64-1830a3         Job completed

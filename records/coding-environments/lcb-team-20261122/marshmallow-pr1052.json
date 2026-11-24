@@ -1,0 +1,44 @@
+{
+ "task": "marshmallow-pr1052",
+ "repo": "marshmallow-code/marshmallow",
+ "t0": 1795381484.407716,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 58125,
+ "install_exit": 0,
+ "install_s": 56.0,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 11.855,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 57520,
+    "output_tokens": 9925,
+    "thinking_tokens": 8178,
+    "cache_read_tokens": 393662,
+    "total_tokens": 67445
+   },
+   "seconds": 88.781907201,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed `ValidationError.valid_data` handling during deserialization in [marshmallow/fields.py](file:///work/marshmallow/fields.py):\n\n- **`List._deserialize`** ([fields.py](file:///work/marshmallow/fields.py#L598-L615)): Only append `e.valid_data` to `result` when `e.valid_data is not None`, and raise `ValidationError(errors, valid_data=result)` instead of `data=result`.\n- **`Dict._deserialize`** ([fields.py](file:///work/marshmallow/fields.py#L1257-L1291)): Iterate over `value.items()`, include an entry in `result` only when the key is valid and either the value is valid or `e.valid_data is not None` (using `e.valid_data`), and raise `ValidationError(errors, valid_data=result)` instead of `data=result`.\n\n### Verification\nRan `/work/venv/bin/pytest`: **894 passed** (including `test_structured_dict_value_deserialization`, `test_structured_dict_key_deserialization`, and `test_structured_dict_key_value_deserialization`).\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "marshmallow/fields.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-9da6a566f041",
+   "created_to_healthy_s": 7.2
+  }
+ ],
+ "wall_s": 195.8
+}

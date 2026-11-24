@@ -1,0 +1,46 @@
++ kubectl -n ate-system patch deploy ate-api-server --type=json -p [{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["--grpc-server-cred-bundle=/run/servicedns.podcert.ate.dev/credential-bundle.pem", "--config-file=/run/apiconfig.ate.dev/apiconfig.textproto", "--authentication-config=/etc/ateapi/authentication/authentication.yaml", "--postgres-read-write-connection-string=@env", "--postgres-owner-connection-string=@env", "--postgres-read-write-role=@env", "--postgres-owner-role=@env", "--postgres-schema=@env", "--actor-id-jwt-pool=/run/actor-id-jwt-pool/pool.json", "--actor-jwt-issuer=@env", "--actor-id-ca-pool=/run/actor-id-ca-pool/pool.json", "--atelet-client-cred-bundle=/run/podidentity.podcert.ate.dev/credential-bundle.pem", "--pod-identity-ca-certs=/run/podidentity.podcert.ate.dev/trust-bundle.pem", "--default-egress-gateway-address=atenet-egress.ate-system.svc:443", "--drain-delay=13s", "--drain-timeout=15s", "--objectstore-plugin-socket=/run/objectstore-plugin/control.sock", "--snapshot-location=@env", "--preview=", "--authz-bootstrap-owners=system:serviceaccount:ate-system:ate-client"]}]
+deployment.apps/ate-api-server patched
++ kubectl -n ate-system rollout status deploy/ate-api-server --timeout=300s
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "ate-api-server" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "ate-api-server" rollout to finish: 1 old replicas are pending termination...
+deployment "ate-api-server" successfully rolled out
++ kubectl -n ate-system patch deploy atenet-router --type=json -p [{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["router", "--mode=ingress", "--namespace=ate-system", "--port-xds=18000", "--port-extproc=50051", "--extproc-address=127.0.0.1", "--status-port=4040", "--port-https=8443", "--envoy-cert-path=/run/servicedns.podcert.ate.dev/credential-bundle.pem", "--port-connect-tls=8444", "--ingress-client-ca-file=/run/podidentity.podcert.ate.dev/trust-bundle.pem", "--ateapi-address=k8s:///api.ate-system.svc:443", "--ateapi-ca-file=/run/servicedns-ca/trust-bundle.pem", "--ateapi-client-cert=/run/podidentity.podcert.ate.dev/credential-bundle.pem", "--drain-delay=13s", "--ingress-allowed-spiffe-ids=spiffe://cluster.local/ns/ate-system/sa/atenet-client", "--preview="]}]
+deployment.apps/atenet-router patched
++ kubectl -n ate-system rollout status deploy/atenet-router --timeout=300s
+Waiting for deployment "atenet-router" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "atenet-router" rollout to finish: 1 old replicas are pending termination...
+deployment "atenet-router" successfully rolled out
++ kubectl delete -f /home/operator/lab-src/substrate/benchmarking/monitoring.yaml --ignore-not-found --wait=true --timeout=300s
+namespace "benchmarking" deleted
+serviceaccount "prometheus" deleted from benchmarking namespace
+role.rbac.authorization.k8s.io "prometheus" deleted from benchmarking namespace
+rolebinding.rbac.authorization.k8s.io "prometheus" deleted from benchmarking namespace
+clusterrole.rbac.authorization.k8s.io "prometheus-benchmarking-nodes" deleted
+clusterrolebinding.rbac.authorization.k8s.io "prometheus-benchmarking-nodes" deleted
+clusterrole.rbac.authorization.k8s.io "prometheus-benchmarking-pods" deleted
+clusterrolebinding.rbac.authorization.k8s.io "prometheus-benchmarking-pods" deleted
+configmap "prometheus-config" deleted from benchmarking namespace
+deployment.apps "prometheus" deleted from benchmarking namespace
+service "prometheus" deleted from benchmarking namespace
+configmap "grafana-datasources" deleted from benchmarking namespace
+configmap "grafana-dashboards-provider" deleted from benchmarking namespace
+configmap "grafana-dashboards" deleted from benchmarking namespace
+deployment.apps "grafana" deleted from benchmarking namespace
+service "grafana" deleted from benchmarking namespace
++ kubectl delete namespace benchmarking --ignore-not-found --wait=true --timeout=300s
++ kubectl delete clusterrolebinding benchmark-runner-hardware-discovery --ignore-not-found
+clusterrolebinding.rbac.authorization.k8s.io "benchmark-runner-hardware-discovery" deleted
++ kubectl delete clusterrole benchmark-runner-hardware-discovery --ignore-not-found
+clusterrole.rbac.authorization.k8s.io "benchmark-runner-hardware-discovery" deleted
++ kubectl -n ate-system delete rolebinding automated-benchmarking-permissions --ignore-not-found
+rolebinding.rbac.authorization.k8s.io "automated-benchmarking-permissions" deleted from ate-system namespace
++ kubectl -n ate-system delete rolebinding benchmark-runner-atelet-logs --ignore-not-found
+rolebinding.rbac.authorization.k8s.io "benchmark-runner-atelet-logs" deleted from ate-system namespace
++ kubectl -n ate-system delete role benchmark-runner-atelet-logs --ignore-not-found
+role.rbac.authorization.k8s.io "benchmark-runner-atelet-logs" deleted from ate-system namespace
++ sh -c cd /home/operator/lab-src/substrate && benchmarking/workloads/deploy.sh --delete
+Deleting workloads...
+atespace benchmark-workloads not deleted (may not exist or is not empty)

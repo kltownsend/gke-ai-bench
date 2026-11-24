@@ -1,0 +1,74 @@
+{
+ "venue": "substrate",
+ "label": "substrate-p2",
+ "run_token": "lab-run-13da1185b984",
+ "exit": 0,
+ "stderr_tail": "",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "neighbor_ip": "34.118.230.113",
+ "neighbor_endpoints": "",
+ "result": {
+  "probe": "api_scope",
+  "t": 1795321614.4966185,
+  "uid": 10001,
+  "credential": {
+   "metadata_token": true,
+   "expires_in_s": 3599,
+   "placeholder": true,
+   "metadata_host": "127.0.0.1:8081",
+   "identity": "<agent-service-account>",
+   "scopes": [
+    "https://www.googleapis.com/auth/cloud-platform"
+   ],
+   "real_metadata_token": false,
+   "real_metadata_error": "URLError: <urlopen error [Errno 113] No route to host>",
+   "env_names": [
+    "GPG_KEY"
+   ],
+   "files": {
+    "/home/agent/.config/gcloud/application_default_credentials.json": false,
+    "/nonexistent": false,
+    "/var/run/secrets/kubernetes.io/serviceaccount/token": false
+   }
+  },
+  "positive_control": {
+   "reached": true,
+   "http_status": 200,
+   "body_start": "403\r\n{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"role\": \"model\",\n        \"parts\": [\n          {\n            \"text\": \"\"\n          }\n        ]\n      },\n",
+   "ok": true
+  },
+  "routing": {
+   "named": {
+    "reached": false,
+    "stage": "connect",
+    "detail": "gaierror: [Errno -2] Name or service not known",
+    "storage_served": false
+   },
+   "sni": {
+    "reached": false,
+    "stage": "connect",
+    "detail": "SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1032)",
+    "storage_served": false
+   },
+   "host": {
+    "reached": true,
+    "http_status": 403,
+    "body_start": "egress denied",
+    "storage_served": false
+   }
+  },
+  "authorization": {
+   "list_lab_buckets": "no route to storage"
+  },
+  "dns_outside_names": {
+   "example.com": "no: gaierror",
+   "lab-dns-probe-1795321617.example.org": "no: gaierror"
+  },
+  "verdict_inputs": {
+   "counts": true,
+   "storage_reached": false,
+   "usable_credential": true,
+   "outside_dns": false
+  }
+ }
+}

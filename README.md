@@ -7,9 +7,10 @@ otherwise build by hand?
 The results are on the project site, https://gke-ai-layer2c.web.app, with a "How it was tested" page for every
 claim. This repository is the instrument behind those pages: the probes, the drivers, the configurations and
 the cases, so you can run the same tests on your own Google Cloud project and get your own measurements, or
-point them at your own cluster. It doesn't reproduce the site's numbers exactly: the lab's raw run records and
-its rulings aren't here, and your project, timing and model behavior will differ. Read your numbers beside the
-site's as two runs of the same instrument.
+point them at your own cluster. The lab's own run records are in `records/`, sanitized, with a hash of every
+original, so you can recompute the site's numbers from what the lab measured. Its rulings aren't here, and a
+rerun won't land on the same numbers: your project, timing and model behavior will differ. Read your numbers
+beside the lab's as two runs of the same instrument.
 
 ## What's here
 
@@ -24,6 +25,7 @@ site's as two runs of the same instrument.
 | `baselines/` | The Clinic source trees the cases start from, sanitized so no file names a cause |
 | `infra/` | The plain GKE baselines and runtime clusters (`cluster.sh`), Kubernetes and Substrate configuration, team two's actor, the Executor image |
 | `tests/` | Unit tests for the judge, the controller, the venues and the harness |
+| `records/` | The lab's own run records behind each site claim, sanitized, with hashes of every original (`records/README.md` says what was changed) |
 
 `RUNBOOK.md` is the run guide, written so a coding agent can follow it, with what each step cost the lab and the
 exact versions it ran. `AGENTS.md` holds the rules an agent running it should keep. Use a Google Cloud project

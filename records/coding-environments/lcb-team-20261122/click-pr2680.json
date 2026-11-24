@@ -1,0 +1,44 @@
+{
+ "task": "click-pr2680",
+ "repo": "pallets/click",
+ "t0": 1795381939.673279,
+ "preflight": "skipped-by-override: hosted Vertex via agy, no self-served engine to check",
+ "prompt_chars": 115916,
+ "install_exit": 0,
+ "install_s": 36.0,
+ "install_tail": "RNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\nWARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.\n\n[notice] A new release of pip is available: 26.1.2 -> 26.3\n[notice] To update, run: /work/venv/bin/python3 -m pip install --upgrade pip\n",
+ "to_agent_policy_s": 5.113,
+ "calls": [
+  {
+   "stage": "lcb",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 58831,
+    "output_tokens": 5719,
+    "thinking_tokens": 4607,
+    "cache_read_tokens": 389543,
+    "total_tokens": 64550
+   },
+   "seconds": 52.219928732,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Fixed the bug in [`Command.make_context`](file:///work/src/click/core.py#L1130-L1136) where `ctx.close()` was never called if `self.parse_args(ctx, args)` raised an exception (such as `Exit` from an eager option like `--help` or a custom callback calling `ctx.exit()`).\n\n### Root Cause\n`Command.make_context` enters `with ctx.scope(cleanup=False):` while calling `self.parse_args(ctx, args)`. When `parse_args` raises an exception, `make_context` never returns `ctx` to the caller (e.g. `with self.make_context(...) as ctx:` in `Command.main`), so `ctx.close()` was skipped and any callbacks registered via `ctx.call_on_close()` were never invoked.\n\n### Fix\nWrapped `self.parse_args(ctx, args)` in a `try ... except BaseException:` block inside `with ctx.scope(cleanup=False):` in [src/click/core.py](file:///work/src/click/core.py#L1130-L1136) so `ctx.close()` is called before the exception propagates and before `ctx` is popped from the context stack.\n\n### Verification\nRan `./venv/bin/python -m pytest -vv tests/test_context.py`: all 27 tests in [tests/test_context.py](file:///work/tests/test_context.py) passed, including `test_no_state_leaks` and both `test_multiple_eager_callbacks` cases.\n"
+  }
+ ],
+ "verdict": "RESULT: SOLVED",
+ "changed_allowlisted": [
+  "src/click/core.py"
+ ],
+ "changed_out_of_scope": [],
+ "venue_events": [
+  {
+   "actor": "lab-87c6020ae914",
+   "created_to_healthy_s": 6.6
+  }
+ ],
+ "wall_s": 123.6
+}

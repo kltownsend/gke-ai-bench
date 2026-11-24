@@ -1,0 +1,210 @@
+{
+ "case": "T12",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 635,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 92594,
+    "output_tokens": 18390,
+    "thinking_tokens": 15888,
+    "cache_read_tokens": 572808,
+    "total_tokens": 110984
+   },
+   "seconds": 162.039881727,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is caused by a bug in the frozen instrument ([policy.py](file:///work/clinicbench/policy.py#L303-L318)), triggered when the driver pivots to a booking during a reschedule:\n\n1. **Instrument bug (`fix`)**: In [`PatientPolicy._in_truth`](file:///work/clinicbench/policy.py#L303-L318), the `\"cancel\"` branch checks `any(i[\"action\"] == \"cancel\" for i in self.t[\"intents\"])`, but the `\"book\"` branch only checks `self.now[\"schedule\"][\"works\"]` (and self-pay limits) without checking `any(i[\"action\"] == \"book\" for i in self.t[\"intents\"])`. Because `reschedule_own` populates `schedule[\"works\"]` with candidate slots for the move, the simulated patient answers `\"Yes\"` to a `\"book\"` offer even though their only intent is `\"move\"`.\n2. **Trigger in the driver**: When a rambling patient picks a new time, [voice.py](file:///work/clinicbench/voice.py#L287-L288) appends `COLOR[0]` from [truth.py](file:///work/clinicbench/truth.py#L38) (`\"I don't drive, so I'm going by my daughter's schedule\"`). [`parse_intents`](file:///work/clinicbench/adapters/dcitl_port.py#L90-L104) matches `\"schedule\"` as `\"book\"`, and [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L340-L345) pivots the active `\"reschedule\"` workflow to `\"book\"`.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/policy.py\"], \"symbols\": [\"clinicbench.policy.PatientPolicy._in_truth\"], \"cause\": \"PatientPolicy._in_truth accepts a 'book' offer whenever the slot is in schedule['works'] without checking that 'book' is in self.t['intents']. When the driver misreads 'daughter's schedule' in a rambling patient's reschedule turn as a pivot to 'book', the patient confirms the new booking while their original appointment remains on the books.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 65291,
+    "output_tokens": 4959,
+    "thinking_tokens": 2746,
+    "cache_read_tokens": 173539,
+    "total_tokens": 70250
+   },
+   "seconds": 59.120995561,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated `PatientPolicy._in_truth` in [policy.py](file:///work/clinicbench/policy.py#L310-L319) to return `False` for `\"book\"` offers unless `\"book\"` is present in `self.t[\"intents\"]`:\n\n```python\n        if comp.get(\"action\") == \"book\":\n            if not any(i[\"action\"] == \"book\" for i in self.t[\"intents\"]):\n                return False\n```\n\n### Verification\n- Ran an inline `python3` check against `PatientPolicy._in_truth` and `PatientPolicy.respond_offer`:\n  - With `intents=[{\"action\": \"move\"}]`, a `\"book\"` offer for a working slot returns `False` from `_in_truth` and produces a refusal (`parts[0][\"k\"] == \"refuse\"`), while a `\"move\"` offer for the target appointment still returns `True`.\n  - With `intents=[{\"action\": \"book\", \"basis\": \"covered\"}]`, a `\"book\"` offer for a working slot returns `True` and is accepted.\n- Note: `pytest` is not installed in the container (`No module named pytest`), so the `tests/` suite could not be executed.\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 82666,
+    "output_tokens": 17712,
+    "thinking_tokens": 15005,
+    "cache_read_tokens": 727450,
+    "total_tokens": 100378
+   },
+   "seconds": 121.673156423,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a bug in the frozen instrument code ([policy.py](file:///work/clinicbench/policy.py#L303-L318)), not in the reference driver.\n\nWhen a `move` patient picks a new time and the driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py#L340-L344)) pivots from `reschedule` to `book` (for example, when `parse_intents` matches `\"schedule\"` in the patient's rambling `color` line `\"I don't drive, so I'm going by my daughter's schedule\"`), the driver proposes a new booking at that slot and asks for confirmation. In [`PatientPolicy._in_truth`](file:///work/clinicbench/policy.py#L310-L317), the `\"book\"` branch checks only `self.now[\"schedule\"][\"works\"]` and self-pay constraints without checking that `\"book\"` is in `self.t[\"intents\"]`, so the `move` patient accepts the `book` read-back and confirms a second appointment instead of refusing it.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/policy.py\"], \"symbols\": [\"clinicbench.policy.PatientPolicy._in_truth\"], \"cause\": \"PatientPolicy._in_truth does not check that \\\"book\\\" is in self.t[\\\"intents\\\"] when evaluating a \\\"book\\\" offer or read-back. Because a \\\"move\\\" patient has working slots populated in self.now[\\\"schedule\\\"][\\\"works\\\"], they answer yes to confirm a new booking if the clinician offers one at their chosen time.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 50987,
+    "output_tokens": 5581,
+    "thinking_tokens": 3613,
+    "cache_read_tokens": 284108,
+    "total_tokens": 56568
+   },
+   "seconds": 72.810769263,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "I'm running the verification checks and `selftest.run_all` in the background and will report back once they complete.\nUpdated [`PatientPolicy._in_truth`](file:///work/clinicbench/policy.py#L310-L313) in [clinicbench/policy.py](file:///work/clinicbench/policy.py) to return `False` for `\"book\"` offers or read-backs unless `\"book\"` is present in `self.t[\"intents\"]`:\n\n```python\n        if comp.get(\"action\") == \"book\":\n            if not any(i[\"action\"] == \"book\" for i in self.t[\"intents\"]):\n                return False\n```\n\n### Verification\n- **Direct policy check**: Verified that a `reschedule_own` (`\"move\"`) patient returns `False` from `_in_truth` and refuses/counters a `\"book\"` offer at their working slot, while still accepting a `\"move\"` offer, and a `covered_booking` (`\"book\"`) patient still accepts a `\"book\"` offer.\n- **Self-test suite** (`python -c \"from clinicbench import selftest; ok, msg = selftest.run_all(verbose=True); ...\"`): `SELFTEST PASS` (59/59 golden, 556/556 mutation, 10368/10368 stub grid, 5184/5184 adapter). Note: `pytest` and `git` are not installed in this environment.\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 142959,
+    "output_tokens": 15396,
+    "thinking_tokens": 12526,
+    "cache_read_tokens": 717976,
+    "total_tokens": 158355
+   },
+   "seconds": 114.508835676,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a bug in the frozen patient instrument (`clinicbench/policy.py`), so its kind is `fix`.\n\nIn [`PatientPolicy._in_truth`](file:///work/clinicbench/policy.py#L303-L318), the `\"book\"` branch checks whether the offered slot is in `self.now[\"schedule\"][\"works\"]` (and checks self-pay willingness/cap if `self_pay`), but unlike `\"cancel\"` it never checks whether `\"book\"` is actually in `self.t[\"intents\"]`. Because move scenarios (`reschedule_own`, `unconfirmed_reschedule`) also populate `self.now[\"schedule\"][\"works\"]` with valid new times for the existing appointment, [`PatientPolicy.respond_offer`](file:///work/clinicbench/policy.py#L320-L351) accepts a `\"book\"` read-back for one of those slots and answers yes, causing a second, new booking to be created while the original appointment remains untouched.\n\n```json\n{\"kind\": \"fix\", \"files\": [\"clinicbench/policy.py\"], \"symbols\": [\"clinicbench.policy.PatientPolicy._in_truth\"], \"cause\": \"PatientPolicy._in_truth does not check that \\\"book\\\" is in self.t[\\\"intents\\\"] when evaluating a \\\"book\\\" offer/read-back, and move scenarios also populate self.now[\\\"schedule\\\"][\\\"works\\\"] with the new times. As a result, a patient intending only to move an existing appointment accepts a \\\"book\\\" confirmation for their chosen slot and ends up with a second, new booking.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "work",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 51022,
+    "output_tokens": 5206,
+    "thinking_tokens": 3892,
+    "cache_read_tokens": 296072,
+    "total_tokens": 56228
+   },
+   "seconds": 62.624032517,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "Updated [`PatientPolicy._in_truth`](file:///work/clinicbench/policy.py#L303-L320) in [policy.py](file:///work/clinicbench/policy.py) to require `\"book\"` in `self.t[\"intents\"]` when evaluating a `\"book\"` offer or read-back:\n\n```python\nif comp.get(\"action\") == \"book\":\n    if not any(i[\"action\"] == \"book\" for i in self.t[\"intents\"]):\n        return False\n```\n\n### Verification\n- `python3 -m clinicbench.selftest`: `SELFTEST PASS` (golden: 59/59, mutation: 556/556, stub grid: 10368/10368, adapter: 5184/5184).\n- Targeted check on a `reschedule_own` truth confirmed `_in_truth` returns `False` for a `\"book\"` offer on a valid move slot (and `True` for `\"move\"`), and `respond_offer` returns `\"counter\"` instead of `\"accept\"`.\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 485519,
+  "output_tokens": 67244,
+  "thinking_tokens": 53670,
+  "cache_read_tokens": 2771953
+ },
+ "pods": [
+  {
+   "actor": "lab-7b35653e1a41",
+   "created_to_healthy_s": 7.0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 167.4,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 63.3,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 127.6,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 77.2,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 118.5,
+   "exit": 0
+  },
+  {
+   "actor": "lab-7b35653e1a41",
+   "call_s": 67.1,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/policy.py"
+   ],
+   "symbols": [
+    "clinicbench.policy.PatientPolicy._in_truth"
+   ],
+   "attribution": null,
+   "cause": "PatientPolicy._in_truth accepts a 'book' offer whenever the slot is in schedule['works'] without checking that 'book' is in self.t['intents']. When the driver misreads 'daughter's schedule' in a rambling patient's reschedule turn as a pivot to 'book', the patient confirms the new booking while their original appointment remains on the books."
+  },
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/policy.py"
+   ],
+   "symbols": [
+    "clinicbench.policy.PatientPolicy._in_truth"
+   ],
+   "attribution": null,
+   "cause": "PatientPolicy._in_truth does not check that \"book\" is in self.t[\"intents\"] when evaluating a \"book\" offer or read-back. Because a \"move\" patient has working slots populated in self.now[\"schedule\"][\"works\"], they answer yes to confirm a new booking if the clinician offers one at their chosen time."
+  },
+  {
+   "kind": "fix",
+   "files": [
+    "clinicbench/policy.py"
+   ],
+   "symbols": [
+    "clinicbench.policy.PatientPolicy._in_truth"
+   ],
+   "attribution": null,
+   "cause": "PatientPolicy._in_truth does not check that \"book\" is in self.t[\"intents\"] when evaluating a \"book\" offer/read-back, and move scenarios also populate self.now[\"schedule\"][\"works\"] with the new times. As a result, a patient intending only to move an existing appointment accepts a \"book\" confirmation for their chosen slot and ends up with a second, new booking."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-3am1vq0r/clinicbench"
+}

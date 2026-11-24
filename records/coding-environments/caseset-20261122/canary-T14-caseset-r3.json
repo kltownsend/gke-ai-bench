@@ -1,0 +1,151 @@
+{
+ "case": "T14",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r3",
+ "final_stage": "escalated",
+ "attempts": 3,
+ "wall_seconds": 584,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 106658,
+    "output_tokens": 16397,
+    "thinking_tokens": 14677,
+    "cache_read_tokens": 555097,
+    "total_tokens": 123055
+   },
+   "seconds": 107.016855118,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **`finding`** in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py), ported from [lab23_dcitl.py.orig](file:///work/clinicbench/adapters/lab23_dcitl.py.orig)).\n\n### Cause\n1. In [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L360-L372), the message is split on conjunctions (`and`, `then`, `also`, `plus`, `;`) and any subsequent clause containing an action verb\u2014including a second `\"cancel\"` clause\u2014is appended to `self.queue`.\n2. In [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L533-L543), when the first request resolves to `\"not_yours\"`, [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) outputs the refusal and calls [`Driver.finish`](file:///work/clinicbench/adapters/dcitl_port.py#L308-L316), which immediately pops the queued `\"cancel\"` clause and runs `self.continue_wf(u)` in the same reply.\n3. Because the queued clause lacks a date, time, or provider, [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) falls back to `mine[0]` (`len(mine) == 1 and not (d or t or provs)`), resolving it to the patient's own appointment, and `Driver.cancel` immediately calls `do_cancel()` if `explicit_confirm(u)` is truthy.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\", \"clinicbench/adapters/lab23_dcitl.py.orig\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.route\", \"clinicbench.adapters.dcitl_port.Driver.not_yours\", \"clinicbench.adapters.dcitl_port.Driver.finish\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\", \"clinicbench.adapters.dcitl_port.Driver.cancel\"], \"cause\": \"Driver.route queues a second cancel clause from the same message, and Driver.not_yours calls Driver.finish which executes that queued clause in the same reply. Because the queued clause has no date, time, or provider, Driver.resolve_appt defaults to the patient's own single appointment and Driver.cancel immediately cancels it if explicit_confirm matches.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 43665,
+    "output_tokens": 7280,
+    "thinking_tokens": 6044,
+    "cache_read_tokens": 189414,
+    "total_tokens": 50945
+   },
+   "seconds": 153.568782119,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)).\n\n### Root Cause\n1. In [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L360-L372), the message is split on conjunctions (`and`, `then`, `also`, `plus`, `;`), and any subsequent clause containing an action verb (`cancel`, `book`, `reschedule`) is appended to `self.queue`\u2014even when that clause is a continuation or confirmation of the same `cancel` request rather than a separate request.\n2. When [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L533-L544) runs on the full utterance and [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) returns `\"not_yours\"`, [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) calls [`Driver.finish`](file:///work/clinicbench/adapters/dcitl_port.py#L308-L316) without clearing `self.queue`.\n3. `finish` immediately pops the queued `(\"cancel\", c)` clause and runs `self.cancel(c)` in the same reply. Because the isolated clause `c` lacks any appointment ID, date, time, or provider, `resolve_appt(c)` falls back to `mine[0]` when `len(mine) == 1` ([lines 525-526](file:///work/clinicbench/adapters/dcitl_port.py#L525-L526)), and `explicit_confirm(c)` triggers `self.do_cancel()` on the patient's own appointment.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.route\", \"clinicbench.adapters.dcitl_port.Driver.not_yours\", \"clinicbench.adapters.dcitl_port.Driver.finish\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\", \"clinicbench.adapters.dcitl_port.Driver.cancel\"], \"cause\": \"Driver.route splits multi-clause messages on conjunctions and queues a second cancel workflow when a later clause also contains \\\"cancel\\\", and Driver.not_yours calls Driver.finish without clearing self.queue so the queued clause executes in the same reply. Because that isolated clause lacks target details, Driver.resolve_appt defaults to the patient's own single appointment (len(mine) == 1) and Driver.cancel cancels it immediately if explicit_confirm matches.\", \"attribution\": null}\n```\n"
+  },
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 132581,
+    "output_tokens": 20541,
+    "thinking_tokens": 16980,
+    "cache_read_tokens": 1006614,
+    "total_tokens": 153122
+   },
+   "seconds": 291.981491481,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "The failure is a bug in the frozen reference driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)):\n\n1. In [`Driver.route`](file:///work/clinicbench/adapters/dcitl_port.py#L360-L372), splitting the patient's message on conjunctions (`and`, `then`, `also`, `plus`, `;`) queues any subsequent clause containing `cancel` as a separate `cancel` workflow in `self.queue`, even when it is just repeating or confirming the same request.\n2. When [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L533-L544) determines the requested appointment is `\"not_yours\"`, [`Driver.not_yours`](file:///work/clinicbench/adapters/dcitl_port.py#L529-L531) calls [`Driver.finish`](file:///work/clinicbench/adapters/dcitl_port.py#L308-L316), which pops the queued `cancel` clause and runs it in the same reply.\n3. Because the queued clause lacks the relative's provider/date/ID from the first clause, [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L525-L526) falls back to `mine[0]` when the patient has one appointment, and [`Driver.cancel`](file:///work/clinicbench/adapters/dcitl_port.py#L542-L543) immediately cancels it if `explicit_confirm` matches that clause.\n\n```json\n{\n  \"kind\": \"finding\",\n  \"files\": [\n    \"clinicbench/adapters/dcitl_port.py\"\n  ],\n  \"symbols\": [\n    \"clinicbench.adapters.dcitl_port.Driver.route\",\n    \"clinicbench.adapters.dcitl_port.Driver.not_yours\",\n    \"clinicbench.adapters.dcitl_port.Driver.finish\",\n    \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\",\n    \"clinicbench.adapters.dcitl_port.Driver.cancel\"\n  ],\n  \"cause\": \"Driver.route queues a second clause containing 'cancel' as a separate request, and Driver.not_yours calls Driver.finish to run that queued clause in the same reply. Because the queued clause lacks the other person's appointment details, Driver.resolve_appt defaults to the patient's own single appointment and Driver.cancel cancels it.\",\n  \"attribution\": null\n}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 282904,
+  "output_tokens": 44218,
+  "thinking_tokens": 37701,
+  "cache_read_tokens": 1751125
+ },
+ "pods": [
+  {
+   "actor": "lab-de6ff4036e0a",
+   "created_to_healthy_s": 7.5
+  },
+  {
+   "actor": "lab-de6ff4036e0a",
+   "call_s": 113.7,
+   "exit": 0
+  },
+  {
+   "actor": "lab-de6ff4036e0a",
+   "call_s": 159.1,
+   "exit": 0
+  },
+  {
+   "actor": "lab-de6ff4036e0a",
+   "call_s": 298.3,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "wrong",
+  "wrong",
+  "wrong"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py",
+    "clinicbench/adapters/lab23_dcitl.py.orig"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.route",
+    "clinicbench.adapters.dcitl_port.Driver.not_yours",
+    "clinicbench.adapters.dcitl_port.Driver.finish",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt",
+    "clinicbench.adapters.dcitl_port.Driver.cancel"
+   ],
+   "attribution": null,
+   "cause": "Driver.route queues a second cancel clause from the same message, and Driver.not_yours calls Driver.finish which executes that queued clause in the same reply. Because the queued clause has no date, time, or provider, Driver.resolve_appt defaults to the patient's own single appointment and Driver.cancel immediately cancels it if explicit_confirm matches."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.route",
+    "clinicbench.adapters.dcitl_port.Driver.not_yours",
+    "clinicbench.adapters.dcitl_port.Driver.finish",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt",
+    "clinicbench.adapters.dcitl_port.Driver.cancel"
+   ],
+   "attribution": null,
+   "cause": "Driver.route splits multi-clause messages on conjunctions and queues a second cancel workflow when a later clause also contains \"cancel\", and Driver.not_yours calls Driver.finish without clearing self.queue so the queued clause executes in the same reply. Because that isolated clause lacks target details, Driver.resolve_appt defaults to the patient's own single appointment (len(mine) == 1) and Driver.cancel cancels it immediately if explicit_confirm matches."
+  },
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.route",
+    "clinicbench.adapters.dcitl_port.Driver.not_yours",
+    "clinicbench.adapters.dcitl_port.Driver.finish",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt",
+    "clinicbench.adapters.dcitl_port.Driver.cancel"
+   ],
+   "attribution": null,
+   "cause": "Driver.route queues a second clause containing 'cancel' as a separate request, and Driver.not_yours calls Driver.finish to run that queued clause in the same reply. Because the queued clause lacks the other person's appointment details, Driver.resolve_appt defaults to the patient's own single appointment and Driver.cancel cancels it."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-rbrb6o28/clinicbench"
+}

@@ -1,0 +1,83 @@
+Name:                        runner-durdir-implicit-resume-38c856
+Namespace:                   benchmarking
+Selector:                    batch.kubernetes.io/controller-uid=a2dc5d41-7b93-4130-9324-f5131012b62c
+Labels:                      app=substrate-benchmark-runner
+                             batch.kubernetes.io/controller-uid=a2dc5d41-7b93-4130-9324-f5131012b62c
+                             batch.kubernetes.io/job-name=runner-durdir-implicit-resume-38c856
+                             controller-uid=a2dc5d41-7b93-4130-9324-f5131012b62c
+                             job-name=runner-durdir-implicit-resume-38c856
+                             tag=20778a6d
+                             test-name=durdir_implicit_resume
+Annotations:                 <none>
+Parallelism:                 1
+Completions:                 1
+Completion Mode:             NonIndexed
+Suspend:                     false
+Backoff Limit:               0
+TTL Seconds After Finished:  86400
+Start Time:                  Sun, 22 Nov 2026 11:09:08 -0600
+Completed At:                Sun, 22 Nov 2026 11:11:26 -0600
+Duration:                    2m18s
+Pods Statuses:               0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=substrate-benchmark-runner
+                    batch.kubernetes.io/controller-uid=a2dc5d41-7b93-4130-9324-f5131012b62c
+                    batch.kubernetes.io/job-name=runner-durdir-implicit-resume-38c856
+                    controller-uid=a2dc5d41-7b93-4130-9324-f5131012b62c
+                    job-name=runner-durdir-implicit-resume-38c856
+                    tag=20778a6d
+                    test-name=durdir_implicit_resume
+  Service Account:  benchmark-runner
+  Containers:
+   runner:
+    Image:      localhost:5001/locust-test:v1.0.1
+    Port:       8001/TCP (boomer-metrics)
+    Host Port:  0/TCP (boomer-metrics)
+    Command:
+      python3
+      /app/runner.py
+    Args:
+      -f
+      /app/tests/durdir.py
+      -t
+      1m
+      -u
+      1
+      --tag
+      20778a6d
+      --name
+      durdir_implicit_resume
+      --dest
+      /tmp/bench/durdir_implicit_resume
+      --durdir-template
+      glutton-durdir-data
+      --resume-mode
+      implicit
+      --durdir-file-size-bytes
+      8388608
+      --min-wait-time
+      1.0
+      --max-wait-time
+      1.0
+      --metadata
+      {"cluster_name": "lab-substrate", "project_id": "example-project", "lab_test": "durdir_implicit_resume"}
+    Requests:
+      cpu:     1
+      memory:  1Gi
+    Environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT:  http://opentelemetry-collector.gke-managed-otel.svc.cluster.local:4317
+    Mounts:
+      /run/podidentity.podcert.ate.dev from podidentity (ro)
+      /run/servicedns-ca from servicedns-ca (ro)
+  Volumes:
+   servicedns-ca:
+    Type:  Projected (a volume that contains injected data from multiple sources)
+   podidentity:
+    Type:          Projected (a volume that contains injected data from multiple sources)
+  Node-Selectors:  <none>
+  Tolerations:     ate.dev/benchmarking=true:NoSchedule
+Events:
+  Type    Reason            Age    From            Message
+  ----    ------            ----   ----            -------
+  Normal  SuccessfulCreate  2m18s  job-controller  Created pod: runner-durdir-implicit-resume-38c856-sfcd6
+  Normal  Completed         0s     job-controller  Job completed

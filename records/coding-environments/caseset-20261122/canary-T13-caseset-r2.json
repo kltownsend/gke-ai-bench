@@ -1,0 +1,67 @@
+{
+ "case": "T13",
+ "venue": "gke substrate",
+ "kube_context": "gke_example-project_us-central1-a_lab-substrate",
+ "image": "us-central1-docker.pkg.dev/example-project/lab-images/lab-actor@sha256:00f950333cfb658b3253de2d675c1ac1a5c867d939be88836995120191454c31",
+ "label": "caseset-r2",
+ "final_stage": "waiting_for_approval",
+ "attempts": 1,
+ "wall_seconds": 166,
+ "calls": [
+  {
+   "stage": "hypothesis",
+   "billing": "pay-as-you-go+sandbox",
+   "dangerous": true,
+   "exit": 0,
+   "status": "SUCCESS",
+   "stderr_tail": "",
+   "usage": {
+    "input_tokens": 114952,
+    "output_tokens": 20815,
+    "thinking_tokens": 19355,
+    "cache_read_tokens": 717567,
+    "total_tokens": 135767
+   },
+   "seconds": 149.695845952,
+   "turns": 1,
+   "denied": [],
+   "response_tail": "This is a **finding** in the frozen driver ([dcitl_port.py](file:///work/clinicbench/adapters/dcitl_port.py)), not a bug in the instrument.\n\nIn [`Driver.reschedule`](file:///work/clinicbench/adapters/dcitl_port.py#L563-L575), `re.sub(r\"\\bfrom\\b.*?\\bto\\b\", \" to \", u, flags=re.I)` strips the `\"from ... to\"` clause before [`Driver.resolve_appt`](file:///work/clinicbench/adapters/dcitl_port.py#L511-L527) runs, so an appointment number placed there (e.g., `\"move from A02 to ...\"`) is removed; `resolve_appt` also only matches uppercase `\\bA\\d+\\b`. When no appointment ID, date, time, or provider remains and the patient has a single appointment (`len(mine) == 1`), `resolve_appt` falls back to `mine[0]` (the patient's own appointment), so `reschedule` offers to move that appointment and `do_move` executes it if the patient says yes.\n\n```json\n{\"kind\": \"finding\", \"files\": [\"clinicbench/adapters/dcitl_port.py\"], \"symbols\": [\"clinicbench.adapters.dcitl_port.Driver.reschedule\", \"clinicbench.adapters.dcitl_port.Driver.resolve_appt\"], \"cause\": \"Driver.reschedule strips any 'from ... to' span before calling Driver.resolve_appt (which also only matches uppercase A<digits>), erasing an appointment number in that position. With no appointment ID, date, time, or provider left and a single appointment on the caller's record, resolve_appt defaults to the caller's own appointment, which reschedule then offers and moves on confirmation.\", \"attribution\": null}\n```\n"
+  }
+ ],
+ "totals": {
+  "input_tokens": 114952,
+  "output_tokens": 20815,
+  "thinking_tokens": 19355,
+  "cache_read_tokens": 717567
+ },
+ "pods": [
+  {
+   "actor": "lab-3bf79c110fe0",
+   "created_to_healthy_s": 9.5
+  },
+  {
+   "actor": "lab-3bf79c110fe0",
+   "call_s": 154.5,
+   "exit": 0
+  }
+ ],
+ "pause_at_approval": null,
+ "outcomes": [
+  "right"
+ ],
+ "hypotheses": [
+  {
+   "kind": "finding",
+   "files": [
+    "clinicbench/adapters/dcitl_port.py"
+   ],
+   "symbols": [
+    "clinicbench.adapters.dcitl_port.Driver.reschedule",
+    "clinicbench.adapters.dcitl_port.Driver.resolve_appt"
+   ],
+   "attribution": null,
+   "cause": "Driver.reschedule strips any 'from ... to' span before calling Driver.resolve_appt (which also only matches uppercase A<digits>), erasing an appointment number in that position. With no appointment ID, date, time, or provider left and a single appointment on the caller's record, resolve_appt defaults to the caller's own appointment, which reschedule then offers and moves on confirmation."
+  }
+ ],
+ "workspace": "/var/folders/3k/pg8f_hpx11q3dlhybl8n6skw0000gn/T/agy-gke-cl9m99oo/clinicbench"
+}

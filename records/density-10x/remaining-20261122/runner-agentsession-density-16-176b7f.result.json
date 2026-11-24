@@ -1,0 +1,17 @@
+{
+ "test": "agentsession_density_16",
+ "job": "runner-agentsession-density-16-176b7f",
+ "dest": "gs://lab-bench-results-xxxxxxxx/agentsession_density_16/20261122T194805",
+ "source": "density ladder: the guide's agent-session invocation, 16 sessions, 10 min (lab sizing)",
+ "complete": false,
+ "served": {
+  "ok": false,
+  "requests": 2708,
+  "failures": 776,
+  "permission_denied_lines": 0
+ },
+ "worker_nodepools": [
+  "substrate-node-pool"
+ ],
+ "runner_placement": "its own node (lab-bench-runner, e2-standard-4) in the cluster under test; Google's automation uses a separate cluster (disclosed)"
+}

@@ -1,0 +1,15 @@
+{
+ "test": "durdir_implicit_resume",
+ "job": "runner-durdir-implicit-resume-19f768",
+ "dest": "/tmp/bench/durdir_implicit_resume",
+ "source": "catalog, verbatim",
+ "complete": true,
+ "served": {
+  "ok": true,
+  "requests": 204,
+  "failures": 0,
+  "permission_denied_lines": 0
+ },
+ "worker_nodepools": [],
+ "runner_placement": "local shakeout: one kind node, shared"
+}
