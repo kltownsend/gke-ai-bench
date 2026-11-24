@@ -67,7 +67,10 @@ def kubectl(*a):
 
 
 def main():
-    out_dir = os.path.join(TOOLS, "runs", "remaining-20261122")
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from lcb_team import require_onboarded
+    require_onboarded("cross_team_probe.py")
+    out_dir = os.path.join(TOOLS, "runs", "remaining")
     os.makedirs(out_dir, exist_ok=True)
     rec = {"probe": "cross_team", "t": time.time()}
     with SubstrateVenue() as one:                      # team one: lab-agent atespace

@@ -59,6 +59,20 @@ def arg(name, default=None):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
+def require_onboarded(script: str) -> None:
+    """Stop with a clear message unless team two's atespace exists. tenants.py, cross_team_probe.py and
+    remaining_small.py pids/denyall run as or against team two; without `onboard` every team-two call
+    is refused, which reads like an isolation result and isn't one (clean-project run, 2026-11-23)."""
+    r = subprocess.run(["kubectl", "ate", "get", "atespaces"], capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        sys.exit(f"{script}: can't list atespaces, so team two's state is unknown:\n{r.stderr.strip()[:400]}")
+    names = {line.split()[0] for line in r.stdout.splitlines()[1:] if line.split()}
+    if ATESPACE not in names:
+        sys.exit(f"{script}: team two isn't onboarded (no atespace '{ATESPACE}'). Run "
+                 "`harness/lcb_team.py onboard --apply` first (it needs LoopControlBench at LCB_DIR), "
+                 "or skip this script.")
+
+
 def say(*cmd, check=True, **kw):
     print("+", " ".join(str(c) for c in cmd), flush=True)
     if not APPLY:

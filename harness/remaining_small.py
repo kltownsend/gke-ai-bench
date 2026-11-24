@@ -27,7 +27,7 @@ import time
 TOOLS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(TOOLS, "agent"))
 sys.path.insert(0, os.path.join(TOOLS, "harness"))
-OUT = os.path.join(TOOLS, "runs", "remaining-20261122")
+OUT = os.path.join(TOOLS, "runs", "remaining")
 
 
 def save(name, rec):
@@ -89,6 +89,8 @@ import json; print(json.dumps({"started": n, "stopped_by": err}))
 
 
 def pids():
+    from lcb_team import require_onboarded
+    require_onboarded("remaining_small.py pids")
     import lcb_team as L
     with L.team_venue() as sb:
         sb.ensure_actor()
@@ -98,6 +100,8 @@ def pids():
 
 
 def denyall():
+    from lcb_team import require_onboarded
+    require_onboarded("remaining_small.py denyall")
     import lcb_team as L
     from substrate_venue import SubstrateVenue
     pol = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)

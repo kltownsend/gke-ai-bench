@@ -224,12 +224,23 @@ the repository root. All but the case set and team two make no model calls.
 | First request after a long idle, inside the cluster | `harness/incluster_wake.py --n 12 --wait 2100 --out runs/wake` | /tests/restore-500ms/ |
 | Google's own benchmark under lab settings | `harness/google_bench.py list`, then `setup --apply`, `build --apply`, `run TEST --apply` | /tests/density-10x/ |
 | The container control for density | `harness/density_control.py --apply --out runs/density` | /tests/density-10x/ |
-| Per-team identities and the isolation matrix | `harness/tenants.py setup`, `run`, `teardown` | /teams/ |
-| Cross-team reach from a team-two actor | `harness/cross_team_probe.py` | /teams/ |
-| Warm-pool reuse, a long held call, the no-network actor | `harness/remaining_small.py reuse`, `longcall SECONDS`, `denyall` | /tests/warm-pool/ |
+| Warm-pool reuse and a long held call | `harness/remaining_small.py reuse`, `longcall SECONDS` | /tests/warm-pool/ |
 | The Clinic case set | `harness/pilot.py --gke substrate --dangerous --cap 50 --out runs/caseset` with `LAB_SUBSTRATE_POLL=1` set | /tests/coding-environments/ |
 | Its report | `harness/pilot_report.py runs/caseset` | /tests/coding-environments/ |
-| Team two (LoopControlBench, cloned to `$LCB_DIR`) | `harness/lcb_team.py onboard --apply`, `probes --apply`, `run --tasks 10 --cap 25 --apply` | /teams/ |
+| **Needs team two.** Onboard team two (LoopControlBench, cloned to `$LCB_DIR`) | `harness/lcb_team.py onboard --apply` | /teams/ |
+| Per-team identities and the isolation matrix | `harness/tenants.py setup`, `run`, `teardown` | /teams/ |
+| Cross-team reach from a team-two actor | `harness/cross_team_probe.py` | /teams/ |
+| The no-network actor, team two's process ceiling | `harness/remaining_small.py denyall`, `pids` | /tests/warm-pool/ |
+| Team two's own work | `harness/lcb_team.py probes --apply`, `run --tasks 10 --cap 25 --apply` | /teams/ |
+
+Everything from the onboarding row down needs team two: the isolation matrix runs one team against the
+other, and the rest run inside a team-two actor. Without `onboard`, team two's calls are all refused, which
+would read like an isolation result and isn't one, so those scripts stop with a message instead. If you
+skip team two, skip those rows too.
+
+Results land under `runs/`: `runs/resume/resume-<time>.json` and `storage-<time>.json` (each run keeps its
+own record and atelet logs), and `runs/remaining/` for the isolation matrix, cross-team reach and the small
+probes.
 
 `LAB_SUBSTRATE_POLL=1` starts each agent call detached inside the actor and checks back every 10 seconds. A
 request held open and silent through Substrate's router is cut at about 5 minutes; without the polled wait,
@@ -261,7 +272,10 @@ and two firewall rules, about $1.70 a day for the lab. `infra/cluster.sh unpark 
 
 When you're done for good: `infra/cluster.sh substrate-down --apply` runs Google's teardown in order (the
 actors, `ate-setup delete`, the database disk, `tools/cleanup-gcp`), then the lab's own `down` and the
-inventory. It needs `SUBSTRATE_BUCKET`. Then remove what step 1 created, if you won't run again: the Artifact
+inventory. It needs `SUBSTRATE_BUCKET`. Expect a run of `ERROR` lines near the end, 404s for clusters, a
+router, a subnet, a network and DNS policies the other steps would have made (`lab-vulnerable`,
+`lab-prereq`, `lab-sandbox`, `lab-net`): `down` deletes every rung's resources whether or not they exist.
+They're harmless. The line that counts is the last one, `inventory clean`. Then remove what step 1 created, if you won't run again: the Artifact
 Registry repository, the agent's service account (which removes its bindings), and the lab's gcloud config
 directory. Never assume a teardown worked: read the inventory.
 

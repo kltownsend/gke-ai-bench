@@ -17,7 +17,7 @@ model (docs/guides/authorization.md, an OpenFGA check on every RPC) grants roles
           tag the owner published.
   teardown deletes the test actors, tags and access policies, and the namespace.
 
-Results: runs/remaining-20261122/tenants-*.json, every call's exit code and first error line.
+Results: runs/remaining/tenants-*.json, every call's exit code and first error line.
 No model calls. Source harness/lab_env.sh.
 usage: tenants.py setup|run|teardown
 """
@@ -29,7 +29,7 @@ import tempfile
 import time
 
 TOOLS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(TOOLS, "runs", "remaining-20261122")
+OUT = os.path.join(TOOLS, "runs", "remaining")
 TOK = os.path.join(tempfile.gettempdir(), "lab-tenant-tokens")
 NS = "lab-tenants"
 TEAMS = {"one": {"sa": "team-one", "atespace": "lab-agent", "template": "lab-agent"},
@@ -119,6 +119,9 @@ def run():
         row("list atespaces (global)", k, "global", "denied", ate(k, "get", "atespaces"))
     # A published tag: team one publishes; team two tries to restore from it. Recorded, not expected:
     # Substrate's docs say creating an actor from a tag needs editor on the tag's atespace.
+    # A tag needs a suspended actor, and the matrix above resumed team one's, so suspend it first
+    # (setup, not a row: the same-team suspend control is recorded above).
+    ate("one", "suspend", "actor", names["one"], "-a", "lab-agent", "--mode=sync")
     row("team one publishes its tag", "one", "one", "allowed",
         ate("one", "create", "tag", f"pub-one-{STAMP}", "--actor", names["one"], "-a", "lab-agent", "--scope", "published"))
     row("restore team one's published tag into team two", "two", "one", "denied",
@@ -149,4 +152,8 @@ def teardown():
 
 
 if __name__ == "__main__":
+    if sys.argv[1] in ("setup", "run"):
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from lcb_team import require_onboarded
+        require_onboarded(f"tenants.py {sys.argv[1]}")
     {"setup": setup, "run": run, "teardown": teardown}[sys.argv[1]]()

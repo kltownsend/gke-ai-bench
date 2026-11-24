@@ -78,7 +78,7 @@ def kubectl(*a):
 
 
 def main():
-    out_dir = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else os.path.join(TOOLS, "runs", "lcb-team-20261122")
+    out_dir = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else os.path.join(TOOLS, "runs", "lcb-team")
     pod_ip = kubectl("-n", "lab-neighbor", "get", "pod", "neighbor", "-o", "jsonpath={.status.podIP}").strip()
     svc_ip = kubectl("-n", "lab-neighbor", "get", "svc", "neighbor", "-o", "jsonpath={.spec.clusterIP}").strip()
     canary = base64.b64decode(kubectl("-n", "lab-neighbor", "get", "secret", "neighbor-canary",

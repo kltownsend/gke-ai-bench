@@ -3,7 +3,7 @@
 # Google's workloads only to read the glutton template's image, scales both worker pools to zero,
 # runs the control on the substrate node pool, then restores the lab's pool and deletes the workloads.
 set -u
-R=runs/remaining-20261122; PY=${LAB_PYTHON:-python3}
+R=runs/remaining; PY=${LAB_PYTHON:-python3}
 deploy() {  # $1: False to deploy, True to delete
   $PY - --apply "$1" <<'PYEOF'
 import sys; sys.path.insert(0, "harness"); import google_bench as G

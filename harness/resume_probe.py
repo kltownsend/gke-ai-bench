@@ -305,7 +305,9 @@ def main():
     from substrate_venue import SubstrateVenue
     n_ex, n_wk = int(arg("--explicit", 10)), int(arg("--wake", 10))
     n_st, wait_s = int(arg("--storage", 0)), int(arg("--wait", 2100))
-    label = arg("--label", "resume")
+    # The default label names the mode and the start time, so the run guide's two commands (and any
+    # rerun) each keep their own record and atelet logs instead of the second overwriting the first.
+    label = arg("--label", f"{'storage' if n_st else 'resume'}-{time.strftime('%H%M%S')}")
     out_dir = arg("--out", os.path.join(TOOLS, "runs", f"resume-{time.strftime('%Y%m%d')}"))
     os.makedirs(out_dir, exist_ok=True)
     t_start = time.time()

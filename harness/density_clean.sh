@@ -5,7 +5,7 @@
 # Substrate's worker pools scaled to zero (the first control shared nodes with Substrate's workers).
 # Source harness/lab_env.sh first; DOCKER_CONFIG set; google_bench setup done.
 set -u
-R=runs/remaining-20261122; mkdir -p $R; PY=${LAB_PYTHON:-python3}
+R=runs/remaining; mkdir -p $R; PY=${LAB_PYTHON:-python3}
 clean() {  # every actor in Google's session atespace, gone
   for a in $(kubectl ate get actors -a benchmark 2>/dev/null | awk 'NR>1{print $2}'); do
     kubectl ate delete actor "$a" -a benchmark >/dev/null 2>&1; done

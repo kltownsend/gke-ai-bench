@@ -3,7 +3,7 @@
 # Teardown runs whatever happens. PROFILES picks clusters; REACH=1 adds the listener and a reach run.
 cd "$(dirname "$0")/.." && source harness/lab_env.sh
 export OPERATOR_CIDR="$(curl -s --max-time 10 https://checkip.amazonaws.com)/32"
-R=${OUT:-runs/probes-20261121}; mkdir -p "$R"
+R=${OUT:-runs/probes}; mkdir -p "$R"
 for PR in ${PROFILES:-default hardened vulnerable}; do
   echo "== $PR $(date '+%H:%M:%S')"
   # Substrate's cluster comes from Google's installer, driven by an operator (infra/substrate/INSTALL.md),

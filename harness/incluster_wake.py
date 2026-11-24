@@ -120,7 +120,7 @@ def arg(n, d):
 
 def main():
     n, wait = int(arg("--n", 12)), int(arg("--wait", 2100))
-    out_dir = arg("--out", os.path.join(TOOLS, "runs", "remaining-20261122"))
+    out_dir = arg("--out", os.path.join(TOOLS, "runs", "remaining"))
     os.makedirs(out_dir, exist_ok=True)
     rec = {"probe": "incluster_wake", "n": n, "wait_s": wait, "t": time.time(), "awake": [], "wakes": []}
     kubectl("apply", "-f", "-", inp=MANIFEST)
