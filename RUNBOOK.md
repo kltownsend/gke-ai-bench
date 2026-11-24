@@ -54,8 +54,11 @@ buckets, firewall rules, an Artifact Registry repository, a service account and 
 on a throwaway project covers it. You also need permission to impersonate the agent's service account; step
 1 grants it.
 
-**Quota:** Agent Substrate's bundled database takes a 500 GiB balanced persistent disk, which counts against
-the regional SSD quota. Request a raise before install day if yours is lower; it isn't instant.
+**Quota:** Agent Substrate needs about 900 GB of the region's SSD quota (`SSD_TOTAL_GB`): its bundled
+database claims a 500 GiB balanced persistent disk and its four nodes' boot disks take 100 GB each. The lab's
+project started at a limit of 500, so the install created the cluster, then hung with the database disk
+Pending on QUOTA_EXCEEDED until a raise came through. Step 1 ends with a free check; run it before install day,
+because a raise isn't always instant.
 
 ## 1. Configure and bootstrap
 
@@ -114,7 +117,12 @@ role with only the prediction permissions is tighter; the lab didn't test one.
 
 ```bash
 $GOOGLE_AUTH_PY agent/mint_token.py "$(mktemp -d)"      # must print {"minted_for": "<your LAB_AGENT>", ...}
+infra/cluster.sh quota                                  # read-only, free: must print "quota ok"
 ```
+
+If the quota check prints `quota SHORT`, it names the limit to request. Request it and rerun the check before
+step 5 or 7; nothing that bills should start on a short quota. `infra/cluster.sh quota sandbox` and `quota
+baseline` check the smaller needs of steps 6 and 5 (200 GB and 100 GB).
 
 ## 2. Fetch what isn't redistributed
 
@@ -184,6 +192,9 @@ $LAB_PYTHON harness/probe_run.py --venue sandbox --out runs/probes
 ```
 
 ## 7. Agent Substrate
+
+Rerun `infra/cluster.sh quota` first; it must print `quota ok`. The wizard's region must be `$LAB_REGION`,
+the one the check read: the wizard offers its own default region and zone, and the quota is per region.
 
 Install by Google's documented path, an interactive wizard. `infra/substrate/INSTALL.md` has every answer the
 lab gave; rehearse it free with `make dry-run` in `$SUBSTRATE_GKE_DIR`. Save the exit summary: it prints the

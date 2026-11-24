@@ -3,7 +3,7 @@
 # Read the printed commands and price them before passing --apply: clusters and VMs bill by the hour.
 #
 #   source harness/lab_env.sh
-#   infra/cluster.sh PROFILE [--apply]      PROFILE: default | hardened | vulnerable | prereq | sandbox | substrate-down | executor-down | park | unpark | down | inventory
+#   infra/cluster.sh PROFILE [--apply]      PROFILE: default | hardened | vulnerable | prereq | sandbox | substrate-down | executor-down | park | unpark | down | inventory | quota
 #   infra/cluster.sh setup --profile PROFILE [--apply]
 #   infra/cluster.sh listener --profile PROFILE [--apply]     (after setup: the canary listener)
 #
@@ -416,5 +416,30 @@ inventory)
   if [[ $residue == 0 ]]; then echo "inventory clean: only the declared retained set remains"; else
     echo "inventory NOT clean: see RESIDUE/UNEXPECTED above" >&2; exit 1; fi
 ;;
+quota)
+  # Read-only and free, so it runs without --apply: does the region's SSD quota fit an install?
+  # The Substrate install fails on a project at default quota: its bundled Postgres claims a 500 GiB
+  # balanced disk and its four nodes' boot disks take 4 x 100 GB pd-balanced, all against the
+  # region's SSD_TOTAL_GB (default 500 on the lab's project). The claim then sits Pending with
+  # QUOTA_EXCEEDED and the installer times out, with the cluster already billing.
+  # usage: infra/cluster.sh quota [substrate|sandbox|baseline]   (default substrate)
+  case ${APPLY:-substrate} in substrate) NEED=900 ;; sandbox) NEED=200 ;; baseline) NEED=100 ;;
+    --apply) NEED=900 ;; *) echo "quota: substrate, sandbox or baseline" >&2; exit 2 ;; esac
+  q=$(gcloud compute regions describe "$REGION" --project "$P" --flatten quotas \
+        --format "value(quotas.metric,quotas.limit,quotas.usage)" 2>&1) || {
+    echo "quota: cannot read $REGION's quotas (is compute.googleapis.com enabled, are you signed in?)" >&2
+    echo "$q" | sed 's/^/  /' >&2; exit 2; }
+  read -r _ LIMIT USED <<< "$(grep -E '^SSD_TOTAL_GB[[:space:]]' <<< "$q" || true)"
+  LIMIT=${LIMIT%.*}; USED=${USED%.*}
+  [[ -n $LIMIT ]] || { echo "quota: no SSD_TOTAL_GB quota reported for $REGION" >&2; exit 2; }
+  FREE=$((LIMIT - USED))
+  echo "SSD_TOTAL_GB in $REGION: limit $LIMIT GB, used $USED GB, free $FREE GB; ${APPLY:-substrate} needs $NEED GB"
+  if (( FREE >= NEED )); then echo "quota ok"; else
+    echo "quota SHORT by $((NEED - FREE)) GB. Request SSD_TOTAL_GB of at least $((USED + NEED)) in $REGION" >&2
+    echo "  (console: IAM & Admin > Quotas, filter 'Persistent Disk SSD (GB)', region $REGION) and" >&2
+    echo "  rerun this check before creating anything. The lab's request for 1,000 GB was approved in a minute;" >&2
+    echo "  yours may not be." >&2
+    exit 1; fi
+  ;;
 *) echo "unknown profile $PROFILE" >&2; exit 2 ;;
 esac
