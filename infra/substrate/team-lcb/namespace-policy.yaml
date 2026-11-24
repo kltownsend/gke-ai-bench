@@ -1,5 +1,7 @@
-# The credential provider's grants, now for two teams. One shared ConfigMap: onboarding team two
-# edits the platform's configuration here (counted in the onboarding ledger).
+# The credential provider's grants, now for two teams: the shape after onboarding, for reference.
+# One shared ConfigMap: onboarding team two edits the platform's configuration (counted in the
+# onboarding ledger). `harness/lcb_team.py onboard` merges team two's entry into the live ConfigMap
+# rather than applying this file, so another tenant's grant isn't overwritten.
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -171,7 +171,7 @@ def onboard():
     env = dict(os.environ, LAB_TOKEN_NAMESPACE=CREDS_NS)
     step("team two's token Secret", os.environ.get("GOOGLE_AUTH_PY", PY),
          os.path.join(TOOLS, "harness", "token_secret.py"), "--once", env=env)
-    step("the provider's grant, both teams", "kubectl", "apply", "-f", os.path.join(TEAM, "namespace-policy.yaml"))
+    step("the provider's grant, team two's entry merged in", PY, os.path.abspath(__file__), "_grant", "add", "--apply")
     step("provider restart", "kubectl", "-n", "ate-system", "rollout", "restart", "deployment/k8s-credential-provider")
     step("provider ready", "kubectl", "-n", "ate-system", "rollout", "status", "deployment/k8s-credential-provider",
          "--timeout=180s")
@@ -204,7 +204,7 @@ def offboard():
             "-a", ATESPACE, check=False)
     say("kubectl", "ate", "delete", "actor-template", TEMPLATE, "-a", ATESPACE, check=False)
     say("kubectl", "ate", "delete", "atespace", ATESPACE, check=False)
-    say("kubectl", "apply", "-f", os.path.join(TOOLS, "infra", "substrate", "namespace-policy.yaml"))
+    say(PY, os.path.abspath(__file__), "_grant", "remove", "--apply")
     say("kubectl", "-n", "ate-system", "rollout", "restart", "deployment/k8s-credential-provider")
     say("kubectl", "delete", "namespace", CREDS_NS, "--ignore-not-found")
 
@@ -257,9 +257,13 @@ def probes(out_dir: str):
         time.sleep(5)                                 # policy propagation
         cross = json.loads(InActor(sb).run("/work", ["python3", "api_scope.py", PROJECT]).stdout or "{}")
         rec["cross_team_model_call"] = cross.get("positive_control")
-        rec["cross_team_verdict"] = ("ISOLATED: team one's credential was not injected"
+        # What this measures: whether an egress policy naming team one's Secret gets that Secret
+        # injected for team two. Both Secrets are minted for the same service account (LAB_AGENT), so a
+        # refusal is Secret-reference separation, not separate cloud identities or spend.
+        rec["cross_team_verdict"] = ("REFUSED: a policy naming team one's Secret wasn't injected for team two"
+                                     " (both teams' Secrets hold the same service account)"
                                      if not (cross.get("positive_control") or {}).get("ok")
-                                     else "NOT ISOLATED: team two spent team one's credential")
+                                     else "INJECTED: team two's call used team one's Secret")
         rec["venue_events"] = sb.events
     path = os.path.join(out_dir, "lcb-probes.json")
     json.dump(rec, open(path, "w"), indent=1, default=str)
@@ -267,6 +271,28 @@ def probes(out_dir: str):
 
 
 # -- run -------------------------------------------------------------------------------------------------
+# Read one allowlisted file in the actor as base64, without a shell, and only if it's a regular file
+# inside /work: a link the agent made comes back empty, as a missing file does.
+READ_REGULAR = (
+    "import base64,os,stat,sys\n"
+    "p=os.path.realpath(os.path.join('/work',sys.argv[1]))\n"
+    "ok=p.startswith('/work/') and os.path.lexists(os.path.join('/work',sys.argv[1])) "
+    "and stat.S_ISREG(os.lstat(os.path.join('/work',sys.argv[1])).st_mode)\n"
+    "sys.stdout.write(base64.b64encode(open(p,'rb').read()).decode() if ok else '')\n")
+
+
+def safe_dest(rp, rel):
+    """The host path for an allowlisted source file: a normalized relative path that stays under the
+    checkout and isn't a link, so task metadata or returned output can't write elsewhere."""
+    if not rel or os.path.isabs(rel) or os.path.normpath(rel).split(os.sep)[0] == ".." or "\0" in rel:
+        raise ValueError(f"source file path {rel!r} isn't a plain relative path")
+    root = os.path.realpath(rp)
+    dest = os.path.join(root, os.path.normpath(rel))
+    if os.path.commonpath([root, os.path.realpath(os.path.dirname(dest))]) != root or os.path.islink(dest):
+        raise ValueError(f"source file path {rel!r} leaves the checkout or is a link")
+    return dest
+
+
 def build_prompt(spec, rp, extract_tests):
     """Team two's prompt, the one the lab ran, carried here because the pinned bench doesn't have it.
 
@@ -394,9 +420,10 @@ def one_task(spec, path, INSTALL, prepare_host, agentic, bench_run, M, lock, sta
                            "and do exactly what it says.", "/work", stage="lcb")
                 rec["calls"] = model.calls
                 for sf in spec["source_files"]:
-                    b64 = sb.run_in_actor(["sh", "-c", f"base64 -w0 {sf} 2>/dev/null || true"])
+                    dest = safe_dest(rp, sf)
+                    b64 = sb.run_in_actor(["python3", "-I", "-c", READ_REGULAR, sf])
                     if b64.strip():
-                        with open(os.path.join(rp, sf), "wb") as fh:
+                        with open(dest, "wb") as fh:
                             fh.write(base64.b64decode(b64))
                 verdict, changed, out_of_scope = agentic.score(spec, rp)
                 rec.update(verdict=verdict, changed_allowlisted=[p for p in changed if p in spec["source_files"]],
@@ -418,8 +445,55 @@ def one_task(spec, path, INSTALL, prepare_host, agentic, bench_run, M, lock, sta
             shutil.rmtree(work, ignore_errors=True)
 
 
+# -- the provider's grant -----------------------------------------------------------------------------
+# The bundled credential provider reads one shared ConfigMap of atespace-to-namespace grants. Team two's
+# entry is merged in and taken out by itself, with the ConfigMap's resourceVersion, so other tenants'
+# grants survive and a concurrent edit fails instead of being overwritten. The infra/substrate
+# namespace-policy files show the resulting shape; they aren't applied whole.
+GRANT_CM, GRANT_KEY = "k8s-credential-provider-namespace-policy", "namespace-policy.yaml"
+
+
+def parse_grants(text: str) -> list[dict]:
+    """The provider's policy file (a list of {atespace, allowedNamespaces}); refuses other shapes."""
+    out, cur, in_ns = [], None, False
+    for raw in text.splitlines():
+        line = raw.split("#", 1)[0].rstrip()
+        t = line.strip()
+        if not t or t == "policies:":
+            continue
+        if t.startswith("- atespace:"):
+            cur = {"atespace": t.split(":", 1)[1].strip(), "allowedNamespaces": []}; out.append(cur); in_ns = False
+        elif t == "allowedNamespaces:" and cur is not None:
+            in_ns = True
+        elif t.startswith("- ") and in_ns and cur is not None:
+            cur["allowedNamespaces"].append(t[2:].strip())
+        else:
+            raise ValueError(f"unexpected line in the provider's grant: {raw!r}")
+    return out
+
+
+def emit_grants(grants: list[dict]) -> str:
+    lines = ["policies:"]
+    for g in grants:
+        lines += [f"- atespace: {g['atespace']}", "  allowedNamespaces:"] + [f"  - {n}" for n in g["allowedNamespaces"]]
+    return "\n".join(lines) + "\n"
+
+
+def grant(mode: str):
+    cm = json.loads(subprocess.run(["kubectl", "-n", "ate-system", "get", "configmap", GRANT_CM, "-o", "json"],
+                                   capture_output=True, text=True, check=True).stdout)
+    grants = [g for g in parse_grants((cm.get("data") or {}).get(GRANT_KEY, "")) if g["atespace"] != ATESPACE]
+    if mode == "add":
+        grants.append({"atespace": ATESPACE, "allowedNamespaces": [CREDS_NS]})
+    cm["data"] = {**(cm.get("data") or {}), GRANT_KEY: emit_grants(grants)}
+    subprocess.run(["kubectl", "replace", "-f", "-"], input=json.dumps(cm), text=True, capture_output=True, check=True)
+    print(json.dumps({"grant": mode, "atespaces": [g["atespace"] for g in grants]}), flush=True)
+
+
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
+    if cmd == "_grant":
+        return grant(sys.argv[2])
     out = arg("--out", os.path.join(TOOLS, "runs", f"lcb-team-{time.strftime('%Y%m%d')}"))
     if cmd == "onboard":
         onboard()

@@ -17,15 +17,27 @@ if command -v sha256sum >/dev/null; then SUM="sha256sum -c -"; else SUM="shasum 
 get() { # URL DEST SHA256
   if [[ -z $YES ]]; then echo "would fetch $1 -> $2"; return; fi
   mkdir -p "$(dirname "$2")"
-  [[ -f $2 ]] || curl -fsSL -o "$2" "$1"
+  [[ -f $2 ]] || { curl -fsSL -o "$2.part" "$1" && mv "$2.part" "$2"; }
   echo "$3  $2" | $SUM >/dev/null || { echo "checksum mismatch: $2" >&2; rm -f "$2"; exit 1; }
   echo "ok  $2"
 }
-extract() { # DIR: unpack the one tarball in DIR into DIR/x, refusing absolute or parent paths
-  local t; t=$(ls "$1"/agy_cli_linux_*.tar.gz)
-  if tar -tzf "$t" | grep -qE '^/|(^|/)\.\.(/|$)'; then echo "unsafe path in $t" >&2; exit 1; fi
-  mkdir -p "$1/x"; [[ -f $1/x/antigravity ]] || tar -xzf "$t" -C "$1/x"
-  [[ -f $1/x/antigravity ]] || { echo "expected $1/x/antigravity after extracting" >&2; exit 1; }
+extract() { # DIR: unpack the one checked tarball in DIR into DIR/x, fresh every time
+  # Always from the archive whose checksum just passed, into a new directory that replaces DIR/x only
+  # once it's complete, so a binary already sitting in DIR/x is never trusted. Only regular files and
+  # directories with plain relative paths are accepted: no links, devices, absolute or parent paths.
+  local t new; t=$(ls "$1"/agy_cli_linux_*.tar.gz); new=$(mktemp -d "$1/.x.XXXXXX")
+  python3 -I - "$t" "$new" <<'PY' || { rm -rf "$new"; echo "refused $t" >&2; exit 1; }
+import os, sys, tarfile
+t, out = sys.argv[1], sys.argv[2]
+with tarfile.open(t, "r:gz") as tf:
+    for m in tf.getmembers():
+        n = os.path.normpath(m.name)
+        if not (m.isreg() or m.isdir()) or os.path.isabs(m.name) or n == ".." or n.startswith("../"):
+            sys.exit(f"unsafe member {m.name!r} ({'link' if m.issym() or m.islnk() else 'type ' + repr(m.type)})")
+    tf.extractall(out, filter="data")
+PY
+  [[ -f $new/antigravity ]] || { rm -rf "$new"; echo "expected antigravity in $t" >&2; exit 1; }
+  rm -rf "$1/x"; mv "$new" "$1/x"
 }
 AGY=https://github.com/google-antigravity/antigravity-cli/releases/download/1.5.13
 get "$AGY/agy_cli_linux_x64.tar.gz"   agent/vendor/agy-1.5.13-x64/agy_cli_linux_x64.tar.gz \

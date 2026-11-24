@@ -336,6 +336,11 @@ down)
   run gcloud dns policies update lab-dns-log-default --project "$P" --networks "" || true
   run gcloud dns policies delete lab-dns-log-default --project "$P" --quiet || true
   run gcloud compute networks delete lab-net --project "$P" --quiet || true
+  # The baselines' Workload Identity binding is project-wide (any cluster in the project's pool with a
+  # lab-agent/lab-agent service account would get the agent's identity), so it goes with the clusters.
+  run gcloud iam service-accounts remove-iam-policy-binding "$AGENT_SA" --project "$P" \
+      --role roles/iam.workloadIdentityUser --member "serviceAccount:$P.svc.id.goog[lab-agent/lab-agent]" \
+      --quiet >/dev/null 2>&1 || true
   "$0" inventory ${APPLY:+--apply}
   ;;
 park)
@@ -388,11 +393,20 @@ import json, subprocess, sys
 pf, p = sys.argv[1], sys.argv[2]
 d = json.load(open(pf))
 def names(*cmd):
-    return [l for l in subprocess.run(list(cmd), capture_output=True, text=True).stdout.split() if l]
+    r = subprocess.run(list(cmd), capture_output=True, text=True)
+    if r.returncode != 0:
+        sys.exit(f"park: can't list ({' '.join(cmd[:4])}): {r.stderr.strip()[-200:]}")
+    return [l for l in r.stdout.split() if l]
+# Only this install's own resources, by what identifies them, never "whatever exists right now":
+# the parked cluster, the disks Substrate's own volume claims created in ate-system, and the
+# installer's snapshot buckets. Anything else present at park time stays residue.
+c = d["cluster"]
 d["allowed"] = {
-    "clusters": names("gcloud", "container", "clusters", "list", "--project", p, "--format", "value(name)"),
-    "disks": names("gcloud", "compute", "disks", "list", "--project", p, "--format", "value(name)"),
-    "buckets": names("gcloud", "storage", "buckets", "list", "--project", p, "--format", "value(name)"),
+    "clusters": [n for n in names("gcloud", "container", "clusters", "list", "--project", p, "--format", "value(name)") if n == c],
+    "disks": names("gcloud", "compute", "disks", "list", "--project", p, "--format", "value(name)", "--filter",
+                   'description~"kubernetes.io/created-for/pvc/namespace\\":\\"ate-system"'),
+    "buckets": [b for b in names("gcloud", "storage", "buckets", "list", "--project", p, "--format", "value(name)")
+                if b.startswith("ate-snapshots-" + p)],
     "firewalls": [f for f in names("gcloud", "compute", "firewall-rules", "list", "--project", p, "--format", "value(name)")
                   if f.startswith("gke-" + d["cluster"])],
     "service accounts": [s for s in names("gcloud", "iam", "service-accounts", "list", "--project", p, "--format", "value(email)")
@@ -465,7 +479,16 @@ inventory)
   assert_only buckets "$RETAINED_BUCKETS" gcloud storage buckets list --project "$P" --format "value(name)"
   assert_only repos "$RETAINED_REPOS" gcloud artifacts repositories list --project "$P" --location "$REGION" --format "value(name.basename())"
   assert_only "service accounts" "$RETAINED_SAS" gcloud iam service-accounts list --project "$P" --format "value(email)"
-  if [[ $residue == 0 ]]; then echo "inventory clean: only the declared retained set remains"; else
+  assert_empty "forwarding rules" gcloud compute forwarding-rules list --project "$P" --format "value(name)"
+  assert_empty "disk snapshots" gcloud compute snapshots list --project "$P" --format "value(name)"
+  assert_empty "filestore instances" gcloud filestore instances list --project "$P" --format "value(name)"
+  # The agent's identity: who may impersonate it, beyond the operator's own Token Creator grant.
+  # Checked parked too: Substrate never uses it (its gateway injects the token); only the baselines do.
+  assert_empty "workload identity bindings on $AGENT_SA" gcloud iam service-accounts get-iam-policy \
+    "$AGENT_SA" --project "$P" --flatten "bindings[].members" --filter "bindings.role=roles/iam.workloadIdentityUser" \
+    --format "value(bindings.members)"
+  CHECKED="clusters, disks, instances, addresses, routers, forwarding rules, disk snapshots, Filestore, DNS zones and policies, networks, firewall rules, buckets, Artifact Registry repositories, service accounts and the agent's Workload Identity bindings"
+  if [[ $residue == 0 ]]; then echo "inventory clean: only the declared retained set remains ($CHECKED; not checked: other IAM grants, APIs, Vertex AI resources)"; else
     echo "inventory NOT clean: see RESIDUE/UNEXPECTED above" >&2; exit 1; fi
 ;;
 quota)

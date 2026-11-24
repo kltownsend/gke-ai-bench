@@ -2,6 +2,11 @@
 
 These are the rules the lab ran under. They cost little and they prevent the mistakes that cost the most.
 
+They're rules, not controls. The harness builds a sandbox for the agent it tests, and then you, the agent
+running the harness, work outside it: on the operator's workstation, with their project-owner identity and
+whatever their user account can read. Nothing below is enforced by anything but you. That's inconsistent with
+what the lab measures, and it's how the lab ran. If you're unsure whether something is allowed, stop and ask.
+
 ## Money
 
 - **Name the cost and get a yes before anything that meters.** Creating a cluster or node pool, resizing one up,
@@ -19,10 +24,14 @@ These are the rules the lab ran under. They cost little and they prevent the mis
 
 ## Credentials
 
-- **No personal credential goes in any sandbox.** The agent's sandbox gets a placeholder; the gateway (or the
-  sidecar, on the plain GKE baselines) injects a short-lived token for the agent's service account. That account's
-  one role, Vertex AI user, allows more than the model call the lab makes, so run in a project with nothing else
-  of value in it.
+- **No personal credential goes in any sandbox.** What the agent can read depends on the venue. On Agent
+  Substrate it gets a placeholder and the egress gateway injects a short-lived token for the agent's service
+  account on the way out; the token never enters the actor. On the local Docker venue (the sidecar's metadata
+  shim) and on the plain GKE baselines (Workload Identity's metadata server) the agent can read that short-lived
+  token itself and use it until it expires, within the hour; on the baselines that reach is what the probes
+  measure. That account's one role, Vertex AI user, allows more than the model call the lab makes, and the
+  harness's billing guard sees only the agy calls it launches, so run in a project with nothing else of value in
+  it and a budget alert.
 - **Check the cluster before writing a token.** `harness/token_secret.py` refuses any kubectl context but your
   lab cluster; delete its Secret (`--delete`) when a session ends.
 - **Keep the lab's gcloud configuration separate** from the person's own (`CLOUDSDK_CONFIG`, set by

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import stat
 import re
 import shutil
 import subprocess
@@ -286,7 +287,11 @@ class RecordingModel:
         for rel in sorted(set(before) | set(after)):
             if before.get(rel) != after.get(rel):
                 p = os.path.join(ctx["workspace"], rel)
-                files[rel] = open(p).read() if os.path.exists(p) else None
+                # Only regular files are read. On the local venue the workspace is a host bind mount,
+                # so a symlink the agent made would otherwise be followed to any file this user can read.
+                st = os.lstat(p) if os.path.lexists(p) else None
+                files[rel] = (open(p).read() if st and stat.S_ISREG(st.st_mode)
+                              else None if st is None else {"not_a_regular_file": _kind(st)})
         self.rec[f"work:{ctx['attempt']}"] = {"out": out, "files": files}
         self._save()
         return out
@@ -308,6 +313,8 @@ class ReplayModel:
         r = self.rec[f"work:{ctx['attempt']}"]
         for i, (rel, content) in enumerate(sorted(r["files"].items())):
             p = os.path.join(ctx["workspace"], rel)
+            if isinstance(content, dict):            # a link or special file: recorded, never followed
+                continue
             if content is None:
                 os.remove(p)
                 continue
@@ -320,13 +327,29 @@ class ReplayModel:
         return r["out"]
 
 
+def _kind(st):
+    return ("symlink" if stat.S_ISLNK(st.st_mode) else "fifo" if stat.S_ISFIFO(st.st_mode)
+            else "socket" if stat.S_ISSOCK(st.st_mode) else "device" if stat.S_ISCHR(st.st_mode) or
+            stat.S_ISBLK(st.st_mode) else "other")
+
+
 def _hashes(root):
+    """Content hashes of the workspace's regular files. Links and special files are hashed by what
+    they are (a link by its target text), never opened, so an agent-made link can't point the
+    controller at a file outside the workspace."""
     import hashlib
     out = {}
-    for d, dirs, files in os.walk(root):
+    for d, dirs, files in os.walk(root):                 # os.walk doesn't descend into linked dirs
         dirs[:] = [x for x in dirs if x != "__pycache__"]
-        for f in files:
+        for f in files + [x for x in dirs if os.path.islink(os.path.join(d, x))]:
             p = os.path.join(d, f)
-            with open(p, "rb") as fh:
-                out[os.path.relpath(p, root)] = hashlib.sha256(fh.read()).hexdigest()
+            st = os.lstat(p)
+            if stat.S_ISREG(st.st_mode):
+                with open(p, "rb") as fh:
+                    h = hashlib.sha256(fh.read()).hexdigest()
+            elif stat.S_ISLNK(st.st_mode):
+                h = "link:" + hashlib.sha256(os.readlink(p).encode()).hexdigest()
+            else:
+                h = _kind(st)
+            out[os.path.relpath(p, root)] = h
     return out

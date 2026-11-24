@@ -28,12 +28,13 @@ import json
 import os
 import socket
 import subprocess
+import sys
 import time
 import urllib.error
 import urllib.request
 import uuid
 
-from pod_sandbox import pack, unpack_replace
+from pod_sandbox import MAX_TAR_BYTES, pack, unpack_replace
 
 ATESPACE = "lab-agent"
 TEMPLATE = "lab-agent"
@@ -96,7 +97,10 @@ class SubstrateVenue:
                                               "Content-Type": ctype})
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.read()
+                body = r.read(MAX_TAR_BYTES + 1)     # bounded: an agent-filled workspace can't exhaust memory
+                if len(body) > MAX_TAR_BYTES:
+                    raise RuntimeError(f"{method} {path}: response over {MAX_TAR_BYTES} bytes")
+                return body
         except urllib.error.HTTPError as e:      # keep the server's reason (the first 400 had none)
             raise RuntimeError(f"{method} {path}: HTTP {e.code}: {e.read()[:500].decode(errors='replace')}") from e
 
@@ -198,18 +202,26 @@ print(json.dumps({"work": tree(sys.argv[1]), "home": tree(os.path.expanduser("~"
     # The polled wait (2026-11-23, item 7's void runs). One /process request held silent for a whole agy
     # call is cut by the router's CONNECT stream idle timeout (Envoy's default 5 minutes; item 5). So the
     # command starts detached inside the actor under a supervisor that applies the same timeout and
-    # writes {stdout, stderr, exitCode, error} to /tmp/lab-run (outside /work, so the agent never sees
-    # it), and the harness polls with short requests. Opt-in (LAB_SUBSTRATE_POLL=1); each call records
+    # writes {stdout, stderr, exitCode, error} to /tmp/lab-run, and the harness polls with short requests.
+    # /tmp/lab-run is outside /work but not hidden: the supervisor runs as the agent's uid, so an agent
+    # could read or overwrite a result. Verdicts don't rest on it; the judge scores the returned tree. Opt-in (LAB_SUBSTRATE_POLL=1); each call records
     # which wait it used. The actor image is unchanged.
     SUPERVISE_PY = r"""
 import json, os, subprocess, sys
 spec = json.loads(sys.argv[1]); out = {"stdout": "", "stderr": "", "exitCode": -1}
 try:
-    p = subprocess.run(spec["argv"], cwd=os.environ.get("LAB_WORK", "/work"), capture_output=True, timeout=spec["timeout"])
-    out.update(stdout=p.stdout.decode(errors="replace"), stderr=p.stderr.decode(errors="replace"), exitCode=p.returncode)
-except subprocess.TimeoutExpired as e:
-    out.update(stdout=(e.stdout or b"").decode(errors="replace"), stderr=(e.stderr or b"").decode(errors="replace"),
-               error=f"timed out after {spec['timeout']}s")
+    import tempfile
+    CAP = 16 << 20                                   # per stream, as the actor server caps /process
+    def cut(f):
+        n = f.seek(0, 2); f.seek(0)
+        return f.read(CAP).decode(errors="replace") + (f"\n[output cut: {n - CAP} more bytes]" if n > CAP else "")
+    with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
+        try:
+            p = subprocess.run(spec["argv"], cwd=os.environ.get("LAB_WORK", "/work"), stdout=fo, stderr=fe, timeout=spec["timeout"])
+            out["exitCode"] = p.returncode
+        except subprocess.TimeoutExpired:
+            out["error"] = f"timed out after {spec['timeout']}s"
+        out.update(stdout=cut(fo), stderr=cut(fe))
 except Exception as e:
     out["error"] = repr(e)[:500]
 tmp = spec["path"] + ".tmp"
@@ -312,3 +324,6 @@ print("started")
         left = self.leftover() if self.created else []
         if left:
             self.events.append({"leftover_actors": left})
+            print(f"WARNING: actor {self.atespace}/{self.actor} is still there and holds a worker slot or a "
+                  f"snapshot. Clean up with: kubectl ate delete actor {self.actor} -a {self.atespace}",
+                  file=sys.stderr, flush=True)

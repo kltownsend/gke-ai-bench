@@ -39,16 +39,35 @@ NAME, KEY = "lab-agent-token", "token"
 AX_LABEL = os.environ.get("LAB_TOKEN_AX_LABEL") == "1"
 EVERY_S = 40 * 60
 CLUSTER = os.environ.get("LAB_TOKEN_CLUSTER") or os.environ.get("LAB_CLUSTER", "lab-substrate")
+LOCATION = os.environ.get("LAB_TOKEN_LOCATION") or os.environ.get("LAB_ZONE", "")
 PROJECT = os.environ.get("LAB_PROJECT") or sys.exit("LAB_PROJECT is not set: source harness/lab_env.sh")
 
 
+CONTEXT = f"gke_{PROJECT}_{LOCATION}_{CLUSTER}"
+
+
 def check_context():
-    """GKE contexts are named gke_<project>_<location>_<cluster>; refuse anything else."""
-    ctx = subprocess.run(["kubectl", "config", "current-context"], capture_output=True, text=True,
-                         timeout=30).stdout.strip()
-    if not (ctx.startswith(f"gke_{PROJECT}_") and ctx.endswith(f"_{CLUSTER}")):
-        sys.exit(f"refusing: kubectl context is {ctx!r}, not cluster {CLUSTER} in {PROJECT}. "
-                 "Run infra/cluster.sh setup for that cluster, or set LAB_TOKEN_CLUSTER.")
+    """The token goes only to the lab cluster: the exact context gcloud names it (project, zone and
+    cluster), and that context's API server must be the endpoint Google reports for the cluster, so a
+    kubeconfig entry that merely has the right name can't receive it. Every kubectl call below names
+    this context, so a later change of current context doesn't redirect the write."""
+    if not LOCATION:
+        sys.exit("refusing: LAB_ZONE is not set: source harness/lab_env.sh")
+    server = subprocess.run(["kubectl", "config", "view", "--raw", "-o",
+                             f"jsonpath={{.clusters[?(@.name==\"{CONTEXT}\")].cluster.server}}"],
+                            capture_output=True, text=True, timeout=30).stdout.strip()
+    want = subprocess.run(["gcloud", "container", "clusters", "describe", CLUSTER, "--location", LOCATION,
+                           "--project", PROJECT, "--format",
+                           "value(endpoint,controlPlaneEndpointsConfig.dnsEndpointConfig.endpoint,"
+                           "controlPlaneEndpointsConfig.ipEndpointsConfig.publicEndpoint)"],
+                          capture_output=True, text=True, timeout=60)
+    if want.returncode != 0 or not want.stdout.strip():
+        sys.exit(f"refusing: can't read cluster {CLUSTER} in {LOCATION}, {PROJECT} from Google Cloud (no such cluster there, or the sign-in expired) "
+                 f": {want.stderr.strip()[-200:]}")
+    endpoints = {f"https://{e}" for e in want.stdout.replace(";", "\t").split() if e}
+    if server not in endpoints:
+        sys.exit(f"refusing: kubeconfig context {CONTEXT!r} points at {server or 'nothing'!r}, not cluster "
+                 f"{CLUSTER}'s endpoint. Run infra/cluster.sh setup for that cluster, or set LAB_TOKEN_CLUSTER.")
 
 
 def mint() -> tuple[str, float]:
@@ -70,14 +89,14 @@ def secret(token: str) -> dict:
 
 
 def write(token: str):
-    subprocess.run(["kubectl", "apply", "-f", "-"], input=json.dumps(secret(token)).encode(),
+    subprocess.run(["kubectl", "--context", CONTEXT, "apply", "-f", "-"], input=json.dumps(secret(token)).encode(),
                    capture_output=True, check=True, timeout=60)
 
 
 def main():
     check_context()
     if "--delete" in sys.argv:
-        subprocess.run(["kubectl", "-n", NAMESPACE, "delete", "secret", NAME, "--ignore-not-found"],
+        subprocess.run(["kubectl", "--context", CONTEXT, "-n", NAMESPACE, "delete", "secret", NAME, "--ignore-not-found"],
                        check=True, timeout=60)
         print(json.dumps({"event": "token secret deleted", "secret": f"{NAMESPACE}/{NAME}"}), flush=True)
         return

@@ -12,7 +12,9 @@ Vertex AI operations than the one generate call the lab makes.
 
 Needs google-auth; run with an interpreter that has it (GOOGLE_AUTH_PY in lab.env).
 
-usage: mint_token.py OUT_DIR [--loop]    (--loop refreshes every 40 minutes until killed)
+usage: mint_token.py OUT_DIR [--loop | --delete]
+    --loop refreshes every 40 minutes until stopped, and removes token.json when it stops;
+    --delete removes it. A single mint leaves token.json for the sidecar, valid up to an hour.
 """
 import json
 import os
@@ -44,10 +46,31 @@ def mint(out_dir):
     return tok["expiry"]
 
 
+def remove(out_dir):
+    for n in ("token.json", "token.json.tmp"):
+        p = os.path.join(out_dir, n)
+        if os.path.lexists(p):
+            os.unlink(p)
+
+
 if __name__ == "__main__":
     out = sys.argv[1]
+    if os.path.islink(out) or (os.path.exists(out) and not os.path.isdir(out)):
+        sys.exit(f"refusing: {out} is a link or not a directory")
+    if "--delete" in sys.argv:
+        remove(out)
+        print(json.dumps({"event": "token removed", "dir": out}), flush=True)
+        sys.exit(0)
     os.makedirs(out, mode=0o700, exist_ok=True)
     os.chmod(out, 0o700)
+    if "--loop" in sys.argv:
+        # The refresher removes the token when it stops, so a killed loop doesn't leave a usable
+        # access token on disk (it would stay valid up to an hour). SIGKILL can't be caught: use --delete.
+        import atexit
+        import signal
+        atexit.register(remove, out)
+        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            signal.signal(sig, lambda *_: sys.exit(0))
     while True:
         exp = mint(out)
         print(json.dumps({"minted_for": LAB_AGENT, "expires_in_s": int(exp - time.time())}), flush=True)

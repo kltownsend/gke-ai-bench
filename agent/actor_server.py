@@ -39,6 +39,7 @@ import shutil
 import socketserver
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import uuid
@@ -100,12 +101,26 @@ def state() -> dict:
             "child_alive": bool(child) and child.poll() is None}
 
 
+WORK_LOCK = threading.Lock()
+MAX_OUTPUT_BYTES = 16 << 20
+
+
+def capped(f):
+    """A command's captured stream, cut at MAX_OUTPUT_BYTES with a note of how much was dropped."""
+    size = f.seek(0, os.SEEK_END); f.seek(0)
+    text = f.read(MAX_OUTPUT_BYTES).decode(errors="replace")
+    return text + (f"\n[output cut: {size - MAX_OUTPUT_BYTES} more bytes]" if size > MAX_OUTPUT_BYTES else "")
+
+
 def replace_work(data: bytes):
     """Replace /work's contents with the tar stream's. The Pod harness's unpack swaps directories
     by renaming the target, which needs its parent writable; /work's parent is / and the agent's
     uid can't write there (found on the first Substrate probe, 2026-11-21: "Permission denied:
-    '/.pod-ws-...'"). So the stream is validated and unpacked, all or nothing, into a directory
-    inside /work, and only then swapped in for the old contents."""
+    '/.pod-ws-...'"). So the stream is validated and fully unpacked into a directory inside /work
+    before anything is touched; a bad stream leaves the old contents. The swap itself moves entries one
+    at a time, so it isn't atomic: a failure mid-swap leaves a mix, and the next replace starts over.
+    Replace and pack hold WORK_LOCK, so the harness's own swap and download don't interleave; a process
+    the agent left running can still change files during either."""
     incoming = os.path.join(WORK, ".lab-incoming")
     shutil.rmtree(incoming, ignore_errors=True)
     os.mkdir(incoming)
@@ -154,7 +169,12 @@ class Actor(http.server.BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def body(self, limit):
-        n = int(self.headers.get("Content-Length") or 0)
+        if self.headers.get("Transfer-Encoding"):
+            raise ValueError("Transfer-Encoding isn't supported; send Content-Length")
+        raw = self.headers.get_all("Content-Length") or ["0"]
+        if len(set(raw)) != 1 or not raw[0].strip().isdigit():
+            raise ValueError(f"bad Content-Length {raw!r}")
+        n = int(raw[0])
         if n > limit:
             raise ValueError(f"body over {limit} bytes")
         return self.rfile.read(n) if n else b""
@@ -163,7 +183,9 @@ class Actor(http.server.BaseHTTPRequestHandler):
         if self.path == "/healthz":
             return self.reply(200, {"ok": True})
         if self.path == "/workspace":
-            return self.reply(200, pack(WORK), "application/x-tar")
+            with WORK_LOCK:
+                data = pack(WORK)
+            return self.reply(200, data, "application/x-tar")
         if self.path == "/state":
             return self.reply(200, state())
         return self.reply(404, {"error": "not found"})
@@ -172,7 +194,9 @@ class Actor(http.server.BaseHTTPRequestHandler):
         if self.path != "/workspace":
             return self.reply(404, {"error": "not found"})
         try:
-            replace_work(self.body(MAX_TAR_BYTES))
+            body = self.body(MAX_TAR_BYTES)
+            with WORK_LOCK:
+                replace_work(body)
         except (ValueError, OSError) as e:
             return self.reply(400, {"error": str(e)})
         return self.reply(200, {"ok": True})
@@ -203,15 +227,17 @@ class Actor(http.server.BaseHTTPRequestHandler):
         except (ValueError, TypeError) as e:
             return self.reply(400, {"error": f"bad request: {e}"})
         env = dict(os.environ, **{str(k): str(v) for k, v in (req.get("envvars") or {}).items()})
-        try:
-            p = subprocess.run(cmd, cwd=req.get("cwd") or WORK, env=env, capture_output=True, timeout=timeout)
-            resp = {"stdout": p.stdout.decode(errors="replace"), "stderr": p.stderr.decode(errors="replace"),
-                    "exitCode": p.returncode}
-        except subprocess.TimeoutExpired as e:
-            resp = {"stdout": (e.stdout or b"").decode(errors="replace"), "stderr": (e.stderr or b"").decode(errors="replace"),
-                    "exitCode": -1, "error": f"timed out after {timeout:.0f}s"}
-        except OSError as e:
-            resp = {"stdout": "", "stderr": "", "exitCode": -1, "error": str(e)}
+        # Output goes to files, not memory, and each stream returns at most MAX_OUTPUT_BYTES, so a
+        # command that prints without end can't exhaust the actor's or the harness's memory.
+        with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
+            try:
+                p = subprocess.run(cmd, cwd=req.get("cwd") or WORK, env=env, stdout=fo, stderr=fe, timeout=timeout)
+                resp = {"exitCode": p.returncode}
+            except subprocess.TimeoutExpired:
+                resp = {"exitCode": -1, "error": f"timed out after {timeout:.0f}s"}
+            except OSError as e:
+                resp = {"exitCode": -1, "error": str(e)}
+            resp["stdout"], resp["stderr"] = capped(fo), capped(fe)
         return self.reply(200, resp)
 
 

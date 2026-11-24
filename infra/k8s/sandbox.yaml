@@ -77,6 +77,11 @@ spec:
       - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: agent-sandbox-system}}
         podSelector: {matchLabels: {app: sandbox-router}}
     egress:
+    # The except list names private ranges, not GKE's Service range (34.118.224.0/20 here), which is
+    # public address space. Dataplane V2 applies this policy after service translation, to the backend
+    # Pod's private address, so Services stay blocked: on this profile the escape suite's calls to the
+    # neighbor's Service IP (34.118.232.89), its DNS name and the Kubernetes API Service all timed out
+    # (runs/probes/escape_suite-sandbox.json, 2026-11-23). A cluster without Dataplane V2 may differ.
     - to:
       - ipBlock: {cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16]}
     - to:

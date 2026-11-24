@@ -33,6 +33,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import time
@@ -103,6 +104,30 @@ def pod_spec(name: str, profile: str, image: str, session: str = "", drop: tuple
             "metadata": {"name": name, "namespace": NAMESPACE,
                          "labels": {"app": "lab-agent", "lab-profile": profile, "lab-session": session}},
             "spec": spec}
+
+
+def bounded_run(cmd, check=True, timeout=None):
+    """subprocess.run for a command whose stdout is a workspace: spooled to a file and cut off past
+    MAX_TAR_BYTES, so a workspace the agent filled can't exhaust the workstation's memory before the
+    tar check runs."""
+    with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
+        p = subprocess.Popen(cmd, stdout=fo, stderr=fe)
+        deadline = time.monotonic() + timeout if timeout else None
+        while p.poll() is None:
+            if os.fstat(fo.fileno()).st_size > MAX_TAR_BYTES:
+                p.kill(); p.wait()
+                raise ValueError(f"tar stream over {MAX_TAR_BYTES} bytes")
+            if deadline and time.monotonic() > deadline:
+                p.kill(); p.wait()
+                raise subprocess.TimeoutExpired(cmd, timeout)
+            time.sleep(0.1)
+        if os.fstat(fo.fileno()).st_size > MAX_TAR_BYTES:
+            raise ValueError(f"tar stream over {MAX_TAR_BYTES} bytes")
+        fo.seek(0); fe.seek(0)
+        r = subprocess.CompletedProcess(cmd, p.returncode, fo.read(), fe.read()[-20000:])
+    if check:
+        r.check_returncode()
+    return r
 
 
 def pack(root: str) -> bytes:
@@ -185,6 +210,8 @@ class PodSandbox:
 
     def kubectl(self, *args, input=None, check=True, timeout=None):
         cmd = ["kubectl", *(["--context", self.context] if self.context else []), "-n", NAMESPACE, *args]
+        if args and args[0] == "exec" and input is None:      # a download: bounded on the way in
+            return bounded_run(cmd, check=check, timeout=timeout)
         return subprocess.run(cmd, input=input, capture_output=True, check=check, timeout=timeout)
 
     def __enter__(self):
@@ -235,6 +262,9 @@ class PodSandbox:
                          "--timeout=60s", "--ignore-not-found", check=False, timeout=90)
         if r.returncode != 0:
             self.events.append({"delete_failed": target, "stderr": r.stderr.decode(errors="replace")[-300:]})
+            ctx = f" --context {self.context}" if self.context else ""
+            print(f"WARNING: couldn't delete {target}; it may still bill. Clean up with: "
+                  f"kubectl{ctx} -n {NAMESPACE} delete {target} --grace-period=0 --force", file=sys.stderr, flush=True)
 
     def sidecar_log(self) -> list[dict]:
         return []

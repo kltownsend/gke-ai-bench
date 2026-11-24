@@ -54,6 +54,16 @@ buckets, firewall rules, an Artifact Registry repository, a service account and 
 on a throwaway project covers it. You also need permission to impersonate the agent's service account; step
 1 grants it.
 
+**Where you run this is outside every boundary it tests.** The harness spends its effort keeping an untrusted
+agent inside a sandbox: no ambient credential, egress by allowlist, a judge in its own container. The operator
+gets none of that. These scripts run on your workstation as you, with your project-owner sign-in, and
+`lab.env` is sourced as shell. Whatever follows this guide, you or a coding agent you hand it to, can read
+anything your user account can, including your own gcloud credentials, and can change anything in the project.
+The lab's own gcloud config keeps its sign-in apart from yours so nothing mixes by accident; it isn't a
+security boundary. The lab ran this way, so the published instrument runs this way. If you'll hand the guide
+to an agent, give it a throwaway project and its own OS account or VM holding only the lab's sign-in. That
+isn't how the lab ran; it's what we'd do running it again with the agent in charge.
+
 **Quota:** Agent Substrate needs about 900 GB of the region's SSD quota (`SSD_TOTAL_GB`): its bundled
 database claims a 500 GiB balanced persistent disk and its four nodes' boot disks take 100 GB each. The lab's
 project started at a limit of 500, so the install created the cluster, then hung with the database disk
