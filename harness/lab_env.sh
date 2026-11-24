@@ -22,6 +22,11 @@ if [ "$LAB_PROJECT" = "your-project-id" ]; then echo "lab.env still has the plac
 export LAB_PROJECT
 export LAB_REGION="${LAB_REGION:-us-central1}"
 export LAB_ZONE="${LAB_ZONE:-$LAB_REGION-a}"
+case "$LAB_ZONE" in
+  "$LAB_REGION"-?) ;;
+  *) echo "lab.env: LAB_ZONE=$LAB_ZONE isn't in LAB_REGION=$LAB_REGION; set both (the zone is the region plus -a, -b, ...)" >&2
+     return 1 2>/dev/null || exit 1 ;;
+esac
 export LAB_CLUSTER="${LAB_CLUSTER:-lab-substrate}"
 export LAB_AGENT_SA_NAME="${LAB_AGENT_SA_NAME:-lab-agent}"
 export LAB_AGENT="$LAB_AGENT_SA_NAME@$LAB_PROJECT.iam.gserviceaccount.com"

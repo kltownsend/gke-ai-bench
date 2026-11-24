@@ -67,6 +67,11 @@ cp lab.env.example lab.env        # git-ignored; set LAB_PROJECT, and anything e
 source harness/lab_env.sh          # in every shell that runs the lab
 ```
 
+Set `LAB_REGION` and `LAB_ZONE` in lab.env if you don't want the default (us-central1, us-central1-a). Every
+cluster, node pool and VM the scripts create goes in `LAB_ZONE`, and the Substrate wizard takes the same zone
+(step 7). The zone has to sit in the region; `lab_env.sh` refuses a mismatch. If a create fails on zone
+capacity, change `LAB_ZONE` to another zone in the region and source the file again.
+
 `harness/lab_env.sh` derives the rest: the agent's service-account email (`LAB_AGENT`), the Artifact Registry
 path (`LAB_REGISTRY`), and a gcloud configuration directory of the lab's own
 (`$HOME/.config/gcloud-$LAB_PROJECT`), so your own gcloud and Application Default Credentials stay untouched.
