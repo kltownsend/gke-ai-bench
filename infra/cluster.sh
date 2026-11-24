@@ -20,6 +20,28 @@ ZONE=${LAB_ZONE:?source harness/lab_env.sh}; VER=1.37.1-gke.1552000
 AGENT_SA=${LAB_AGENT:?source harness/lab_env.sh}      # the agent's Google service account
 NAME=lab-$PROFILE; MT=c3-standard-4
 run() { if [[ $APPLY == --apply ]]; then "$@"; else printf '%q ' "$@"; echo; fi; }
+# Resize a node pool and wait for GKE to finish, however long that takes. gcloud's own wait gives
+# up before GKE does: scaling a Substrate pool to zero can stall on the API server's disruption
+# budget until GKE forces the drain after about an hour, and the lab's parks failed there three
+# times. A sign-in failure stops the wait; it never reads as done.
+resize_pool() {   # CLUSTER POOL SIZE
+  if [[ $APPLY != --apply ]]; then run gcloud container clusters resize "$1" --node-pool "$2" --num-nodes "$3" --zone "$ZONE" --project "$P" --quiet; return; fi
+  echo "resizing $2 to $3"
+  gcloud container clusters resize "$1" --node-pool "$2" --num-nodes "$3" --zone "$ZONE" --project "$P" --quiet --async >/dev/null || return 1
+  local op st t0=$SECONDS
+  op=$(gcloud container operations list --zone "$ZONE" --project "$P" --filter "operationType=SET_NODE_POOL_SIZE AND status=RUNNING AND targetLink~/nodePools/$2\$" --format "value(name)" | head -1)
+  [[ -z $op ]] && { echo "  $2: done"; return 0; }
+  while :; do
+    st=$(gcloud container operations describe "$op" --zone "$ZONE" --project "$P" --format "value(status)") \
+      || { echo "  $2: can't read operation $op (sign-in?); state unverified" >&2; return 1; }
+    [[ $st == DONE ]] && break
+    (( SECONDS - t0 > 5400 )) && { echo "  $2: still running after 90 minutes ($op)" >&2; return 1; }
+    sleep 20
+  done
+  local err; err=$(gcloud container operations describe "$op" --zone "$ZONE" --project "$P" --format "value(error.message)")
+  [[ -n $err ]] && { echo "  $2: $err" >&2; return 1; }
+  echo "  $2: done in $(( SECONDS - t0 ))s"
+}
 # For a step fed by a pipe: the dry run drains stdin, so the writer doesn't die of SIGPIPE under pipefail.
 runp() { if [[ $APPLY == --apply ]]; then "$@"; else cat >/dev/null; printf '%q ' "$@"; echo '  < (stdin)'; fi; }
 # Fills a manifest's placeholders from the lab environment, as
@@ -329,11 +351,16 @@ park)
   sizes="{}"
   for np in $pools; do
     n=$(kubectl get nodes -l "cloud.google.com/gke-nodepool=$np" --no-headers 2>/dev/null | wc -l | tr -d ' ')
+    # A park rerun after a half-finished one sees drained pools at zero; keep the size it recorded.
+    if [[ $n == 0 && -f $PF ]]; then n=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['sizes'].get(sys.argv[2],0))" "$PF" "$np"); fi
     sizes=$(python3 -c "import json,sys;d=json.loads(sys.argv[1]);d[sys.argv[2]]=int(sys.argv[3]);print(json.dumps(d))" "$sizes" "$np" "$n")
   done
   echo "node pool sizes before parking: $sizes"
   if [[ $APPLY == --apply ]]; then printf '{"cluster": "%s", "sizes": %s}\n' "$C" "$sizes" > "$PF"; fi
-  for np in $pools; do run gcloud container clusters resize "$C" --node-pool "$np" --num-nodes 0 --zone "$ZONE" --project "$P" --quiet; done
+  # The database last: with postgres gone the API server goes unready and its disruption budget
+  # blocks every eviction, so the infra drain stalls until GKE forces it.
+  order=$(printf '%s\n' $pools | awk '$0=="ate-postgres"{l=$0;next} $0=="ate-system-infra"{m=$0;next} {print} END{if(m)print m; if(l)print l}')
+  for np in $order; do resize_pool "$C" "$np" 0; done
   if [[ $APPLY == --apply ]]; then
     # What a parked install leaves, recorded by exact name for the inventory.
     python3 - "$PF" "$P" <<'PY'
@@ -361,8 +388,9 @@ unpark)
   [[ -f $PF ]] || { echo "no parked manifest at $PF" >&2; exit 2; }
   for np in $(python3 -c "import json;[print(k) for k in json.load(open('$PF'))['sizes']]"); do
     n=$(python3 -c "import json;print(json.load(open('$PF'))['sizes']['$np'])")
-    [[ $n == 0 ]] && continue
-    run gcloud container clusters resize "$C" --node-pool "$np" --num-nodes "$n" --zone "$ZONE" --project "$P" --quiet
+    # Every Substrate pool needs a node: the infra pool hosts the credential provider postgres waits on.
+    (( n < 1 )) && { echo "manifest has $np at $n; waking it at 1"; n=1; }
+    resize_pool "$C" "$np" "$n"
   done
   for d in ate-api-server atenet-router atenet-egress ate-controller k8s-credential-provider; do
     run kubectl -n ate-system rollout status "deploy/$d" --timeout=900s; done
