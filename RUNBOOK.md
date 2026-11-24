@@ -41,7 +41,7 @@ billed inside output tokens. Set a budget alert on the project before step 5.
 | Antigravity CLI | agy 1.5.13 (fetched and checksum-verified) |
 | Model | `gemini-4-hydrogen-medium`, Vertex AI, global. If your project can't call it, set `LAB_MODEL` and say so beside your results |
 | clinicbench (optional) | https://github.com/kltownsend/clinicbench at `1d45ebdee80b74af4b26a98280deb4f7ec863cca` |
-| LoopControlBench (team two) | https://github.com/kltownsend/loopcontrolbench at `2b4e733c6bf5b563e38188fe1f8135f37cce07b7` |
+| LoopControlBench (team two) | https://github.com/kltownsend/loopcontrolbench at `2b4e733c6bf5b563e38188fe1f8135f37cce07b7`; its install, workspace prep and scoring. The prompt is `harness/lcb_team.py build_prompt`, the text the lab ran, which that commit doesn't have |
 | Workstation | Python 3.13, Go 1.27.3, Docker with buildx, gcloud with the GKE auth plugin, kubectl, git, curl |
 
 ## 0. Before you start

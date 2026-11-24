@@ -267,6 +267,41 @@ def probes(out_dir: str):
 
 
 # -- run -------------------------------------------------------------------------------------------------
+def build_prompt(spec, rp, extract_tests):
+    """Team two's prompt, the one the lab ran, carried here because the pinned bench doesn't have it.
+
+    The lab ran an unpublished working copy of LoopControlBench whose agentic.py adds
+    build_prompt_agentic; the pinned commit (2b4e733) builds the agentic prompt as
+    run.build_prompt + agentic.HARNESS_SUFFIX instead. That one asks for SEARCH/REPLACE text
+    blocks and then retracts the instruction, and the working copy replaced it because a session
+    told to ignore an instruction tends to follow it. This is that function's text, byte for byte,
+    with the bench's own run.extract_tests (identical at the pin) passed in. Same task content,
+    one edit channel.
+    """
+    parts = ['You are fixing a bug in the Python project `%s`.' % spec['repo'], '',
+             'These test(s) currently fail and must pass after your change:', '',
+             extract_tests(rp, spec), '', 'Source file(s) you may edit:']
+    for sf in spec['source_files']:
+        path = os.path.join(rp, sf)
+        content = open(path).read() if os.path.exists(path) else ''
+        parts += ['', 'FILE: %s' % sf, '```python', content, '```']
+    parts += ['',
+              'You are working in a checkout of this repository at the buggy commit. The failing '
+              'test file(s) are already present, and a virtualenv with the project installed is '
+              'at ./venv. Reproduce the failure first:',
+              '',
+              '    ./venv/bin/python -m pytest -vv %s' % ' '.join(spec['test_files']),
+              '',
+              'The full current contents of those file(s) are shown above. Apply your fix directly '
+              'to them with your editing tools. Change only what is needed to make the failing '
+              'test(s) pass.',
+              '',
+              'Scope rule: you may edit ONLY the source file(s) listed above. Edits to test files, '
+              'or to any other file, are discarded before your work is scored, so a green test run '
+              'you achieved by changing a test counts for nothing.']
+    return '\n'.join(parts)
+
+
 def run(n: int, out_dir: str, parallel: int = 1, cap: float = 25.0):
     """Tasks PARALLEL at a time (scales out beside the Clinic repairs). Spend cap:
     measured spend plus a $2 ceiling per task in flight stays under CAP, priced as harness/pilot.py."""
@@ -274,7 +309,8 @@ def run(n: int, out_dir: str, parallel: int = 1, cap: float = 25.0):
     from pilot import cost, RUN_CEILING
     sys.path.insert(0, os.path.join(LCB, "tools"))
     from run_sandboxed import INSTALL, prepare_host   # the bench's own install script and workspace prep
-    import agentic                                    # its prompt and its scoring through the gate
+    import agentic                                    # its scoring through the gate (the prompt is build_prompt above)
+    import run as bench_run                           # its extract_tests, for the prompt
     import models as M
     tasks = pick_tasks(n)
     os.makedirs(out_dir, exist_ok=True)
@@ -310,7 +346,7 @@ def run(n: int, out_dir: str, parallel: int = 1, cap: float = 25.0):
                     print(json.dumps({"cap_reached": round(state["spent"], 2), "cap": cap}), flush=True)
                     return
             time.sleep(5)
-        th = threading.Thread(target=one_task, args=(spec, path, INSTALL, prepare_host, agentic, M,
+        th = threading.Thread(target=one_task, args=(spec, path, INSTALL, prepare_host, agentic, bench_run, M,
                                                     lock, state, spent_of))
         th.start()
         threads.append(th)
@@ -319,7 +355,7 @@ def run(n: int, out_dir: str, parallel: int = 1, cap: float = 25.0):
     print(json.dumps({"done": True, "spent": round(state["spent"], 2)}), flush=True)
 
 
-def one_task(spec, path, INSTALL, prepare_host, agentic, M, lock, state, spent_of):
+def one_task(spec, path, INSTALL, prepare_host, agentic, bench_run, M, lock, state, spent_of):
     if True:
         rec = {"task": spec["task_id"], "repo": spec["repo"], "t0": time.time(),
                # The bench's venue preflight checks a self-served engine (envelope, large prefill,
@@ -329,7 +365,7 @@ def one_task(spec, path, INSTALL, prepare_host, agentic, M, lock, state, spent_o
         work = tempfile.mkdtemp(prefix="lcb-")
         try:
             rp = prepare_host(spec, work)
-            prompt = agentic.build_prompt_agentic(spec, rp)
+            prompt = build_prompt(spec, rp, bench_run.extract_tests)
             up = tempfile.mkdtemp(prefix="lcb-up-")
             shutil.copytree(rp, os.path.join(up, "w"), ignore=shutil.ignore_patterns(".git"))
             # The bench's prompt is larger than one argv string may be in the actor ("Argument list

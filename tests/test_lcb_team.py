@@ -4,6 +4,8 @@
 """
 import os
 import sys
+import hashlib
+import tempfile
 import unittest
 
 TOOLS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -56,3 +58,21 @@ class Policies(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Prompt(unittest.TestCase):
+    """The carried prompt builder stays the text the lab ran (the unpublished bench copy's
+    build_prompt_agentic). The hash was taken from that function on this same input."""
+    LAB_SHA = "59b35758382efe69459844c7a0a3bcd08b203c684bbd7c4dd17969e2c12c0901"
+
+    def test_matches_the_lab_prompt(self):
+        rp = tempfile.mkdtemp()
+        os.makedirs(os.path.join(rp, "pkg"))
+        with open(os.path.join(rp, "pkg", "mod.py"), "w") as f:
+            f.write("def f():\n    return 1\n")
+        spec = {"repo": "example/pkg", "test_files": ["tests/test_mod.py"],
+                "source_files": ["pkg/mod.py", "pkg/missing.py"]}
+        p = L.build_prompt(spec, rp, lambda rp, spec: "def test_x():\n    assert f() == 2")
+        self.assertEqual(hashlib.sha256(p.encode()).hexdigest(), self.LAB_SHA)
+        self.assertNotIn("SEARCH/REPLACE", p)
+        self.assertIn("./venv/bin/python -m pytest -vv tests/test_mod.py", p)
