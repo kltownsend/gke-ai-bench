@@ -271,11 +271,13 @@ infra/cluster.sh park --apply                      # node pools to zero, and a m
 infra/cluster.sh inventory --apply
 ```
 
-`park` scales the pools down one at a time, the database last, and waits on each until GKE reports it done.
-The infra pool can take up to an hour: Substrate's API server has a disruption budget that blocks the drain
-until GKE forces it. If park stops on a sign-in failure, the cluster's state is unverified: sign in and
-run it again. A rerun keeps the sizes the first one recorded, and `unpark` wakes every pool to at least one
-node.
+`park` scales Substrate's control plane (its deployments and the postgres StatefulSet in `ate-system`) to
+zero replicas, then the pools, the database last, and waits on each until GKE reports it done. Without the
+first step the infra drain stalls about an hour on the API and identity servers' disruption budgets, and GKE
+refuses any other resize on the cluster until it finishes, unpark included. The replica counts and pool sizes
+go in the manifest; `unpark` restores both, waking every pool to at least one node. If park stops on a
+sign-in failure, the cluster's state is unverified: sign in and run it again. A rerun keeps what the first one
+recorded.
 
 "Inventory clean" means nothing is running and nothing exists beyond what `park` recorded. It doesn't mean
 nothing bills: a parked Substrate install keeps its cluster, the 500 GiB database disk, the snapshot buckets

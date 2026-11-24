@@ -356,7 +356,27 @@ park)
     sizes=$(python3 -c "import json,sys;d=json.loads(sys.argv[1]);d[sys.argv[2]]=int(sys.argv[3]);print(json.dumps(d))" "$sizes" "$np" "$n")
   done
   echo "node pool sizes before parking: $sizes"
-  if [[ $APPLY == --apply ]]; then printf '{"cluster": "%s", "sizes": %s}\n' "$C" "$sizes" > "$PF"; fi
+  old_reps='{}'
+  if [[ $APPLY == --apply ]]; then
+    old_reps=$( [[ -f $PF ]] && python3 -c "import json,sys;print(json.dumps(json.load(open(sys.argv[1])).get('replicas',{})))" "$PF" || echo '{}')
+    printf '{"cluster": "%s", "sizes": %s}\n' "$C" "$sizes" > "$PF"
+  fi
+  # Substrate's control plane to zero replicas before the drains. Its API and identity servers have
+  # disruption budgets (max one unavailable) and both replicas of each sit on the one infra node, so
+  # a drain can evict one and then waits until GKE forces it, about an hour, during which GKE refuses
+  # any other resize on the cluster. With no pods the budgets have nothing to hold. The counts go in
+  # the manifest and unpark restores them; a rerun keeps the counts the first park recorded.
+  reps=$(kubectl -n ate-system get deploy,statefulset -o json | python3 -c "
+import json,sys
+cur={('%s/%s'%(i['kind'].lower(),i['metadata']['name'])):i['spec'].get('replicas',1) for i in json.load(sys.stdin)['items']}
+old=json.loads(sys.argv[1])
+print(json.dumps({k:(old.get(k) or v) for k,v in cur.items()}))" "$old_reps")
+  echo "control plane replicas before parking: $reps"
+  if [[ $APPLY == --apply ]]; then
+    python3 -c "import json,sys;d=json.load(open(sys.argv[1]));d['replicas']=json.loads(sys.argv[2]);json.dump(d,open(sys.argv[1],'w'))" "$PF" "$reps"
+  fi
+  for w in $(python3 -c "import json,sys;[print(k) for k in json.loads(sys.argv[1])]" "$reps"); do
+    run kubectl -n ate-system scale "$w" --replicas=0; done
   # The database last: with postgres gone the API server goes unready and its disruption budget
   # blocks every eviction, so the infra drain stalls until GKE forces it.
   order=$(printf '%s\n' $pools | awk '$0=="ate-postgres"{l=$0;next} $0=="ate-system-infra"{m=$0;next} {print} END{if(m)print m; if(l)print l}')
@@ -392,7 +412,11 @@ unpark)
     (( n < 1 )) && { echo "manifest has $np at $n; waking it at 1"; n=1; }
     resize_pool "$C" "$np" "$n"
   done
-  for d in ate-api-server atenet-router atenet-egress ate-controller k8s-credential-provider; do
+  # Restore the control plane park scaled to zero (a manifest from before that has no counts).
+  for w in $(python3 -c "import json,sys;[print(k) for k in json.load(open(sys.argv[1])).get('replicas',{})]" "$PF"); do
+    n=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['replicas'][sys.argv[2]])" "$PF" "$w")
+    run kubectl -n ate-system scale "$w" --replicas="$n"; done
+  for d in ate-api-server ate-idp-server atenet-router atenet-egress ate-controller k8s-credential-provider; do
     run kubectl -n ate-system rollout status "deploy/$d" --timeout=900s; done
   run kubectl -n ate-system rollout status statefulset/postgres --timeout=900s
   [[ $APPLY == --apply ]] && rm -f "$PF"
