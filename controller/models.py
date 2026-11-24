@@ -134,6 +134,12 @@ class AntigravityModel:
         # permission layer auto-approves everything, so the only controls left are the rung's.
         # Off unless asked for; LAB_AGY_DANGEROUS=1 sets it from a runner. Recorded on every call.
         self.dangerous = (os.environ.get("LAB_AGY_DANGEROUS") == "1") if dangerous is None else dangerous
+        # The containment gate (harness/containment_gate.py) sets LAB_CONTAINMENT when the venue's probes
+        # passed on this install, or to an explicit override. Without it, no prompts-off call runs.
+        self.containment = os.environ.get("LAB_CONTAINMENT")
+        if self.dangerous and not self.containment:
+            raise SystemExit("refusing --dangerously-skip-permissions: the containment gate didn't run "
+                             "(harness/containment_gate.py; pilot.py --dangerous runs it)")
         self.calls = []            # one entry per call: stage, usage, duration, status
 
     @staticmethod
@@ -215,7 +221,9 @@ class AntigravityModel:
             out = json.loads(p.stdout)
         except ValueError:
             out = {"status": "unparsed", "response": p.stdout[-2000:]}
-        self.calls.append({"stage": stage, "billing": mode, "dangerous": self.dangerous, "exit": p.returncode, "status": out.get("status"),
+        self.calls.append({"stage": stage, "billing": mode, "dangerous": self.dangerous,
+                           **({"containment": self.containment} if self.dangerous else {}),
+                           "exit": p.returncode, "status": out.get("status"),
                            "stderr_tail": (p.stderr or "")[-300:] if p.returncode else "",
                            "usage": out.get("usage"), "seconds": out.get("duration_seconds"),
                            "turns": out.get("num_turns"), "denied": out.get("denied_actions") or [],

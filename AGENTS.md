@@ -20,7 +20,9 @@ what the lab measures, and it's how the lab ran. If you're unsure whether someth
 - **Cap model spend per batch.** `harness/pilot.py` takes a cap (estimated dollars, priced from token counts)
   and won't launch a run that could cross it. It isn't a billing limit: set a budget alert on the project too.
 - **Run the containment probes before any `--dangerous` run,** and read them. That flag turns the agent's own
-  permission prompts off.
+  permission prompts off. The harness refuses it until this install's probes pass
+  (`harness/containment_gate.py`); never reach for `--dangerous-override` yourself. That's the operator's call,
+  with a reason they give you.
 
 ## Credentials
 

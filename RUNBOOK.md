@@ -265,7 +265,11 @@ long agent calls fail as infrastructure.
 
 `--dangerous` turns agy's own permission prompts off, so the runtime's controls are the only ones. That's the
 point of the test, and it's why the containment probes come first: run the probe row and read its results
-before any `--dangerous` run, and leave the flag off if anything there surprised you. `--cap` is the harness's
+before any `--dangerous` run, and leave the flag off if anything there surprised you. The harness checks too:
+`--dangerous` refuses unless this install's probe records in `runs/probes` passed every containment reading
+(`harness/containment_gate.py VENUE` prints the verdict and why), and the agent wrapper won't run agy with its
+prompts off unless the gate ran. `--dangerous-override REASON` runs anyway and records the reason in
+`plan.json` and on every call. The lab read its probes by hand; this check came after its runs. `--cap` is the harness's
 own stop on estimated model spend in dollars, priced from token counts; it's not a billing limit, which is
 what the budget alert is for.
 

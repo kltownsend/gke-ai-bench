@@ -15,10 +15,14 @@ Source harness/lab_env.sh first; run with LAB_PYTHON.
 
 With --gke PROFILE each run is harness/canary_gke.py on that rung instead (the Clinic repairs
 ran with --gke substrate --label-prefix repair --dangerous). --dangerous sets
-LAB_AGY_DANGEROUS=1, so agy runs with --dangerously-skip-permissions (recorded on every call).
+LAB_AGY_DANGEROUS=1, so agy runs with --dangerously-skip-permissions (recorded on every call). It runs
+only once harness/containment_gate.py passes: the venue's containment probes (runs/probes, or --probes)
+must have passed on this install. --dangerous-override REASON runs anyway and records the reason. The
+gate's verdict and evidence go in plan.json. The lab read the probes by hand; the gate came after.
 
 usage: pilot.py --out DIR [--repeats 3] [--parallel 3] [--cap 47] [--seed 20261120] [--cases ID,...]
-                [--gke PROFILE] [--label-prefix pilot] [--dangerous]
+                [--gke PROFILE] [--label-prefix pilot] [--dangerous [--dangerous-override REASON]]
+                [--probes DIR]
 """
 import argparse
 import json
@@ -57,7 +61,16 @@ def main():
     ap.add_argument("--gke")
     ap.add_argument("--label-prefix", default="pilot")
     ap.add_argument("--dangerous", action="store_true")
+    ap.add_argument("--dangerous-override", metavar="REASON",
+                    help="run --dangerous though the containment probes haven't passed; the reason is recorded")
+    ap.add_argument("--probes", default=os.path.join(TOOLS, "runs", "probes"),
+                    help="where harness/probe_run.py wrote this venue's probe records")
     a = ap.parse_args()
+    containment = None
+    if a.dangerous:
+        sys.path.insert(0, os.path.join(TOOLS, "harness"))
+        from containment_gate import require
+        containment = require(a.gke or "local", a.probes, a.dangerous_override)
     env = dict(os.environ, **({"LAB_AGY_DANGEROUS": "1"} if a.dangerous else {}))
     cases = a.cases.split(",") if a.cases else sorted(
         c for c in os.listdir(os.path.join(TOOLS, "cases")) if os.path.exists(os.path.join(TOOLS, "cases", c, "key.json")))
@@ -66,7 +79,7 @@ def main():
     os.makedirs(os.path.join(a.out, "logs"), exist_ok=True)
     with open(os.path.join(a.out, "plan.json"), "w") as fh:
         json.dump({"seed": a.seed, "cap": a.cap, "parallel": a.parallel, "jobs": jobs, "gke": a.gke,
-                   "dangerous": a.dangerous}, fh, indent=1)
+                   "dangerous": a.dangerous, "containment": containment}, fh, indent=1, default=str)
 
     def result_path(c, r):
         return os.path.join(a.out, f"canary-{c}-{a.label_prefix}-r{r}.json")

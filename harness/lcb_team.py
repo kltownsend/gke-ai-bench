@@ -344,6 +344,12 @@ def run(n: int, out_dir: str, parallel: int = 1, cap: float = 25.0):
     if not APPLY:
         return
     M.AntigravityModel.billing_guard()
+    if os.environ.get("LAB_AGY_DANGEROUS") == "1" and not os.environ.get("LAB_CONTAINMENT"):
+        # Team two with agy's prompts off: the same gate as pilot.py --dangerous, on team two's venue.
+        sys.path.insert(0, os.path.join(TOOLS, "harness"))
+        from containment_gate import require
+        require("substrate", arg("--probes", os.path.join(TOOLS, "runs", "probes")),
+                os.environ.get("LAB_DANGEROUS_OVERRIDE"))
     lock = threading.Lock()
     state = {"spent": 0.0, "inflight": 0}
 
